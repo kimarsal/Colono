@@ -4,23 +4,22 @@ using UnityEngine;
 
 public class MapController : MonoBehaviour
 {
-    private IslandManager islandGenerator;
+    private IslandManager islandManager;
     public GameObject nextIsland;
     public GameObject ship;
     public RectTransform arrow;
 
-    private bool isWithinIslandRadius = false;
+    private float distanceToBoardIsland = 2f;
+    /*private bool isWithinIslandRadius = false;
     private bool enteredIslandRadius = false;
-    private bool exitedIslandRadius = false;
+    private bool exitedIslandRadius = false;*/
 
-    // Start is called before the first frame update
     void Start()
     {
         //S'obté el IslandGenerator
-        islandGenerator = GameObject.Find("GameManager").GetComponent<IslandManager>();
+        islandManager = GameObject.Find("GameManager").GetComponent<IslandManager>();
     }
 
-    // Update is called once per frame
     void Update()
     {
         //Es rota l'agulla de la brúixula
@@ -33,7 +32,7 @@ public class MapController : MonoBehaviour
         //ship.GetComponent<SpriteRenderer>().flipX = (transform.rotation.y < 0 && transform.rotation.y > -180);
 
         //Es comprova la distància amb les illes
-        if (enteredIslandRadius)
+        /*if (enteredIslandRadius)
         {
             enteredIslandRadius = false;
         }
@@ -44,6 +43,33 @@ public class MapController : MonoBehaviour
                 islandGenerator.GenerateIsland(transform);
                 exitedIslandRadius = false;
             }
+        }*/
+
+        bool closeToIsland = false;
+        float minDistance = 10;
+        foreach(MeshCollider meshCollider in nextIsland.transform.GetChild(0).GetComponentsInChildren<MeshCollider>())
+        {
+            Vector3 colliderClosestPoint = Physics.ClosestPoint(transform.position, meshCollider, nextIsland.transform.position, nextIsland.transform.rotation);
+            float distanceToClosestPoint = Vector3.Distance(transform.position, colliderClosestPoint);
+            if (distanceToClosestPoint < minDistance)
+            {
+                minDistance = distanceToClosestPoint;
+            }
+            if(distanceToClosestPoint < distanceToBoardIsland)
+            {
+                closeToIsland = true;
+                break;
+            }
+            
+        }
+        Debug.Log(minDistance);
+        if (closeToIsland)
+        {
+            nextIsland.GetComponent<IslandScript>().PlayerIsNear();
+        }
+        else
+        {
+            nextIsland.GetComponent<IslandScript>().PlayerLeft();
         }
     }
 
@@ -53,7 +79,7 @@ public class MapController : MonoBehaviour
     }
 
 
-    private void OnTriggerEnter(Collider other)
+    /*private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.tag == "Island")
         {
@@ -76,5 +102,5 @@ public class MapController : MonoBehaviour
             isWithinIslandRadius = false;
             exitedIslandRadius = true;
         }
-    }
+    }*/
 }

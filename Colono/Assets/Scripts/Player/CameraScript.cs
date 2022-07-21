@@ -9,7 +9,7 @@ public class CameraScript : MonoBehaviour
     private PlayerController playerController;
     private bool isFollowingPlayer = true;
     private Vector3 targetPosition;
-    private float speed = 25f;
+    private float speed = 50f;
 
     //Distància màxima amb els marges
     private float xLeftMargin = 10f;
@@ -23,7 +23,7 @@ public class CameraScript : MonoBehaviour
         //S'obté Player i el seu script
         player = GameObject.Find("Player");
         //offset = gameObject.transform.position;
-        offset = new Vector3(0, 12, -6);
+        offset = new Vector3(0, 15, -8);
         playerController = player.GetComponent<PlayerController>();
     }
 

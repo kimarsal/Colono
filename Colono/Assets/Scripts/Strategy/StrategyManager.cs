@@ -13,7 +13,7 @@ public class StrategyManager : MonoBehaviour
     private int areasNum;
     private StrategyArea settlementScript;
 
-    private Camera camera;
+    private Camera mainCamera;
 
     void Start()
     {
@@ -39,7 +39,7 @@ public class StrategyManager : MonoBehaviour
             pawns.Add(pawn);
         }
 
-        camera = GameObject.Find("Main Camera").GetComponent<Camera>();
+        mainCamera = GameObject.Find("MainCamera").GetComponent<Camera>();
     }
 
     public Vector3 GetNextPos(StrategyArea.StrategyAreaEnum area)

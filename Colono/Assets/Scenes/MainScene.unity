@@ -2963,7 +2963,7 @@ RectTransform:
   - {fileID: 992006177}
   - {fileID: 1872551643}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -3275,7 +3275,7 @@ Transform:
   m_GameObject: {fileID: 609924340}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
   m_LocalPosition: {x: 0.57, y: -1.2, z: 91.200005}
-  m_LocalScale: {x: 16, y: 22, z: 1}
+  m_LocalScale: {x: 80, y: 110, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 721529892}
@@ -4221,103 +4221,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 907104213}
   m_Mesh: {fileID: 3390558720134950976, guid: bfb3a9d2e58fd9d4f87290c8d7cd5952, type: 3}
---- !u!1001 &914330756
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 53848598, guid: 934b6a4f0d120c6478867058f35ecbbd, type: 3}
-      propertyPath: islandName
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 184347863469043429, guid: 934b6a4f0d120c6478867058f35ecbbd,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 184347863469043429, guid: 934b6a4f0d120c6478867058f35ecbbd,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0.1
-      objectReference: {fileID: 0}
-    - target: {fileID: 184347863469043429, guid: 934b6a4f0d120c6478867058f35ecbbd,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 184347863469043429, guid: 934b6a4f0d120c6478867058f35ecbbd,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -5.8
-      objectReference: {fileID: 0}
-    - target: {fileID: 184347863469043429, guid: 934b6a4f0d120c6478867058f35ecbbd,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 184347863469043429, guid: 934b6a4f0d120c6478867058f35ecbbd,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 184347863469043429, guid: 934b6a4f0d120c6478867058f35ecbbd,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 184347863469043429, guid: 934b6a4f0d120c6478867058f35ecbbd,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 184347863469043429, guid: 934b6a4f0d120c6478867058f35ecbbd,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 184347863469043429, guid: 934b6a4f0d120c6478867058f35ecbbd,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 184347863469043429, guid: 934b6a4f0d120c6478867058f35ecbbd,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 184347863469043449, guid: 934b6a4f0d120c6478867058f35ecbbd,
-        type: 3}
-      propertyPath: m_Name
-      value: Island
-      objectReference: {fileID: 0}
-    - target: {fileID: 184347863469043449, guid: 934b6a4f0d120c6478867058f35ecbbd,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 934b6a4f0d120c6478867058f35ecbbd, type: 3}
---- !u!1 &914330757 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 184347863469043449, guid: 934b6a4f0d120c6478867058f35ecbbd,
-    type: 3}
-  m_PrefabInstance: {fileID: 914330756}
-  m_PrefabAsset: {fileID: 0}
---- !u!135 &914330765
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 914330757}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &928696220
 GameObject:
   m_ObjectHideFlags: 0
@@ -4670,7 +4573,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &972433125
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4851,7 +4754,7 @@ Transform:
   - {fileID: 1340364946}
   - {fileID: 1033035499}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &972688281
 GameObject:
@@ -5123,7 +5026,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &992006177
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5143,7 +5046,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 65}
-  m_SizeDelta: {x: 225, y: 40}
+  m_SizeDelta: {x: 250, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &992006178
 MonoBehaviour:
@@ -10588,7 +10491,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1136053461}
   - component: {fileID: 1136053460}
-  - component: {fileID: 1136053462}
+  - component: {fileID: 1136053463}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -10608,15 +10511,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d1e8ae95e9bc34844b0f785b91accc9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  islandPrefab: {fileID: 184347863469043449, guid: 934b6a4f0d120c6478867058f35ecbbd,
-    type: 3}
   player: {fileID: 1628606270}
+  islandComponentsPrefab: {fileID: 184347863469043449, guid: 934b6a4f0d120c6478867058f35ecbbd,
+    type: 3}
   spotDistance: 10
   islandDistance: 50
   playerDistance: 30
   boardIslandButton: {fileID: 992006178}
   leaveIslandButton: {fileID: 1872551644}
-  cameraScript: {fileID: 0}
 --- !u!4 &1136053461
 Transform:
   m_ObjectHideFlags: 0
@@ -10630,9 +10532,9 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1136053462
+--- !u!114 &1136053463
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -10641,12 +10543,102 @@ MonoBehaviour:
   m_GameObject: {fileID: 1136053459}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8804976891a454e4c922486f16992481, type: 3}
+  m_Script: {fileID: 11500000, guid: 916b4f4143ed7456294aa19afa97bde8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  splashAudioClip: {fileID: 8300000, guid: 78ad13f4590b29b448eb205962e38a61, type: 3}
-  splashPrefab: {fileID: 9125212449759046732, guid: 001931df25717b147a7aee75662e340a,
-    type: 3}
+  noiseScale: 100
+  octaves: 10
+  persistance: 0.5
+  lacunarity: 2
+  seed: 2
+  offset: {x: 0, y: 0}
+  meshHeightMultiplier: 50
+  meshHeightCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: -0.0970459
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.3921135
+      value: 0.0067466665
+      inSlope: 0.11969591
+      outSlope: 0.11969591
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.48799574
+      value: 0.0595309
+      inSlope: 0.19425277
+      outSlope: 0.19425277
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.66847515
+      value: 0.2084804
+      inSlope: 0.16919716
+      outSlope: 0.16919716
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.82753843
+      value: 0.56445694
+      inSlope: 3.1456046
+      outSlope: 3.1456046
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1.1120291
+      value: 1.1415408
+      inSlope: 0.3251441
+      outSlope: 0.3251441
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
+  regions:
+  - name: Water Deep
+    height: 0
+    colour: {r: 0.16381918, g: 0.35942316, b: 0.74264705, a: 0}
+  - name: Water Shallow
+    height: 0.12
+    colour: {r: 0.21204588, g: 0.4037765, b: 0.7794118, a: 0}
+  - name: Sand
+    height: 0.28
+    colour: {r: 0.8235294, g: 0.81434196, b: 0.49048445, a: 0}
+  - name: Grass
+    height: 0.37
+    colour: {r: 0.33856717, g: 0.5955882, b: 0.09196584, a: 0}
+  - name: Grass 2
+    height: 0.55
+    colour: {r: 0.24139647, g: 0.41911763, b: 0.07088018, a: 0}
+  - name: Rock
+    height: 0.61
+    colour: {r: 0.35294116, g: 0.27240184, b: 0.23615916, a: 0}
+  - name: Rock2
+    height: 0.87
+    colour: {r: 0.29411763, g: 0.23507784, b: 0.20977508, a: 0}
+  - name: Snow
+    height: 0.91
+    colour: {r: 1, g: 1, b: 1, a: 0}
+  mapMaterial: {fileID: 2100000, guid: b0872f84cf3c7441d893168677410c73, type: 2}
 --- !u!1 &1167624698
 GameObject:
   m_ObjectHideFlags: 0
@@ -23031,7 +23023,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 84
   m_CollisionDetection: 0
 --- !u!4 &1628606275
 Transform:
@@ -23051,7 +23043,7 @@ Transform:
   - {fileID: 1189031231}
   - {fileID: 1254776716}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1628606276
 MonoBehaviour:
@@ -23065,7 +23057,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d7a66c15f3b9e3489db65c1cb7e0414, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nextIsland: {fileID: 914330757}
+  nextIsland: {fileID: 0}
   ship: {fileID: 1189031230}
   arrow: {fileID: 1038950656}
 --- !u!82 &1628606277
@@ -23193,7 +23185,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   COM: {x: 0, y: 0, z: 0}
-  speed: 0.05
+  speed: 0.1
   steerSpeed: 0.5
   movementThresold: 1
   MovingWaves: {fileID: 1544488646}
@@ -23395,7 +23387,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1632545968
 GameObject:
@@ -23654,7 +23646,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1684752363}
   m_LocalRotation: {x: 0.5, y: -0, z: -0, w: 0.8660254}
-  m_LocalPosition: {x: 0, y: 12, z: -6}
+  m_LocalPosition: {x: 0, y: 15, z: -8}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -23707,6 +23699,7 @@ GameObject:
   - component: {fileID: 1695702958}
   - component: {fileID: 1695702957}
   - component: {fileID: 1695702956}
+  - component: {fileID: 1695702961}
   m_Layer: 4
   m_Name: Sea
   m_TagString: Sea
@@ -23766,17 +23759,17 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   colorGradientTexture: {fileID: 0}
   shallowColor: {r: 0, g: 0.7725491, b: 0.62352943, a: 0.5019608}
-  deepColor: {r: 0.01176471, g: 0.2861874, b: 0.50980073, a: 1}
+  deepColor: {r: 0.01176471, g: 0.28618044, b: 0.50980073, a: 1}
   colorDepth: 0.84
-  horizonColor: {r: 0, g: 0.22736391, b: 0.8, a: 1}
+  horizonColor: {r: 0, g: 0.22735694, b: 0.8, a: 1}
   horizonDistance: 20
   shoreFade: 1
-  shoreColor: {r: 0, g: 0.98039216, b: 0.3018737, a: 0}
+  shoreColor: {r: 0, g: 0.98039216, b: 0.3018667, a: 0}
   shoreStrength: 0
   shoreBlend: 1
   shoreDepth: 0.74
   waveColor: {r: 0, g: 0, b: 0, a: 0}
-  underwaterColor: {r: 0.20383903, g: 0.3097168, b: 0.517647, a: 0}
+  underwaterColor: {r: 0.20383242, g: 0.30970982, b: 0.517647, a: 0}
   underwaterColorStrength: 0
   underwaterRefractionStrength: 0.099
   surfaceFoamTexture: {fileID: 2800000, guid: d3b0d77dfe711a04c8ff18ecc260aa66, type: 3}
@@ -23924,12 +23917,27 @@ Transform:
   m_GameObject: {fileID: 1695702955}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 91.7}
-  m_LocalScale: {x: 20, y: 1, z: 20}
+  m_LocalScale: {x: 100, y: 1, z: 100}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1695702961
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1695702955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8804976891a454e4c922486f16992481, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  splashAudioClip: {fileID: 8300000, guid: 78ad13f4590b29b448eb205962e38a61, type: 3}
+  splashPrefab: {fileID: 9125212449759046732, guid: 001931df25717b147a7aee75662e340a,
+    type: 3}
 --- !u!1 &1716746405
 GameObject:
   m_ObjectHideFlags: 0
@@ -24504,7 +24512,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: -100
+  orthographic size: -500
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -30542,7 +30550,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Board the island
+  m_text: Dock onto the island
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -30569,8 +30577,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
-  m_fontSizeBase: 24
+  m_fontSize: 22
+  m_fontSizeBase: 22
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 0
