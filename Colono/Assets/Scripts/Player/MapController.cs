@@ -9,7 +9,7 @@ public class MapController : MonoBehaviour
     public GameObject ship;
     public RectTransform arrow;
 
-    private float distanceToBoardIsland = 2f;
+    public float distanceToBoardIsland = 2f;
     /*private bool isWithinIslandRadius = false;
     private bool enteredIslandRadius = false;
     private bool exitedIslandRadius = false;*/
@@ -62,7 +62,7 @@ public class MapController : MonoBehaviour
             }
             
         }
-        Debug.Log(minDistance);
+        //Debug.Log(minDistance);
         if (closeToIsland)
         {
             nextIsland.GetComponent<IslandScript>().PlayerIsNear();

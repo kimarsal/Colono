@@ -13,7 +13,7 @@ public class CannonballScript : MonoBehaviour
     protected void Setup()
     {
         player = GameObject.Find("Player");
-        script = GameObject.Find("GameManager").GetComponent<CannonballMissScript>();
+        script = GameObject.Find("Sea").GetComponent<CannonballMissScript>();
         rb = GetComponent<Rigidbody>();
     }
 

@@ -5026,7 +5026,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &992006177
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5092,8 +5092,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1136053460}
-        m_TargetAssemblyTypeName: IslandManager, Assembly-CSharp
+      - m_Target: {fileID: 1136053464}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
         m_MethodName: BoardIsland
         m_Mode: 1
         m_Arguments:
@@ -9971,7 +9971,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1038950656
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10492,6 +10492,7 @@ GameObject:
   - component: {fileID: 1136053461}
   - component: {fileID: 1136053460}
   - component: {fileID: 1136053463}
+  - component: {fileID: 1136053464}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -10517,8 +10518,6 @@ MonoBehaviour:
   spotDistance: 10
   islandDistance: 50
   playerDistance: 30
-  boardIslandButton: {fileID: 992006178}
-  leaveIslandButton: {fileID: 1872551644}
 --- !u!4 &1136053461
 Transform:
   m_ObjectHideFlags: 0
@@ -10639,6 +10638,22 @@ MonoBehaviour:
     height: 0.91
     colour: {r: 1, g: 1, b: 1, a: 0}
   mapMaterial: {fileID: 2100000, guid: b0872f84cf3c7441d893168677410c73, type: 2}
+--- !u!114 &1136053464
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1136053459}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6445af1e60a530c4c9e7e06a4b444f7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isInIsland: 0
+  boardIslandButton: {fileID: 992006178}
+  leaveIslandButton: {fileID: 1872551644}
+  selectedMaterial: {fileID: 2100000, guid: f39134c924a3b4b46bc09cacd0b61b48, type: 2}
 --- !u!1 &1167624698
 GameObject:
   m_ObjectHideFlags: 0
@@ -23060,6 +23075,7 @@ MonoBehaviour:
   nextIsland: {fileID: 0}
   ship: {fileID: 1189031230}
   arrow: {fileID: 1038950656}
+  distanceToBoardIsland: 2
 --- !u!82 &1628606277
 AudioSource:
   m_ObjectHideFlags: 0
@@ -23759,17 +23775,17 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   colorGradientTexture: {fileID: 0}
   shallowColor: {r: 0, g: 0.7725491, b: 0.62352943, a: 0.5019608}
-  deepColor: {r: 0.01176471, g: 0.28618044, b: 0.50980073, a: 1}
+  deepColor: {r: 0.01176471, g: 0.2861785, b: 0.50980073, a: 1}
   colorDepth: 0.84
-  horizonColor: {r: 0, g: 0.22735694, b: 0.8, a: 1}
+  horizonColor: {r: 0, g: 0.227355, b: 0.8, a: 1}
   horizonDistance: 20
   shoreFade: 1
-  shoreColor: {r: 0, g: 0.98039216, b: 0.3018667, a: 0}
+  shoreColor: {r: 0, g: 0.98039216, b: 0.3018648, a: 0}
   shoreStrength: 0
   shoreBlend: 1
   shoreDepth: 0.74
   waveColor: {r: 0, g: 0, b: 0, a: 0}
-  underwaterColor: {r: 0.20383242, g: 0.30970982, b: 0.517647, a: 0}
+  underwaterColor: {r: 0.2038306, g: 0.3097079, b: 0.517647, a: 0}
   underwaterColorStrength: 0
   underwaterRefractionStrength: 0.099
   surfaceFoamTexture: {fileID: 2800000, guid: d3b0d77dfe711a04c8ff18ecc260aa66, type: 3}
@@ -24852,8 +24868,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1136053460}
-        m_TargetAssemblyTypeName: IslandManager, Assembly-CSharp
+      - m_Target: {fileID: 1136053464}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
         m_MethodName: LeaveIsland
         m_Mode: 1
         m_Arguments:

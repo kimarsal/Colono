@@ -31,6 +31,29 @@ public static class MeshGenerator {
 		return meshData;
 
 	}
+
+	public static MeshData GenerateCell(Vector2 pos, MeshData islandMeshData)
+    {
+		MeshData meshData = new MeshData(2, 2);
+		int[] triangles = new int[6];
+		int j = (int)(pos.x * pos.y) * 6;
+		for (int i = 0; i < 6; i++) {
+            triangles[i] = islandMeshData.triangles[j];
+			j++;
+		}
+
+		Vector3[] vertices = new Vector3[6];
+		for(int i = 0; i < 6; i ++)
+        {
+			vertices[i] = islandMeshData.vertices[triangles[i]] + new Vector3(0, 0.1f, 0);
+		}
+		Vector3[] newVertices = new Vector3[] { vertices[0], vertices[5], vertices[2], vertices[1] };
+		meshData.vertices = newVertices;
+		meshData.AddTriangle(0, 3, 2);
+		meshData.AddTriangle(3, 0, 1);
+
+		return meshData;
+	}
 }
 
 public class MeshData {

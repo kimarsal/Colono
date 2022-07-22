@@ -11,16 +11,18 @@ public class PlayerController : MonoBehaviour
 	public float steerSpeed = 5.0f;
 	public float movementThresold = 5.0f;
 
-	Transform m_COM;
-	float verticalInput;
-	float movementFactor;
-	float horizontalInput;
-	float steerFactor;
+	private Transform m_COM;
+	private float verticalInput;
+	private float movementFactor;
+	private float horizontalInput;
+	private float steerFactor;
 
 	public ParticleSystem MovingWaves;
 	public ParticleSystem StillWaves;
 	public AudioSource WavesSound;
 	private bool isStopped = true;
+
+	private GameManager gameManagerScript;
 
 	//Distància màxima amb les vores
 	private float xLeftMargin = 20f;
@@ -36,6 +38,8 @@ public class PlayerController : MonoBehaviour
 
 	private void Start()
 	{
+		gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
+
 		//S'obtenen les mides del mar
 		GameObject sea = GameObject.Find("Sea");
 		float seaWidth = sea.GetComponent<Renderer>().bounds.size.x;
@@ -51,10 +55,13 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
 	{
-		Balance();
-		Movement();
-		Steer();
-		SoundAndParticles();
+        if (!gameManagerScript.isInIsland)
+		{
+			Balance();
+			Movement();
+			Steer();
+			SoundAndParticles();
+		}
 	}
 
 	void Balance()

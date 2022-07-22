@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 public class IslandGenerator : MonoBehaviour
 {
-    public const int mapChunkSize = 241;
+    public static int mapChunkSize = 241;
     public float noiseScale;
 
     public int octaves;
@@ -31,10 +31,9 @@ public class IslandGenerator : MonoBehaviour
         falloffMap = FalloffGenerator.GenerateFalloffMap(mapChunkSize);
     }
 
-    public GameObject GenerateIsland(Vector2 position)
+    public Island GenerateIsland(Vector2 position)
     {
-        Island island = new Island(position, mapChunkSize - 1, transform, mapMaterial, this);
-        return island.island;
+        return new Island(position, transform, mapMaterial, this);
     }
 
     public MeshData GenerateTerrainMesh(MapData mapData)
@@ -45,8 +44,9 @@ public class IslandGenerator : MonoBehaviour
     public MapData GenerateMapData(Vector2 centre)
     {
         float[,] noiseMap = Noise.GenerateNoiseMap(mapChunkSize, mapChunkSize, seed, noiseScale, octaves, persistance, lacunarity, centre + offset);
-
         Color[] colourMap = new Color[mapChunkSize * mapChunkSize];
+        byte[,] regionMap = new byte[mapChunkSize, mapChunkSize];
+
         for (int y = 0; y < mapChunkSize; y++)
         {
             for (int x = 0; x < mapChunkSize; x++)
@@ -58,6 +58,7 @@ public class IslandGenerator : MonoBehaviour
                     if (currentHeight >= regions[i].height)
                     {
                         colourMap[y * mapChunkSize + x] = regions[i].colour;
+                        regionMap[x, y] = (byte)i;
                     }
                     else
                     {
@@ -67,7 +68,7 @@ public class IslandGenerator : MonoBehaviour
             }
         }
 
-        return new MapData(noiseMap, colourMap);
+        return new MapData(noiseMap, colourMap, regionMap);
     }
 
     void OnValidate()
@@ -88,55 +89,46 @@ public class IslandGenerator : MonoBehaviour
 public class Island
 {
     const float scale = 1f;
-    Vector2 position;
 
     public GameObject island;
-    MeshRenderer meshRenderer;
-    MeshFilter meshFilter;
-    MeshCollider meshCollider;
-    MeshCollider meshTriggerCollider;
-    MapData mapData;
-    Mesh mesh;
+    public MeshData meshData;
+    public byte[,] regionMap;
 
-    public Island(Vector2 coord, int size, Transform parent, Material material, IslandGenerator mapGenerator)
+    public Island(Vector2 coord, Transform parent, Material material, IslandGenerator mapGenerator)
     {
-        position = coord * size;
+        Vector2 position = coord;
         Vector3 positionV3 = new Vector3(position.x, 0, position.y);
 
         island = new GameObject("Island");
         island.tag = "Island";
-        meshRenderer = island.AddComponent<MeshRenderer>();
-        meshFilter = island.AddComponent<MeshFilter>();
-        meshCollider = island.AddComponent<MeshCollider>();
+        MeshRenderer meshRenderer = island.AddComponent<MeshRenderer>();
+        MeshFilter meshFilter = island.AddComponent<MeshFilter>();
+        MeshCollider meshCollider = island.AddComponent<MeshCollider>();
         meshRenderer.material = material;
 
         island.transform.position = positionV3 * scale;
         island.transform.parent = parent;
         island.transform.localScale = Vector3.one * scale;
 
-        mapData = mapGenerator.GenerateMapData(position);
+        MapData mapData = mapGenerator.GenerateMapData(position);
+        regionMap = mapData.regionMap;
 
         Texture2D texture = TextureGenerator.TextureFromColourMap(mapData.colourMap, IslandGenerator.mapChunkSize, IslandGenerator.mapChunkSize);
         meshRenderer.material.mainTexture = texture;
 
-        MeshData meshData = mapGenerator.GenerateTerrainMesh(mapData);
-        mesh = meshData.CreateMesh();
+        meshData = mapGenerator.GenerateTerrainMesh(mapData);
+        Mesh mesh = meshData.CreateMesh();
         meshFilter.mesh = mesh;
         meshCollider.sharedMesh = mesh;
 
-        /*GameObject islandTriggerCollider = new GameObject("IslandTriggerCollider");
-        meshTriggerCollider = islandTriggerCollider.AddComponent<MeshCollider>();
-        meshTriggerCollider.isTrigger = true;
-        meshTriggerCollider.sharedMesh = mesh;
-        islandTriggerCollider.AddComponent<DistanceWithPlayerScript>();
-        islandTriggerCollider.transform.parent = island.transform;
-        islandTriggerCollider.transform.localScale = new Vector3(1.1f, 1.1f);*/
-
         CMR.ConvexDecomposition.Bake(island, CMR.VHACDSession.Create(), null, false, true, false);
-        foreach (MeshCollider meshCollider in island.transform.GetChild(0).GetComponentsInChildren<MeshCollider>())
+        foreach (MeshCollider triggerCollider in island.transform.GetChild(0).GetComponentsInChildren<MeshCollider>())
         {
-            meshCollider.isTrigger = true;
+            triggerCollider.isTrigger = true;
         }
+
+        GameObject cells = new GameObject("Cells");
+        cells.transform.parent = island.transform;
     }
 
 }
@@ -153,10 +145,12 @@ public struct MapData
 {
     public readonly float[,] heightMap;
     public readonly Color[] colourMap;
+    public readonly byte[,] regionMap;
 
-    public MapData(float[,] heightMap, Color[] colourMap)
+    public MapData(float[,] heightMap, Color[] colourMap, byte[,] regionMap)
     {
         this.heightMap = heightMap;
         this.colourMap = colourMap;
+        this.regionMap = regionMap;
     }
 }
