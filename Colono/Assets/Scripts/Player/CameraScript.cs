@@ -84,9 +84,10 @@ public class CameraScript : MonoBehaviour
     private IEnumerator FastCameraSwipe()
     {
         float previousSpeed = speed;
+        targetPosition = player.transform.position + offset;
         float distance = Vector3.Distance(transform.position, targetPosition);
-        speed = distance / 1f; //Tornar al lloc en 1 segon
-        yield return new WaitForSeconds(1f);
+        speed = distance / 0.5f; //Tornar al lloc en 0.1 segon
+        yield return new WaitForSeconds(0.5f);
         speed = previousSpeed;
     }
 }
