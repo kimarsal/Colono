@@ -9,15 +9,18 @@ public class IslandScript : MonoBehaviour
     public GameManager gameManagerScript;
     public string islandName;
     public Material selectedMaterial;
+    public IslandCellScript islandCellScript;
+    private List<GameObject> zones;
 
     private void Start()
     {
         gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
+        zones = new List<GameObject>();
     }
 
     public void PlayerIsNear()
     {
-        gameManagerScript.PlayerIsNearIsland(transform.position, islandName, hasBeenDiscovered);
+        gameManagerScript.PlayerIsNearIsland(transform.position, this);
     }
 
     public void PlayerLeft()
@@ -25,5 +28,9 @@ public class IslandScript : MonoBehaviour
         gameManagerScript.PlayerLeftIsland();
     }
 
+    public void AddZone(GameObject zone)
+    {
+        zones.Add(zone);
+    }
 
 }

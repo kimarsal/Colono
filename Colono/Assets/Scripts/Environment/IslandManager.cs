@@ -54,10 +54,12 @@ public class IslandManager : MonoBehaviour
             //GameObject newIsland = Instantiate(islandPrefab, pos, islandPrefab.transform.rotation);
             Island newIsland = GetComponent<IslandGenerator>().GenerateIsland(new Vector2(0,80/*pos.x, pos.z*/));
 
-            newIsland.island.AddComponent<IslandScript>();
-            IslandCellScript script = newIsland.island.AddComponent<IslandCellScript>();
-            script.meshData = newIsland.meshData;
-            script.regionMap = newIsland.regionMap;
+            IslandCellScript islandCellScript = newIsland.island.AddComponent<IslandCellScript>();
+            islandCellScript.meshData = newIsland.meshData;
+            islandCellScript.regionMap = newIsland.regionMap;
+            IslandScript islandScript = newIsland.island.AddComponent<IslandScript>();
+            islandScript.islandCellScript = islandCellScript;
+            islandCellScript.islandScript = islandScript;
             mapController.FollowIsland(newIsland.island);
             islands.Add(newIsland.island);
         }

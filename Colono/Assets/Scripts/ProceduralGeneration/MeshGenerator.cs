@@ -50,6 +50,99 @@ public static class MeshGenerator {
 
 		return meshData;
 	}
+
+	public static void GetFencePositions(Vector2[] cells, MeshData islandMeshData, out Vector3[] positions, out Quaternion[] rotations)
+    {
+		int minX = IslandGenerator.mapChunkSize, maxX = 0, minY = IslandGenerator.mapChunkSize, maxY = 0;
+		foreach (Vector2 cell in cells)
+		{
+			if (cell.x < minX) minX = (int)cell.x;
+			if (cell.x > maxX) maxX = (int)cell.x;
+
+			if (cell.y < minY) minY = (int)cell.y;
+			if (cell.y > maxY) maxY = (int)cell.y;
+		}
+		int rows = maxX - minX;
+		int columns = maxY - minY;
+
+		Vector3[] newVertices;
+		positions = new Vector3[rows * 2 + columns * 2 + 4];
+		rotations = new Quaternion[rows * 2 + columns * 2 + 4];
+		int index = 0;
+		foreach (Vector2 cell in cells)
+		{
+			int vertex = 0;
+			int orientation = 0;
+			bool ok = false;
+			if (cell.y == minY && cell.x < maxX)
+			{
+				vertex = 0;
+				orientation = 0;
+				ok = true;
+			}
+			else if (cell.x == maxX && cell.y < maxY)
+            {
+				vertex = 1;
+				orientation = 1;
+				ok = true;
+			}
+			else if (cell.x == minX && cell.y > minY)
+			{
+				vertex = 2;
+				orientation = 3;
+				ok = true;
+			}
+			else if (cell.y == maxY && cell.x > minX)
+			{
+				vertex = 3;
+				orientation = 2;
+				ok = true;
+			}
+			if(ok)
+            {
+				newVertices = GetCellVertices(cell, islandMeshData);
+
+				positions[index] = newVertices[vertex] + new Vector3(0, -0.1f, 0);
+				rotations[index] = Quaternion.Euler(0, 90 * orientation, 0);
+				index++;
+
+				if(cell.y == minY && cell.x == maxX)
+                {
+					positions[index] = newVertices[0] + new Vector3(0, -0.1f, 0);
+					rotations[index] = Quaternion.Euler(0, 0, 0);
+					index++;
+				}
+				else if (cell.x == maxX && cell.y == maxY)
+                {
+					positions[index] = newVertices[1] + new Vector3(0, -0.1f, 0);
+					rotations[index] = Quaternion.Euler(0, 90, 0);
+					index++;
+				}
+				else if (cell.x == minX && cell.y == minY)
+				{
+					positions[index] = newVertices[2] + new Vector3(0, -0.1f, 0);
+					rotations[index] = Quaternion.Euler(0, 270, 0);
+					index++;
+				}
+			}
+		}
+
+		newVertices = GetCellVertices(new Vector2(minX, maxY), islandMeshData);
+		positions[index] = newVertices[3] + new Vector3(0, -0.1f, 0);
+	}
+
+	private static Vector3[] GetCellVertices(Vector2 cell, MeshData islandMeshData)
+    {
+		int j = (int)(cell.y * (IslandGenerator.mapChunkSize - 1) + cell.x) * 6;
+		Vector3[] vertices = new Vector3[6];
+		for (int i = 0; i < 6; i++)
+		{
+			vertices[i] = islandMeshData.vertices[islandMeshData.triangles[j]] + new Vector3(0, 0.1f, 0);
+			j++;
+		}
+
+		return new Vector3[] { vertices[0], vertices[5], vertices[2], vertices[1] };
+	}
 }
 
 public class MeshData {

@@ -21,6 +21,7 @@ public class IslandGenerator : MonoBehaviour
     public AnimationCurve meshHeightCurve;
 
     public TerrainType[] regions;
+    public TerrainType zoneType;
     
     public Material mapMaterial;
 
@@ -29,6 +30,9 @@ public class IslandGenerator : MonoBehaviour
     private void Start()
     {
         falloffMap = FalloffGenerator.GenerateFalloffMap(mapChunkSize);
+        zoneType.name = "Zone";
+        zoneType.colour = Color.white;
+        zoneType.height = 0;
     }
 
     public Island GenerateIsland(Vector2 position)
