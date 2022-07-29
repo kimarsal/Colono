@@ -15,6 +15,4 @@ public class IslandEditor : MonoBehaviour
 
     public GameObject[] fences;
     public GameObject post;
-
-    public Button createZoneButton;
 }

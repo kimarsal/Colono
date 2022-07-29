@@ -49,7 +49,7 @@ public class IslandGenerator : MonoBehaviour
     {
         float[,] noiseMap = Noise.GenerateNoiseMap(mapChunkSize, mapChunkSize, seed, noiseScale, octaves, persistance, lacunarity, centre + offset);
         Color[] colourMap = new Color[mapChunkSize * mapChunkSize];
-        byte[,] regionMap = new byte[mapChunkSize, mapChunkSize];
+        int[,] regionMap = new int[mapChunkSize, mapChunkSize];
 
         for (int y = 0; y < mapChunkSize; y++)
         {
@@ -62,7 +62,7 @@ public class IslandGenerator : MonoBehaviour
                     if (currentHeight >= regions[i].height)
                     {
                         colourMap[y * mapChunkSize + x] = regions[i].colour;
-                        regionMap[x, y] = (byte)i;
+                        regionMap[x, y] = i;
                     }
                     else
                     {
@@ -96,7 +96,7 @@ public class Island
 
     public GameObject island;
     public MeshData meshData;
-    public byte[,] regionMap;
+    public int[,] regionMap;
 
     public Island(Vector2 coord, Transform parent, Material material, IslandGenerator mapGenerator)
     {
@@ -150,9 +150,9 @@ public struct MapData
 {
     public readonly float[,] heightMap;
     public readonly Color[] colourMap;
-    public readonly byte[,] regionMap;
+    public readonly int[,] regionMap;
 
-    public MapData(float[,] heightMap, Color[] colourMap, byte[,] regionMap)
+    public MapData(float[,] heightMap, Color[] colourMap, int[,] regionMap)
     {
         this.heightMap = heightMap;
         this.colourMap = colourMap;

@@ -10,13 +10,13 @@ public class GameManager : MonoBehaviour
     public Button boardIslandButton;
     public Button leaveIslandButton;
     public Button createZoneButton;
+    public Button removeZoneButton;
     private bool isPlayerNearIsland = false;
 
     private struct IslandType
     {
         public Vector3 position;
-        public string name;
-        public bool hasBeenDiscovered;
+        public IslandScript islandScript;
         public IslandCellScript islandCellScript;
     }
 
@@ -37,8 +37,7 @@ public class GameManager : MonoBehaviour
             boardIslandButton.GetComponentInChildren<TextMeshProUGUI>().text = "Dock onto the island";
             boardIslandButton.gameObject.SetActive(true);
             nearbyIsland.position = islandPosition;
-            nearbyIsland.name = islandScript.islandName;
-            nearbyIsland.hasBeenDiscovered = islandScript.hasBeenDiscovered;
+            nearbyIsland.islandScript = islandScript;
             nearbyIsland.islandCellScript = islandScript.islandCellScript;
         }
     }
@@ -49,19 +48,35 @@ public class GameManager : MonoBehaviour
         cameraScript.SetIslandCamera(nearbyIsland.position);
         boardIslandButton.gameObject.SetActive(false);
         leaveIslandButton.gameObject.SetActive(true);
+
+        nearbyIsland.islandScript.PlayerEntered();
+    }
+
+    public void AreaSelected()
+    {
+        createZoneButton.gameObject.SetActive(true);
+        createZoneButton.onClick.AddListener(nearbyIsland.islandCellScript.CreateZone);
+        createZoneButton.onClick.AddListener(AreaUnelected);
+    }
+
+    public void AreaUnelected()
+    {
+        createZoneButton.gameObject.SetActive(false);
+        createZoneButton.onClick.RemoveAllListeners();
+        ZoneUnselected();
     }
 
     public void ZoneSelected()
     {
-        createZoneButton.gameObject.SetActive(true);
-        createZoneButton.onClick.AddListener(nearbyIsland.islandCellScript.CreateZone);
-        createZoneButton.onClick.AddListener(ZoneUnelected);
+        removeZoneButton.gameObject.SetActive(true);
+        removeZoneButton.onClick.AddListener(nearbyIsland.islandCellScript.DeleteZone);
+        removeZoneButton.onClick.AddListener(ZoneUnselected);
     }
 
-    public void ZoneUnelected()
+    public void ZoneUnselected()
     {
-        createZoneButton.gameObject.SetActive(false);
-        createZoneButton.onClick.RemoveAllListeners();
+        removeZoneButton.gameObject.SetActive(false);
+        removeZoneButton.onClick.RemoveAllListeners();
     }
 
     public void LeaveIsland()
@@ -71,9 +86,11 @@ public class GameManager : MonoBehaviour
         leaveIslandButton.gameObject.SetActive(false);
         boardIslandButton.gameObject.SetActive(true);
         createZoneButton.gameObject.SetActive(false);
+
+        nearbyIsland.islandScript.PLayerLeft();
     }
 
-    public void PlayerLeftIsland()
+    public void PlayerIsFarFromIsland()
     {
         boardIslandButton.gameObject.SetActive(false);
         isPlayerNearIsland = false;

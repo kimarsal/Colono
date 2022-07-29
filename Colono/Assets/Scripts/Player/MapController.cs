@@ -69,7 +69,7 @@ public class MapController : MonoBehaviour
         }
         else
         {
-            nextIsland.GetComponent<IslandScript>().PlayerLeft();
+            nextIsland.GetComponent<IslandScript>().PlayerIsFar();
         }
     }
 
