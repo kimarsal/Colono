@@ -3,6 +3,7 @@ using System.Collections;
 using System;
 using System.Threading;
 using System.Collections.Generic;
+using UnityEngine.AI;
 
 public class IslandGenerator : MonoBehaviour
 {
@@ -124,6 +125,8 @@ public class Island
         Mesh mesh = meshData.CreateMesh();
         meshFilter.mesh = mesh;
         meshCollider.sharedMesh = mesh;
+        NavMeshSurface surface = island.AddComponent<NavMeshSurface>();
+        surface.BuildNavMesh();
 
         CMR.ConvexDecomposition.Bake(island, CMR.VHACDSession.Create(), null, false, true, false);
         foreach (MeshCollider triggerCollider in island.transform.GetChild(0).GetComponentsInChildren<MeshCollider>())
