@@ -133,10 +133,6 @@ public class Island
         {
             triggerCollider.isTrigger = true;
         }
-
-        GameObject cells = new GameObject("Cells");
-        cells.transform.parent = island.transform;
-        cells.transform.localPosition = Vector3.zero;
     }
 
 }

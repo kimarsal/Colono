@@ -51,6 +51,31 @@ public static class MeshGenerator {
 		return meshData;
 	}
 
+	public static Vector3 GetBuildingPosition(Vector2[] selectedCells, Vector2 hoveredCell, int vertexIndex, MeshData islandMeshData)
+    {
+		float heightSum = 0;
+		foreach(Vector2 cell in selectedCells)
+        {
+			Vector3[] cellVertices = GetCellVertices(hoveredCell, islandMeshData);
+			heightSum += (cellVertices[0].y + cellVertices[1].y + cellVertices[2].y + cellVertices[3].y) / 4;
+		}
+		Vector3 vertex = GetCellVertices(hoveredCell, islandMeshData)[vertexIndex];
+		return new Vector3(vertex.x, heightSum / selectedCells.Length, vertex.z);
+    }
+
+	public static void GetCropPositions(Vector2[] cells, MeshData islandMeshData, out Vector3[] positions)
+    {
+		positions = new Vector3[cells.Length];
+		int index = 0;
+		foreach (Vector2 cell in cells)
+		{
+			Vector3[] newVertices = GetCellVertices(cell, islandMeshData);
+			Vector3 center = (newVertices[0] + newVertices[1] + newVertices[2] + newVertices[3]) / 4;
+			positions[index] = center + new Vector3(0, -0.1f, 0);
+			index++;
+		}
+	}
+
 	public static void GetFencePositions(Vector2[] cells, MeshData islandMeshData, out Vector3[] positions, out Quaternion[] rotations)
     {
 		int minX = IslandGenerator.mapChunkSize, maxX = 0, minY = IslandGenerator.mapChunkSize, maxY = 0;
