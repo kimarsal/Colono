@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6968755648469870603}
   - component: {fileID: 7439743356064109974}
+  - component: {fileID: 6302042194633769990}
   m_Layer: 0
   m_Name: wood_house
   m_TagString: Untagged
@@ -45,8 +46,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0a56d236f14adb4496d54279423d076, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  type: 0
   length: 5
   width: 4
+  islandCellScript: {fileID: 0}
+  cells: []
+--- !u!65 &6302042194633769990
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7781708863916176049}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 0
+  serializedVersion: 2
+  m_Size: {x: 18, y: 14, z: 16}
+  m_Center: {x: 8, y: 7, z: -6.5}
 --- !u!1001 &2966038961727908261
 PrefabInstance:
   m_ObjectHideFlags: 0

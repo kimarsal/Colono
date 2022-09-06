@@ -12,7 +12,8 @@ public class GameManager : MonoBehaviour
     public Button leaveIslandButton;
 
     public Button buildButton;
-    public GameObject selectBuildingButtons;
+    public GameObject chooseBuildingButtons;
+    public Button deleteBuildingButton;
 
     public Button createOrchardButton;
     public Button createBarnButton;
@@ -62,93 +63,102 @@ public class GameManager : MonoBehaviour
         nearbyIsland.islandScript.PlayerEntered();
     }
 
+    public void IslandDefaultButtons()
+    {
+        leaveIslandButton.gameObject.SetActive(true);
+
+        buildButton.gameObject.SetActive(true);
+        chooseBuildingButtons.SetActive(false);
+        deleteBuildingButton.gameObject.SetActive(false);
+
+        createOrchardButton.gameObject.SetActive(false);
+        createBarnButton.gameObject.SetActive(false);
+        plantButton.gameObject.SetActive(false);
+        clearPatchButton.gameObject.SetActive(false);
+
+        removeZoneButton.gameObject.SetActive(false);
+    }
+
+    public void HideButtons()
+    {
+        IslandDefaultButtons();
+        buildButton.gameObject.SetActive(false);
+        leaveIslandButton.gameObject.SetActive(false);
+    }
+
     public void Build()
     {
         buildButton.gameObject.SetActive(false);
-        selectBuildingButtons.SetActive(true);
+        chooseBuildingButtons.SetActive(true);
     }
 
-    public void SelectBuilding(int type)
+    public void ChooseBuilding(int type)
     {
-        selectBuildingButtons.SetActive(false);
+        HideButtons();
+        buildButton.gameObject.SetActive(false);
+        nearbyIsland.islandCellScript.ChooseBuilding((BuildingScript.BuildingType)type);
+    }
 
-        nearbyIsland.islandCellScript.SelectBuilding((BuildingScript.BuildingType)type);
+    public void SelectBuilding(BuildingScript.BuildingType type)
+    {
+        IslandDefaultButtons();
+        buildButton.gameObject.SetActive(false);
+        deleteBuildingButton.gameObject.SetActive(true);
+    }
+
+    public void DeleteBuilding()
+    {
+        nearbyIsland.islandCellScript.DeleteBuilding();
+        IslandDefaultButtons();
     }
 
     public void AreaSelected()
     {
+        IslandDefaultButtons();
         buildButton.gameObject.SetActive(false);
-        selectBuildingButtons.SetActive(false);
-
         createOrchardButton.gameObject.SetActive(true);
-        createOrchardButton.onClick.AddListener(nearbyIsland.islandCellScript.CreateOrchard);
-        createOrchardButton.onClick.AddListener(AreaUnselected);
-
         createBarnButton.gameObject.SetActive(true);
-        createBarnButton.onClick.AddListener(nearbyIsland.islandCellScript.CreateBarn);
-        createBarnButton.onClick.AddListener(AreaUnselected);
     }
 
-    public void AreaUnselected()
+    public void CreateZone(int type)
     {
-        buildButton.gameObject.SetActive(true);
-
-        createOrchardButton.gameObject.SetActive(false);
-        createOrchardButton.onClick.RemoveAllListeners();
-        createBarnButton.gameObject.SetActive(false);
-        createBarnButton.onClick.RemoveAllListeners();
+        nearbyIsland.islandCellScript.CreateZone((ZoneScript.ZoneType) type);
+        IslandDefaultButtons();
     }
 
     public void ZoneSelected(ZoneScript.ZoneType type)
     {
+        IslandDefaultButtons();
         buildButton.gameObject.SetActive(false);
-        selectBuildingButtons.SetActive(false);
-
         removeZoneButton.gameObject.SetActive(true);
-        if (type == ZoneScript.ZoneType.Orchard)
-        {
-            removeZoneButton.onClick.AddListener(nearbyIsland.islandCellScript.DeleteOrchard);
-        }
-        else
-        {
-            removeZoneButton.onClick.AddListener(nearbyIsland.islandCellScript.DeleteBarn);
-        }
-        removeZoneButton.onClick.AddListener(ZoneUnselected);
     }
 
-    public void ZoneUnselected()
+    public void DeleteZone()
     {
-        buildButton.gameObject.SetActive(true);
-
-        removeZoneButton.gameObject.SetActive(false);
-        removeZoneButton.onClick.RemoveAllListeners();
+        nearbyIsland.islandCellScript.DeleteZone();
+        IslandDefaultButtons();
     }
-
+    
     public void PatchSelected(bool isPatchEmpty)
     {
         buildButton.gameObject.SetActive(false);
-        selectBuildingButtons.SetActive(false);
+        chooseBuildingButtons.SetActive(false);
 
         plantButton.gameObject.SetActive(true);
-        plantButton.onClick.AddListener(nearbyIsland.islandCellScript.Plant);
-        plantButton.onClick.AddListener(PatchUnselected);
-
         if (!isPatchEmpty)
         {
             clearPatchButton.gameObject.SetActive(true);
-            clearPatchButton.onClick.AddListener(nearbyIsland.islandCellScript.ClearPatch);
-            clearPatchButton.onClick.AddListener(PatchUnselected);
         }
     }
 
-    public void PatchUnselected()
+    public void Plant()
     {
-        buildButton.gameObject.SetActive(true);
+        nearbyIsland.islandCellScript.Plant();
+    }
 
-        plantButton.gameObject.SetActive(false);
-        plantButton.onClick.RemoveAllListeners();
-        clearPatchButton.gameObject.SetActive(false);
-        clearPatchButton.onClick.RemoveAllListeners();
+    public void ClearPatch()
+    {
+        nearbyIsland.islandCellScript.ClearPatch();
     }
 
     public void LeaveIsland()
@@ -158,7 +168,7 @@ public class GameManager : MonoBehaviour
         leaveIslandButton.gameObject.SetActive(false);
         boardIslandButton.gameObject.SetActive(true);
         buildButton.gameObject.SetActive(false);
-        selectBuildingButtons.SetActive(false);
+        chooseBuildingButtons.SetActive(false);
         createOrchardButton.gameObject.SetActive(false);
         createBarnButton.gameObject.SetActive(false);
 

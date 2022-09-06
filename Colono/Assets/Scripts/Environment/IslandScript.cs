@@ -5,16 +5,34 @@ using UnityEngine.EventSystems;
 
 public class IslandScript : MonoBehaviour
 {
+    public enum ItemType { Tree, Bush, Rock, Flower, Miscellaneous};
     public bool hasBeenDiscovered = false;
     public GameManager gameManagerScript;
     public string islandName;
     public Material selectedMaterial;
     public IslandCellScript islandCellScript;
+
     private GameObject convexColliders;
+    public GameObject trees;
+    public GameObject bushes;
+    public GameObject rocks;
+    public GameObject flowers;
+    public GameObject miscellaneous;
+
     public GameObject cells;
     public GameObject buildings;
     public GameObject zones;
+
+    private List<GameObject> treesList = new List<GameObject>();
+    private List<GameObject> bushesList = new List<GameObject>();
+    private List<GameObject> rocksList = new List<GameObject>();
+    private List<GameObject> flowersList = new List<GameObject>();
+    private List<GameObject> miscellaneousList = new List<GameObject>();
+
     private List<GameObject> zonesList = new List<GameObject>();
+    private List<GameObject> buildingsList = new List<GameObject>();
+
+    private List<Vector2> takenCells = new List<Vector2>();
 
     private void Start()
     {
@@ -52,6 +70,47 @@ public class IslandScript : MonoBehaviour
     public void PlayerIsFar()
     {
         gameManagerScript.PlayerIsFarFromIsland();
+    }
+
+    public bool isCellAvailable(Vector2 cell)
+    {
+        return !takenCells.Contains(cell);
+    }
+
+    public void AddItem(GameObject item, ItemType type, Vector2 cell)
+    {
+        switch (type)
+        {
+            case ItemType.Tree: treesList.Add(item); break;
+            case ItemType.Rock: rocksList.Add(item); break;
+            case ItemType.Bush: bushesList.Add(item); break;
+            case ItemType.Flower: flowersList.Add(item); break;
+            case ItemType.Miscellaneous: miscellaneousList.Add(item); break;
+        }
+        takenCells.Add(cell);
+    }
+
+    public void RemoveItem(GameObject item, ItemType type, Vector2 cell)
+    {
+        switch (type)
+        {
+            case ItemType.Tree: treesList.Remove(item); break;
+            case ItemType.Rock: rocksList.Remove(item); break;
+            case ItemType.Bush: bushesList.Remove(item); break;
+            case ItemType.Flower: flowersList.Remove(item); break;
+            case ItemType.Miscellaneous: miscellaneousList.Remove(item); break;
+        }
+        takenCells.Remove(cell);
+    }
+
+    public void AddBuilding(GameObject building)
+    {
+        buildingsList.Add(building);
+    }
+
+    public void RemoveBuilding(GameObject building)
+    {
+        buildingsList.Remove(building);
     }
 
     public void AddZone(GameObject zone)

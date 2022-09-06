@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4212759614877374561}
   - component: {fileID: 4466449268142896528}
+  - component: {fileID: 6398704646448144681}
   m_Layer: 0
   m_Name: stone_house
   m_TagString: Untagged
@@ -45,8 +46,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0a56d236f14adb4496d54279423d076, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  type: 1
   length: 4
   width: 4
+  orientation: 0
+  islandCellScript: {fileID: 0}
+  cells: []
+--- !u!65 &6398704646448144681
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3548108767819252443}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 0
+  serializedVersion: 2
+  m_Size: {x: 15, y: 12, z: 13}
+  m_Center: {x: 7, y: 6, z: -6}
 --- !u!1001 &6686442797446240091
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -133,6 +133,8 @@ public class Island
         {
             triggerCollider.isTrigger = true;
         }
+
+
     }
 
 }

@@ -69,11 +69,16 @@ public static class MeshGenerator {
 		int index = 0;
 		foreach (Vector2 cell in cells)
 		{
-			Vector3[] newVertices = GetCellVertices(cell, islandMeshData);
-			Vector3 center = (newVertices[0] + newVertices[1] + newVertices[2] + newVertices[3]) / 4;
-			positions[index] = center + new Vector3(0, -0.1f, 0);
+			positions[index] = GetItemPosition(cell, islandMeshData);
 			index++;
 		}
+	}
+
+	public static Vector3 GetItemPosition(Vector2 cell, MeshData islandMeshData)
+    {
+		Vector3[] newVertices = GetCellVertices(cell, islandMeshData);
+		Vector3 center = (newVertices[0] + newVertices[1] + newVertices[2] + newVertices[3]) / 4;
+		return center + new Vector3(0, -0.1f, 0);
 	}
 
 	public static void GetFencePositions(Vector2[] cells, MeshData islandMeshData, out Vector3[] positions, out Quaternion[] rotations)

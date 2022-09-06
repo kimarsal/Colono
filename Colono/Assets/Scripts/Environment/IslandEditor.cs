@@ -16,6 +16,7 @@ public class IslandEditor : MonoBehaviour
     [Header("Buildings")]
     public GameObject woodHouse;
     public GameObject stoneHouse;
+    public GameObject mine;
 
     [Header("Fences")]
     public GameObject[] fences;
@@ -25,4 +26,11 @@ public class IslandEditor : MonoBehaviour
 
     [Header("Crops")]
     public GameObject tomato;
+
+    [Header("Decorations")]
+    public GameObject[] trees;
+    public GameObject[] bushes;
+    public GameObject[] rocks;
+    public GameObject[] flowers;
+    public GameObject[] miscellaneous;
 }
