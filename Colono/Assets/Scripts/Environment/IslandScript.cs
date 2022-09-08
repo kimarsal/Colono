@@ -135,5 +135,25 @@ public class IslandScript : MonoBehaviour
         }
         return null;
     }
+    public GameObject GetConstructionByCell(Vector2 cell)
+    {
+        foreach (GameObject zone in zonesList)
+        {
+            Vector2[] cells = zone.GetComponent<ZoneScript>().cells;
+            for (int i = 0; i < cells.Length; i++)
+            {
+                if (cells[i] == cell) return zone;
+            }
+        }
+        foreach (GameObject building in buildingsList)
+        {
+            Vector2[] cells = building.GetComponent<BuildingScript>().cells;
+            for (int i = 0; i < cells.Length; i++)
+            {
+                if (cells[i] == cell) return building;
+            }
+        }
+        return null;
+    }
 
 }

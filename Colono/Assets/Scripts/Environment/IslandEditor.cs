@@ -33,4 +33,7 @@ public class IslandEditor : MonoBehaviour
     public GameObject[] rocks;
     public GameObject[] flowers;
     public GameObject[] miscellaneous;
+
+    [Header("Others")]
+    public GameObject coastObstacle;
 }

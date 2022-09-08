@@ -1926,9 +1926,10 @@ GameObject:
   m_Component:
   - component: {fileID: 4459264826425738264}
   - component: {fileID: 7710815050402750050}
-  - component: {fileID: 5962741931916985627}
   - component: {fileID: 2945593008337719013}
   - component: {fileID: -6809046889581306478}
+  - component: {fileID: 8777550085024709020}
+  - component: {fileID: 7555130144577166092}
   m_Layer: 0
   m_Name: PT_Medieval_Male_Modular_Free_Pack
   m_TagString: Untagged
@@ -1978,28 +1979,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &5962741931916985627
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3938869664887627426}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a316a278638fb7a46858fccb4a70e4bd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 2
-  rotateSpeed: 4
-  head1: {fileID: 1953896830827328188}
-  head2: {fileID: 2938323828424686716}
-  lowerNaked: {fileID: 4187010985156663354}
-  upperNaked: {fileID: 3263698359296160001}
-  lowerClothed: {fileID: 1986968037048491704}
-  upperClothed: {fileID: 1125232617463963011}
-  material: {fileID: 2100000, guid: c79855c6f54ed954293d041acc3120a8, type: 2}
-  isNaked: 0
 --- !u!54 &2945593008337719013
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2030,6 +2009,52 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &8777550085024709020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3938869664887627426}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c13b48975d1134468592b6cd0280f17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  walkSpeed: 2
+  runSpeed: 4
+  rotateSpeed: 4
+  head1: {fileID: 1953896830827328188}
+  head2: {fileID: 2938323828424686716}
+  lowerNaked: {fileID: 4187010985156663354}
+  upperNaked: {fileID: 3263698359296160001}
+  lowerClothed: {fileID: 1986968037048491704}
+  upperClothed: {fileID: 1125232617463963011}
+  material: {fileID: 2100000, guid: c79855c6f54ed954293d041acc3120a8, type: 2}
+  isNaked: 0
+  axe: {fileID: 3854085465935333273}
+--- !u!195 &7555130144577166092
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3938869664887627426}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
 --- !u!1 &3984568644409324313
 GameObject:
   m_ObjectHideFlags: 0
@@ -3277,17 +3302,17 @@ PrefabInstance:
     - target: {fileID: 1387593904142060389, guid: 703d27ff5c2925b46a1af4bd476753a2,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.0846
+      value: -0.054
       objectReference: {fileID: 0}
     - target: {fileID: 1387593904142060389, guid: 703d27ff5c2925b46a1af4bd476753a2,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.1831
+      value: 0.188
       objectReference: {fileID: 0}
     - target: {fileID: 1387593904142060389, guid: 703d27ff5c2925b46a1af4bd476753a2,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.0108
+      value: -0.026
       objectReference: {fileID: 0}
     - target: {fileID: 1387593904142060389, guid: 703d27ff5c2925b46a1af4bd476753a2,
         type: 3}
@@ -3329,8 +3354,19 @@ PrefabInstance:
       propertyPath: m_Name
       value: Axe
       objectReference: {fileID: 0}
+    - target: {fileID: 1732313423079985631, guid: 703d27ff5c2925b46a1af4bd476753a2,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 703d27ff5c2925b46a1af4bd476753a2, type: 3}
+--- !u!1 &3854085465935333273 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1732313423079985631, guid: 703d27ff5c2925b46a1af4bd476753a2,
+    type: 3}
+  m_PrefabInstance: {fileID: 3275840615258035782}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &4483235448522677539 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1387593904142060389, guid: 703d27ff5c2925b46a1af4bd476753a2,

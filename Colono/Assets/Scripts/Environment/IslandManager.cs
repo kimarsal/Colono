@@ -94,7 +94,14 @@ public class IslandManager : MonoBehaviour
                 Debug.Log(itemCell);
                 if (itemPos.y > 0 && islandScript.isCellAvailable(itemCell))
                 {
-                    IslandScript.ItemType type = (IslandScript.ItemType)UnityEngine.Random.Range(0, System.Enum.GetNames(typeof(IslandScript.ItemType)).Length);
+                    float typeFloat = UnityEngine.Random.Range(0f, 1f);
+                    IslandScript.ItemType type = IslandScript.ItemType.Tree;
+                    if (typeFloat >= 0.9f) type = IslandScript.ItemType.Miscellaneous;
+                    else if (typeFloat >= 0.8f) type = IslandScript.ItemType.Flower;
+                    else if (typeFloat >= 0.6f) type = IslandScript.ItemType.Rock;
+                    else if (typeFloat >= 0.4f) type = IslandScript.ItemType.Bush;
+                    //IslandScript.ItemType type = (IslandScript.ItemType)UnityEngine.Random.Range(0, System.Enum.GetNames(typeof(IslandScript.ItemType)).Length);
+
                     Transform parent = null;
                     GameObject prefab = null;
 
@@ -111,7 +118,7 @@ public class IslandManager : MonoBehaviour
                     islandScript.AddItem(item, type, itemCell);
                 }
 
-                int inc = UnityEngine.Random.Range(1, 5);
+                int inc = UnityEngine.Random.Range(1, 8);
                 col += inc;
                 if(col >= IslandGenerator.mapChunkSize - 2)
                 {

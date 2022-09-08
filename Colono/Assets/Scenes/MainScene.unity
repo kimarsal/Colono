@@ -108,7 +108,7 @@ NavMeshSettings:
     agentTypeID: 0
     agentRadius: 0.5
     agentHeight: 2
-    agentSlope: 45
+    agentSlope: 60
     agentClimb: 0.4
     ledgeDropHeight: 0
     maxJumpAcrossDistance: 0
@@ -11756,7 +11756,7 @@ GameObject:
   - component: {fileID: 1136053465}
   m_Layer: 0
   m_Name: GameManager
-  m_TagString: Untagged
+  m_TagString: GameController
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -12055,6 +12055,8 @@ MonoBehaviour:
   - {fileID: 8654195590048485544, guid: ddef13a9e8499c74697c8ae2b6bd9ef0, type: 3}
   - {fileID: 7408531958150532835, guid: 637e89fdcdb5b1b4cb5ca8f4abfceaec, type: 3}
   - {fileID: 7654421513802765652, guid: 263e3c5282f63034d80bbd62714128b3, type: 3}
+  coastObstacle: {fileID: 8685251012979703901, guid: 8c5fe9fa70946b64686598aa40199a59,
+    type: 3}
 --- !u!1 &1167624698
 GameObject:
   m_ObjectHideFlags: 0
@@ -25880,7 +25882,7 @@ GameObject:
   m_TagString: Sea
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!114 &1695702956
 MonoBehaviour:
@@ -25934,17 +25936,17 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   colorGradientTexture: {fileID: 0}
   shallowColor: {r: 0, g: 0.7725491, b: 0.62352943, a: 0.5019608}
-  deepColor: {r: 0.01176471, g: 0.28612447, b: 0.50980073, a: 1}
+  deepColor: {r: 0.01176471, g: 0.2861202, b: 0.50980073, a: 1}
   colorDepth: 0.84
-  horizonColor: {r: 0, g: 0.22730097, b: 0.8, a: 1}
+  horizonColor: {r: 0, g: 0.22729671, b: 0.8, a: 1}
   horizonDistance: 20
   shoreFade: 1
-  shoreColor: {r: 0, g: 0.98039216, b: 0.30181077, a: 0}
+  shoreColor: {r: 0, g: 0.98039216, b: 0.3018065, a: 0}
   shoreStrength: 0
   shoreBlend: 1
   shoreDepth: 0.74
   waveColor: {r: 0, g: 0, b: 0, a: 0}
-  underwaterColor: {r: 0.20377937, g: 0.30965385, b: 0.517647, a: 0}
+  underwaterColor: {r: 0.20377535, g: 0.30964962, b: 0.517647, a: 0}
   underwaterColorStrength: 0
   underwaterRefractionStrength: 0.099
   surfaceFoamTexture: {fileID: 2800000, guid: d3b0d77dfe711a04c8ff18ecc260aa66, type: 3}

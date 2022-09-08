@@ -1,14 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class PeasantScript : MonoBehaviour
 {
-    public float speed;
+    public float walkSpeed;
+    public float runSpeed;
     public float rotateSpeed;
+    private bool isRunning = false;
     private Vector3 nextPos;
     private Rigidbody rb;
 
+    protected enum PeasantState { Moving, Chopping, Planting, Gathering, Dancing };
+    protected Animator animator;
+    private NavMeshAgent navMeshAgent;
+
+    [Header("Appearence")]
     public GameObject head1;
     public GameObject head2;
 
@@ -24,8 +32,6 @@ public class PeasantScript : MonoBehaviour
     private GameObject upper;
 
     public bool isNaked = false;
-    private enum PeasantState { Idle, Walking, Chopping, Gathering};
-    private Animator animator;
 
     void Start()
     {
@@ -34,8 +40,11 @@ public class PeasantScript : MonoBehaviour
         rb = GetComponent<Rigidbody>();
 
         animator = GetComponent<Animator>();
+
+        navMeshAgent = GetComponent<NavMeshAgent>();
+
         animator.SetInteger("State", (int)PeasantState.Chopping);
-        nextPos = transform.position;
+        //StartCoroutine(WaitForNextDestination());
     }
 
     public void SetAppearence()
@@ -81,28 +90,33 @@ public class PeasantScript : MonoBehaviour
         upper.GetComponent<SkinnedMeshRenderer>().material = newMaterial;
     }
 
-    void Update()
+    protected void CheckIfArrivedAtDestination()
     {
-        /*if (Input.GetKeyDown(KeyCode.W))
-            animator.SetInteger("State", (int)PeasantState.Walking);*/
-        if (Input.GetKeyDown(KeyCode.C))
-            animator.SetInteger("State", (int)PeasantState.Chopping);
-        if (Input.GetKeyDown(KeyCode.G))
-            animator.SetInteger("State", (int)PeasantState.Gathering);
-        /*if (Vector3.Distance(transform.position, nextPos) < 0.01f)
+        if (!navMeshAgent.isStopped && Vector3.Distance(transform.position, navMeshAgent.destination) < 0.01f)
         {
-            nextPos = new Vector3(Random.Range(NPCManager.minX, NPCManager.maxX), 0f, Random.Range(NPCManager.minZ, NPCManager.maxZ));
-            //animator.SetInteger("State", (int)PeasantState.Chopping);
+            StopCharacter();
+            StartCoroutine(WaitForNextDestination());
         }
-        transform.position = Vector3.MoveTowards(transform.position, nextPos, speed * Time.deltaTime);
+    }
 
-        Vector3 targetDirection = nextPos - transform.position;
-        if (targetDirection != Vector3.zero)
-        {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetDirection), rotateSpeed * Time.deltaTime);
-            transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
-        }*/
+    protected void StopCharacter()
+    {
+        navMeshAgent.isStopped = true;
+        animator.SetFloat("Speed", 0);
+    }
 
-        animator.SetFloat("Speed", rb.velocity.magnitude);
+    protected IEnumerator WaitForNextDestination()
+    {
+        yield return new WaitForSeconds(1f);
+        SetDestination(new Vector3(Random.Range(NPCManager.minX, NPCManager.maxX), 0f, Random.Range(NPCManager.minZ, NPCManager.maxZ)));
+    }
+
+    public void SetDestination(Vector3 destination)
+    {
+        navMeshAgent.destination = destination;
+        navMeshAgent.isStopped = false;
+        navMeshAgent.speed = isRunning ? runSpeed : walkSpeed;
+        animator.SetFloat("Speed", isRunning ? 1 : 0.5f);
+        animator.SetInteger("State", (int)PeasantState.Moving);
     }
 }

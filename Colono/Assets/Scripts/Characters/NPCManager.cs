@@ -41,9 +41,9 @@ public class NPCManager : MonoBehaviour
             GameObject prefab = malePeasantPrefab;
             switch (i % 3)
             {
-                case 0:
-                    prefab = femalePeasantPrefab; break;
                 case 1:
+                    prefab = femalePeasantPrefab; break;
+                case 2:
                     prefab = childPeasantPrefab; break;
             }
             Instantiate(prefab, new Vector3(Random.Range(minX, maxX), 0f, Random.Range(minZ, maxZ)), prefab.transform.rotation);

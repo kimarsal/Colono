@@ -99,13 +99,15 @@ public class Island
     public MeshData meshData;
     public int[,] regionMap;
 
-    public Island(Vector2 coord, Transform parent, Material material, IslandGenerator mapGenerator)
+    public Island(Vector2 coord, Transform parent, Material material, IslandGenerator islandGenerator)
     {
         Vector2 position = coord;
         Vector3 positionV3 = new Vector3(position.x, 0, position.y);
 
         island = new GameObject("Island");
         island.tag = "Island";
+        island.isStatic = true;
+
         MeshRenderer meshRenderer = island.AddComponent<MeshRenderer>();
         MeshFilter meshFilter = island.AddComponent<MeshFilter>();
         MeshCollider meshCollider = island.AddComponent<MeshCollider>();
@@ -115,16 +117,26 @@ public class Island
         island.transform.parent = parent;
         island.transform.localScale = Vector3.one * scale;
 
-        MapData mapData = mapGenerator.GenerateMapData(position);
+        MapData mapData = islandGenerator.GenerateMapData(position);
         regionMap = mapData.regionMap;
 
         Texture2D texture = TextureGenerator.TextureFromColourMap(mapData.colourMap, IslandGenerator.mapChunkSize, IslandGenerator.mapChunkSize);
         meshRenderer.material.mainTexture = texture;
 
-        meshData = mapGenerator.GenerateTerrainMesh(mapData);
+        meshData = islandGenerator.GenerateTerrainMesh(mapData);
         Mesh mesh = meshData.CreateMesh();
         meshFilter.mesh = mesh;
         meshCollider.sharedMesh = mesh;
+
+        /*GameObject coastObstacle = new GameObject("CoastObstacle");
+        coastObstacle.transform.localPosition = new Vector3(0, -1, 0);
+        coastObstacle.transform.localScale = new Vector3(250, 1, 250);
+        coastObstacle.AddComponent<NavMeshObstacle>();
+        coastObstacle.transform.parent = island.transform;*/
+        IslandEditor islandEditor = GameObject.FindGameObjectWithTag("GameController").GetComponent<IslandEditor>();
+        /*GameObject coastObstacle = GameObject.Instantiate(islandEditor.coastObstacle, island.transform);
+        coastObstacle.transform.position = island.transform.position + new Vector3(0, -1, 0);*/
+
         NavMeshSurface surface = island.AddComponent<NavMeshSurface>();
         surface.BuildNavMesh();
 

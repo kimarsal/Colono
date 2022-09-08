@@ -4,11 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class ZoneScript : MonoBehaviour, IPointerClickHandler
+public class ZoneScript : ConstructionScript, IPointerClickHandler
 {
     public enum ZoneType { Orchard, Barn };
-    public IslandCellScript islandCellScript;
-    public Vector2[] cells;
     public ZoneType type;
 
     public GameObject openGate;

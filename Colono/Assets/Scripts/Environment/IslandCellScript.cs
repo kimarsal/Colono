@@ -19,6 +19,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     private GameObject[,] cells;
 
     private Vector2 hoveredCell;
+    private Vector2[] hoveredCells = new Vector2[0];
     private Vector2 selectedCell;
     private Vector2[] selectedCells = new Vector2[0];
     private bool wasOtherCellHovered = false;
@@ -303,35 +304,53 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
                 /*try
                 {*/
-                    if (wasOtherCellHovered)
+                if (wasOtherCellHovered)
+                {
+                    if (selectedCells.Contains(hoveredCell)) //L'anterior cel·la hovered estava seleccionada
                     {
-                        if (selectedCells.Contains(hoveredCell)) //L'anterior cel·la hovered estava seleccionada
-                        {
-                            cells[(int)hoveredCell.x, (int)hoveredCell.y].GetComponent<MeshRenderer>().material = islandEditorScript.selectedMaterial;
-                        }
-                        else
-                        {
-                            Destroy(cells[(int)hoveredCell.x, (int)hoveredCell.y].gameObject); //S'elimina l'anterior cel·la hovered
-                        }
+                        cells[(int)hoveredCell.x, (int)hoveredCell.y].GetComponent<MeshRenderer>().material = islandEditorScript.selectedMaterial;
                     }
-
-                    if (regionMap[x, y] >= 0 && (regionMap[x, y] > 10 || islandGeneratorScript.regions[regionMap[x, y]].name == "Grass")) //Si la cel·la és gespa
+                    else if(hoveredCells.Length > 0)
                     {
-                        hoveredCell = new Vector2(x, y);
-                        if (selectedCells.Contains(hoveredCell)) //La nova cel·la hovered està seleccionada
+                        for (int i = 0; i < hoveredCells.Length; i++)
                         {
-                            cells[(int)hoveredCell.x, (int)hoveredCell.y].GetComponent<MeshRenderer>().material = islandEditorScript.selectedHoverMaterial;
+                            Destroy(cells[(int)hoveredCells[i].x, (int)hoveredCells[i].y].gameObject);
                         }
-                        else
-                        {
-                            CreateCell(hoveredCell, islandEditorScript.hoverMaterial);
-                        }
-                        wasOtherCellHovered = true;
+                        hoveredCells = new Vector2[0];
                     }
                     else
                     {
-                        wasOtherCellHovered = false;
+                        Destroy(cells[(int)hoveredCell.x, (int)hoveredCell.y].gameObject); //S'elimina l'anterior cel·la hovered
                     }
+                }
+
+                if (regionMap[x, y] < 0)
+                {
+                    GameObject construction = islandScript.GetConstructionByCell(selectedCell);
+                    hoveredCells = construction.GetComponent<ConstructionScript>().cells;
+
+                    foreach (Vector2 cell in hoveredCells)
+                    {
+                        CreateCell(cell, islandEditorScript.hoverMaterial);
+                    }
+                } 
+                else if (regionMap[x, y] > 10 || islandGeneratorScript.regions[regionMap[x, y]].name == "Grass") //Si la cel·la és gespa
+                {
+                    hoveredCell = new Vector2(x, y);
+                    if (selectedCells.Contains(hoveredCell)) //La nova cel·la hovered està seleccionada
+                    {
+                        cells[(int)hoveredCell.x, (int)hoveredCell.y].GetComponent<MeshRenderer>().material = islandEditorScript.selectedHoverMaterial;
+                    }
+                    else
+                    {
+                        CreateCell(hoveredCell, islandEditorScript.hoverMaterial);
+                    }
+                    wasOtherCellHovered = true;
+                }
+                else
+                {
+                    wasOtherCellHovered = false;
+                }
                 /*}
                 catch (Exception e)
                 {
@@ -490,8 +509,8 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     private void InvertRegions(Vector2[] cells, bool isOrchard, bool deletingZone = false)
     {
-        int minX = (int)cells[0].x - 1, maxX = (int)cells[cells.Length - 1].x + 1;
-        int minY = (int)cells[0].y - 1, maxY = (int)cells[cells.Length - 1].y + 1;
+        int minX = (int)cells[0].x, maxX = (int)cells[cells.Length - 1].x;
+        int minY = (int)cells[0].y, maxY = (int)cells[cells.Length - 1].y;
 
         if (isOrchard)
         {
