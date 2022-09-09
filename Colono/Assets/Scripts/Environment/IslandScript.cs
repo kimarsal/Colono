@@ -32,7 +32,7 @@ public class IslandScript : MonoBehaviour
     private List<GameObject> zonesList = new List<GameObject>();
     private List<GameObject> buildingsList = new List<GameObject>();
 
-    private List<Vector2> takenCells = new List<Vector2>();
+    private Dictionary<Vector2, GameObject> items = new Dictionary<Vector2, GameObject>();
 
     private void Start()
     {
@@ -72,14 +72,15 @@ public class IslandScript : MonoBehaviour
         gameManagerScript.PlayerIsFarFromIsland();
     }
 
-    public bool isCellAvailable(Vector2 cell)
+    public bool isCellTaken(Vector2 cell)
     {
-        return !takenCells.Contains(cell);
+        //return !takenCells.Contains(cell);
+        return items.ContainsKey(cell);
     }
 
     public void AddItem(GameObject item, ItemType type, Vector2 cell)
     {
-        switch (type)
+        /*switch (type)
         {
             case ItemType.Tree: treesList.Add(item); break;
             case ItemType.Rock: rocksList.Add(item); break;
@@ -87,12 +88,24 @@ public class IslandScript : MonoBehaviour
             case ItemType.Flower: flowersList.Add(item); break;
             case ItemType.Miscellaneous: miscellaneousList.Add(item); break;
         }
-        takenCells.Add(cell);
+        takenCells.Add(cell);*/
+        items.Add(cell, item);
     }
 
-    public void RemoveItem(GameObject item, ItemType type, Vector2 cell)
+    public void ClearArea(Vector2[] cells)
     {
-        switch (type)
+        foreach(Vector2 cell in cells)
+        {
+            if (isCellTaken(cell))
+            {
+                RemoveItemAtCell(cell);
+            }
+        }
+    }
+
+    public void RemoveItemAtCell(Vector2 cell)
+    {
+        /*switch (type)
         {
             case ItemType.Tree: treesList.Remove(item); break;
             case ItemType.Rock: rocksList.Remove(item); break;
@@ -100,7 +113,25 @@ public class IslandScript : MonoBehaviour
             case ItemType.Flower: flowersList.Remove(item); break;
             case ItemType.Miscellaneous: miscellaneousList.Remove(item); break;
         }
-        takenCells.Remove(cell);
+        takenCells.Remove(cell);*/
+        GameObject item = items[cell];
+        items.Remove(cell);
+        Destroy(item);
+    }
+
+    public void RemoveItem(GameObject item, ItemType type, Vector2 cell)
+    {
+        /*switch (type)
+        {
+            case ItemType.Tree: treesList.Remove(item); break;
+            case ItemType.Rock: rocksList.Remove(item); break;
+            case ItemType.Bush: bushesList.Remove(item); break;
+            case ItemType.Flower: flowersList.Remove(item); break;
+            case ItemType.Miscellaneous: miscellaneousList.Remove(item); break;
+        }
+        takenCells.Remove(cell);*/
+        items.Remove(cell);
+        Destroy(item);
     }
 
     public void AddBuilding(GameObject building)
@@ -128,29 +159,35 @@ public class IslandScript : MonoBehaviour
         foreach(GameObject zone in zonesList)
         {
             Vector2[] cells = zone.GetComponent<ZoneScript>().cells;
-            for(int i = 0; i < cells.Length; i++)
+            if(cell.x >= cells[0].x && cell.x <= cells[cells.Length - 1].x
+                && cell.y >= cells[0].y && cell.y <= cells[cells.Length - 1].y)
             {
-                if (cells[i] == cell) return zone;
+                return zone;
             }
         }
         return null;
     }
-    public GameObject GetConstructionByCell(Vector2 cell)
+
+    public GameObject GetConstructionByCell(Vector2 cell, out bool isBuilding)
     {
+        isBuilding = false;
         foreach (GameObject zone in zonesList)
         {
             Vector2[] cells = zone.GetComponent<ZoneScript>().cells;
-            for (int i = 0; i < cells.Length; i++)
+            if (cell.x >= cells[0].x && cell.x <= cells[cells.Length - 1].x
+                && cell.y >= cells[0].y && cell.y <= cells[cells.Length - 1].y)
             {
-                if (cells[i] == cell) return zone;
+                return zone;
             }
         }
+        isBuilding = true;
         foreach (GameObject building in buildingsList)
         {
             Vector2[] cells = building.GetComponent<BuildingScript>().cells;
-            for (int i = 0; i < cells.Length; i++)
+            if (cell.x >= cells[0].x && cell.x <= cells[cells.Length - 1].x
+                && cell.y >= cells[0].y && cell.y <= cells[cells.Length - 1].y)
             {
-                if (cells[i] == cell) return building;
+                return building;
             }
         }
         return null;

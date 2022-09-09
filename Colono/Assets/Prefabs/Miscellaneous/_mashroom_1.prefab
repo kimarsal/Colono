@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7354269276330711914}
   - component: {fileID: 5881779610052318415}
   - component: {fileID: 8522130104801632261}
+  - component: {fileID: 1082627373638571162}
   m_Layer: 0
   m_Name: _mashroom_1
   m_TagString: Untagged
@@ -83,3 +84,17 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &1082627373638571162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7873502013767713232}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74aa8528bf1ad0344926f14bc722022e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  resourceType: 2
+  resourceAmount: 2

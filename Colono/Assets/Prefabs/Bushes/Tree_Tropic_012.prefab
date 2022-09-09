@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4619705437779255369}
   - component: {fileID: 8055188367081492816}
   - component: {fileID: 7031003143247386568}
+  - component: {fileID: 5529773947502978167}
   m_Layer: 0
   m_Name: Tree_Tropic_012
   m_TagString: Untagged
@@ -83,3 +84,17 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &5529773947502978167
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 886742464509849394}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74aa8528bf1ad0344926f14bc722022e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  resourceType: 0
+  resourceAmount: 2

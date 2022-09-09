@@ -15,7 +15,7 @@ public class ZoneScript : ConstructionScript, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        islandCellScript.ZoneSelected(gameObject, type);
+        //islandCellScript.SelectZone(gameObject, type);
     }
 
     public void ToggleGate()

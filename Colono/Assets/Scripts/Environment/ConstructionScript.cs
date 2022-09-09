@@ -7,4 +7,6 @@ public class ConstructionScript : MonoBehaviour
 {
     public IslandCellScript islandCellScript;
     public Vector2[] cells;
+    public int length;
+    public int width;
 }

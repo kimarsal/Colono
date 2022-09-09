@@ -133,8 +133,8 @@ public class Island
         coastObstacle.transform.localScale = new Vector3(250, 1, 250);
         coastObstacle.AddComponent<NavMeshObstacle>();
         coastObstacle.transform.parent = island.transform;*/
-        IslandEditor islandEditor = GameObject.FindGameObjectWithTag("GameController").GetComponent<IslandEditor>();
-        /*GameObject coastObstacle = GameObject.Instantiate(islandEditor.coastObstacle, island.transform);
+        /*IslandEditor islandEditor = GameObject.FindGameObjectWithTag("GameController").GetComponent<IslandEditor>();
+        GameObject coastObstacle = GameObject.Instantiate(islandEditor.coastObstacle, island.transform);
         coastObstacle.transform.position = island.transform.position + new Vector3(0, -1, 0);*/
 
         NavMeshSurface surface = island.AddComponent<NavMeshSurface>();

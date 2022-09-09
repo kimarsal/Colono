@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class CameraScript : MonoBehaviour
 {
+    private Vector3 navigationOffset;
+    private Vector3 islandOffset;
     private Vector3 offset;
     private GameObject player;
     private PlayerController playerController;
@@ -29,7 +31,9 @@ public class CameraScript : MonoBehaviour
         //S'obté Player i el seu script
         player = GameObject.Find("Player");
         //offset = gameObject.transform.position;
-        offset = new Vector3(0, 15, -8);
+        navigationOffset = new Vector3(0, 15, -8);
+        islandOffset = new Vector3(0, 8, -5);
+        offset = navigationOffset;
         playerController = player.GetComponent<PlayerController>();
         gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
     }
@@ -74,20 +78,36 @@ public class CameraScript : MonoBehaviour
     public void SetIslandCamera(Vector3 position)
     {
         islandPosition = position;
+        StartCoroutine(FastCameraSwipe(true));
     }
 
     public void ResetPlayerCamera()
     {
-        StartCoroutine(FastCameraSwipe());
+        StartCoroutine(FastCameraSwipe(false));
     }
 
-    private IEnumerator FastCameraSwipe()
+    private IEnumerator FastCameraSwipe(bool intoIsland)
     {
-        float previousSpeed = speed;
-        targetPosition = player.transform.position + offset;
-        float distance = Vector3.Distance(transform.position, targetPosition);
-        speed = distance / 0.5f; //Tornar al lloc en 0.1 segon
-        yield return new WaitForSeconds(0.5f);
-        speed = previousSpeed;
+        if (intoIsland)
+        {
+            float previousSpeed = speed;
+            targetPosition = player.transform.position + islandOffset;
+            float distance = Vector3.Distance(transform.position, targetPosition);
+            speed = distance / 0.2f; //Fer zoom en 0.2 segons
+            offset = islandOffset;
+            yield return new WaitForSeconds(0.2f);
+            gameManagerScript.isInIsland = true;
+            speed = previousSpeed;
+        }
+        else
+        {
+            float previousSpeed = speed;
+            targetPosition = player.transform.position + navigationOffset;
+            float distance = Vector3.Distance(transform.position, targetPosition);
+            speed = distance / 0.5f; //Tornar al lloc en 0.5 segons
+            offset = navigationOffset;
+            yield return new WaitForSeconds(0.5f);
+            speed = previousSpeed;
+        }
     }
 }

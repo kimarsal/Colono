@@ -53,7 +53,6 @@ public class GameManager : MonoBehaviour
 
     public void BoardIsland()
     {
-        isInIsland = true;
         cameraScript.SetIslandCamera(nearbyIsland.position);
         boardIslandButton.gameObject.SetActive(false);
         leaveIslandButton.gameObject.SetActive(true);
@@ -112,7 +111,7 @@ public class GameManager : MonoBehaviour
         IslandDefaultButtons();
     }
 
-    public void AreaSelected()
+    public void SelectArea()
     {
         IslandDefaultButtons();
         buildButton.gameObject.SetActive(false);
@@ -126,7 +125,7 @@ public class GameManager : MonoBehaviour
         IslandDefaultButtons();
     }
 
-    public void ZoneSelected(ZoneScript.ZoneType type)
+    public void SelectZone(ZoneScript.ZoneType type)
     {
         IslandDefaultButtons();
         buildButton.gameObject.SetActive(false);

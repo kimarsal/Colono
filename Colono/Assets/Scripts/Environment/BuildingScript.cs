@@ -8,17 +8,15 @@ public class BuildingScript : ConstructionScript, IPointerClickHandler
     public enum BuildingType { WoodHouse, StoneHouse, Mine};
     public BuildingType type;
 
-    public int length;
-    public int width;
     public int orientation;
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        islandCellScript.SelectBuilding(gameObject, type);
+        //islandCellScript.SelectBuilding(gameObject, type);
     }
 
     public void EnableCollider()
     {
-        GetComponent<BoxCollider>().enabled = true;
+        //GetComponent<BoxCollider>().enabled = true;
     }
 }

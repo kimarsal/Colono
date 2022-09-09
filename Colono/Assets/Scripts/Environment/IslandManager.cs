@@ -91,8 +91,7 @@ public class IslandManager : MonoBehaviour
             {
                 Vector2 itemCell = new Vector2(col, row);
                 Vector3 itemPos = MeshGenerator.GetItemPosition(itemCell, newIsland.meshData);
-                Debug.Log(itemCell);
-                if (itemPos.y > 0 && islandScript.isCellAvailable(itemCell))
+                if (itemPos.y > 0 && !islandScript.isCellTaken(itemCell))
                 {
                     float typeFloat = UnityEngine.Random.Range(0f, 1f);
                     IslandScript.ItemType type = IslandScript.ItemType.Tree;
@@ -118,7 +117,7 @@ public class IslandManager : MonoBehaviour
                     islandScript.AddItem(item, type, itemCell);
                 }
 
-                int inc = UnityEngine.Random.Range(1, 8);
+                int inc = UnityEngine.Random.Range(1, 20);
                 col += inc;
                 if(col >= IslandGenerator.mapChunkSize - 2)
                 {
