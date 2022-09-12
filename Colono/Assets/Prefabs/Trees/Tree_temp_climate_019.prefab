@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6864037386688327962}
   - component: {fileID: 7046034695285863871}
   - component: {fileID: -7731729312795018499}
+  - component: {fileID: -9159387103343596900}
   m_Layer: 0
   m_Name: Tree_temp_climate_019
   m_TagString: Untagged
@@ -98,3 +99,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resourceType: 0
   resourceAmount: 10
+--- !u!208 &-9159387103343596900
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7375374686790764945}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 0.83900005, y: 3.982, z: 0.78800005}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0.051000003, y: 0.514, z: -0.116000004}
+  m_TimeToStationary: 0.5

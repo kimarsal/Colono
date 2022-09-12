@@ -12,12 +12,13 @@ GameObject:
   - component: {fileID: 4261259349675981273}
   - component: {fileID: 2073907099102825747}
   - component: {fileID: 8227729649157244602}
+  - component: {fileID: 1122807283203107489}
   m_Layer: 0
   m_Name: Stone_lit_017
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &904330001970673276
 Transform:
@@ -98,3 +99,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resourceType: 1
   resourceAmount: 3
+--- !u!208 &1122807283203107489
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 560421029256686790}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 0.22900002, y: 0.14500001, z: 0.18200001}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 0.14500001, z: 0}
+  m_TimeToStationary: 0.5

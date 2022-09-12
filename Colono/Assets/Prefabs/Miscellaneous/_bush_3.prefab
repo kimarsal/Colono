@@ -12,12 +12,13 @@ GameObject:
   - component: {fileID: 1725351844889480892}
   - component: {fileID: 3464773437093001846}
   - component: {fileID: 5630451897253686141}
+  - component: {fileID: 6645458658387361405}
   m_Layer: 0
   m_Name: _bush_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &2332431166750900505
 Transform:
@@ -98,3 +99,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resourceType: 0
   resourceAmount: 2
+--- !u!208 &6645458658387361405
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3104569372686719907}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 0.84000003, y: 0.68200004, z: 0.526}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0.004, y: 0.679, z: -0.071}
+  m_TimeToStationary: 0.5

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class ZoneScript : ConstructionScript, IPointerClickHandler
+public class ZoneScript : ConstructionScript
 {
     public enum ZoneType { Orchard, Barn };
     public ZoneType type;
@@ -12,11 +12,6 @@ public class ZoneScript : ConstructionScript, IPointerClickHandler
     public GameObject openGate;
     public GameObject closedGate;
     public Dictionary<Vector2, CropScript> crops = new Dictionary<Vector2, CropScript>();
-
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        //islandCellScript.SelectZone(gameObject, type);
-    }
 
     public void ToggleGate()
     {

@@ -106,6 +106,7 @@ public class Island
 
         island = new GameObject("Island");
         island.tag = "Island";
+        //island.layer = 6;
         island.isStatic = true;
 
         MeshRenderer meshRenderer = island.AddComponent<MeshRenderer>();
@@ -138,7 +139,8 @@ public class Island
         coastObstacle.transform.position = island.transform.position + new Vector3(0, -1, 0);*/
 
         NavMeshSurface surface = island.AddComponent<NavMeshSurface>();
-        surface.BuildNavMesh();
+        //surface.layerMask = 6;
+        //surface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
 
         CMR.ConvexDecomposition.Bake(island, CMR.VHACDSession.Create(), null, false, true, false);
         foreach (MeshCollider triggerCollider in island.transform.GetChild(0).GetComponentsInChildren<MeshCollider>())

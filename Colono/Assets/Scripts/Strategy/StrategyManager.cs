@@ -39,7 +39,7 @@ public class StrategyManager : MonoBehaviour
             pawns.Add(pawn);
         }
 
-        mainCamera = GameObject.Find("MainCamera").GetComponent<Camera>();
+        mainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
     }
 
     public Vector3 GetNextPos(StrategyArea.StrategyAreaEnum area)

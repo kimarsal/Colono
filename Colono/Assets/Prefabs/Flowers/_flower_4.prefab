@@ -12,12 +12,13 @@ GameObject:
   - component: {fileID: 58733602689745910}
   - component: {fileID: 2824986973836638012}
   - component: {fileID: 8431982194124297961}
+  - component: {fileID: 8231583569065564246}
   m_Layer: 0
   m_Name: _flower_4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &3999040835642231891
 Transform:
@@ -98,3 +99,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resourceType: 2
   resourceAmount: 5
+--- !u!208 &8231583569065564246
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4338271421203273449}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 0.326, y: 0.43800002, z: 0.35000002}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0.052, y: 0.44400004, z: -0.07700001}
+  m_TimeToStationary: 0.5

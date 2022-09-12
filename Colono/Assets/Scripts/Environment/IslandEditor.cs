@@ -14,8 +14,8 @@ public class IslandEditor : MonoBehaviour
     public Material selectedHoverMaterial;
 
     [Header("Buildings")]
-    public GameObject woodHouse;
-    public GameObject stoneHouse;
+    public GameObject warehouse;
+    public GameObject residence;
     public GameObject mine;
 
     [Header("Fences")]
@@ -35,5 +35,6 @@ public class IslandEditor : MonoBehaviour
     public GameObject[] miscellaneous;
 
     [Header("Others")]
+    public GameObject constructionCanvas;
     public GameObject coastObstacle;
 }

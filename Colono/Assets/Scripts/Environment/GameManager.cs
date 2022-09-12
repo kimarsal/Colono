@@ -3,23 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 public class GameManager : MonoBehaviour
 {
+    private enum ButtonState { Idle, BuildingButtons, ZoneButtons, ConstructionDetails };
+
     private bool isPlayerNearIsland = false;
     public bool isInIsland = false;
+
+    private ButtonState buttonState = ButtonState.Idle;
+    public Animator canvasAnimator;
+    private ConstructionScript constructionScript;
+    public TextMeshProUGUI constructionTitle;
+    public TextMeshProUGUI constructionPeasantNum;
+
     public Button boardIslandButton;
-    public Button leaveIslandButton;
-
-    public Button buildButton;
-    public GameObject chooseBuildingButtons;
+    public Button deleteZoneButton;
     public Button deleteBuildingButton;
-
-    public Button createOrchardButton;
-    public Button createBarnButton;
-    public Button plantButton;
-    public Button clearPatchButton;
-    public Button removeZoneButton;
+    /*public Button plantButton;
+    public Button clearPatchButton;*/
 
 
     private struct IslandType
@@ -44,7 +47,7 @@ public class GameManager : MonoBehaviour
         {
             isPlayerNearIsland = true;
             boardIslandButton.GetComponentInChildren<TextMeshProUGUI>().text = "Dock onto the island";
-            boardIslandButton.gameObject.SetActive(true);
+            canvasAnimator.Play("GetCloseToIsland");
             nearbyIsland.position = islandPosition;
             nearbyIsland.islandScript = islandScript;
             nearbyIsland.islandCellScript = islandScript.islandCellScript;
@@ -53,123 +56,189 @@ public class GameManager : MonoBehaviour
 
     public void BoardIsland()
     {
-        cameraScript.SetIslandCamera(nearbyIsland.position);
-        boardIslandButton.gameObject.SetActive(false);
-        leaveIslandButton.gameObject.SetActive(true);
-
-        buildButton.gameObject.SetActive(true);
-
         nearbyIsland.islandScript.PlayerEntered();
-    }
+        cameraScript.SetIslandCamera(nearbyIsland.position);
+        canvasAnimator.Play("BoardIsland");
 
-    public void IslandDefaultButtons()
-    {
-        leaveIslandButton.gameObject.SetActive(true);
-
-        buildButton.gameObject.SetActive(true);
-        chooseBuildingButtons.SetActive(false);
-        deleteBuildingButton.gameObject.SetActive(false);
-
-        createOrchardButton.gameObject.SetActive(false);
-        createBarnButton.gameObject.SetActive(false);
-        plantButton.gameObject.SetActive(false);
-        clearPatchButton.gameObject.SetActive(false);
-
-        removeZoneButton.gameObject.SetActive(false);
+        buttonState = ButtonState.Idle;
     }
 
     public void HideButtons()
     {
-        IslandDefaultButtons();
-        buildButton.gameObject.SetActive(false);
-        leaveIslandButton.gameObject.SetActive(false);
+        switch (buttonState)
+        {
+            case ButtonState.Idle: canvasAnimator.Play("HideButtons"); break;
+            case ButtonState.BuildingButtons: canvasAnimator.Play("HideBuildingButtonsForSelection"); break;
+            case ButtonState.ZoneButtons: canvasAnimator.Play("HideZoneButtonsForSelection"); break;
+            case ButtonState.ConstructionDetails: canvasAnimator.Play("HideConstructionDetailsForSelection"); break;
+        }
+
+        buttonState = ButtonState.Idle;
+    }
+
+    public void ShowButtons()
+    {
+        canvasAnimator.Play("ShowButtons");
+
+        buttonState = ButtonState.Idle;
     }
 
     public void Build()
     {
-        buildButton.gameObject.SetActive(false);
-        chooseBuildingButtons.SetActive(true);
+        if(buttonState == ButtonState.Idle)
+        {
+            canvasAnimator.Play("ShowBuildingButtons");
+            buttonState = ButtonState.BuildingButtons;
+        }
+        else
+        {
+            canvasAnimator.Play("HideBuildingButtons");
+            buttonState = ButtonState.Idle;
+        }
     }
 
     public void ChooseBuilding(int type)
     {
-        HideButtons();
-        buildButton.gameObject.SetActive(false);
         nearbyIsland.islandCellScript.ChooseBuilding((BuildingScript.BuildingType)type);
+        canvasAnimator.Play("HideBuildingButtonsForSelection");
     }
 
-    public void SelectBuilding(BuildingScript.BuildingType type)
+    public void SelectBuilding(BuildingScript buildingScript, bool wasJustCreated)
     {
-        IslandDefaultButtons();
-        buildButton.gameObject.SetActive(false);
+        deleteZoneButton.gameObject.SetActive(false);
         deleteBuildingButton.gameObject.SetActive(true);
+        constructionTitle.text = buildingScript.type.ToString();
+        constructionScript = buildingScript;
+        SetConstructionDetails();
+
+        if (wasJustCreated) canvasAnimator.Play("ShowConstructionDetailsAfterCreateBuilding");
+        else
+        {
+            switch (buttonState)
+            {
+                case ButtonState.Idle: canvasAnimator.Play("ShowConstructionDetails"); break;
+                case ButtonState.BuildingButtons: canvasAnimator.Play("ShowConstructionDetailsFromBuilding"); break;
+                case ButtonState.ZoneButtons: canvasAnimator.Play("ShowConstructionDetailsFromZone"); break;
+            }
+            
+        }
+
+        buttonState = ButtonState.ConstructionDetails;
     }
 
     public void DeleteBuilding()
     {
         nearbyIsland.islandCellScript.DeleteBuilding();
-        IslandDefaultButtons();
+        canvasAnimator.Play("HideConstructionDetails");
+
+        buttonState = ButtonState.Idle;
     }
 
     public void SelectArea()
     {
-        IslandDefaultButtons();
-        buildButton.gameObject.SetActive(false);
-        createOrchardButton.gameObject.SetActive(true);
-        createBarnButton.gameObject.SetActive(true);
+        canvasAnimator.Play("ShowZoneButtons");
+
+        buttonState = ButtonState.ZoneButtons;
+    }
+
+    public void UnselectArea()
+    {
+        nearbyIsland.islandCellScript.DestroyAllCells();
+        canvasAnimator.Play("HideZoneButtons");
+
+        buttonState = ButtonState.Idle;
     }
 
     public void CreateZone(int type)
     {
         nearbyIsland.islandCellScript.CreateZone((ZoneScript.ZoneType) type);
-        IslandDefaultButtons();
     }
 
-    public void SelectZone(ZoneScript.ZoneType type)
+    public void SelectZone(ZoneScript zoneScript, bool wasJustCreated)
     {
-        IslandDefaultButtons();
-        buildButton.gameObject.SetActive(false);
-        removeZoneButton.gameObject.SetActive(true);
+        deleteZoneButton.gameObject.SetActive(true);
+        deleteBuildingButton.gameObject.SetActive(false);
+        constructionTitle.text = zoneScript.type.ToString();
+        constructionScript = zoneScript;
+        SetConstructionDetails();
+
+        if (wasJustCreated) canvasAnimator.Play("ShowConstructionDetailsAfterCreateZone");
+        else
+        {
+            switch (buttonState)
+            {
+                case ButtonState.Idle: canvasAnimator.Play("ShowConstructionDetails"); break;
+                case ButtonState.BuildingButtons: canvasAnimator.Play("ShowConstructionDetailsFromBuilding"); break;
+                case ButtonState.ZoneButtons: canvasAnimator.Play("ShowConstructionDetailsFromZone"); break;
+            }
+
+        }
+
+        buttonState = ButtonState.ConstructionDetails;
     }
 
     public void DeleteZone()
     {
         nearbyIsland.islandCellScript.DeleteZone();
-        IslandDefaultButtons();
+        canvasAnimator.Play("HideConstructionDetails");
+
+        buttonState = ButtonState.Idle;
     }
-    
+
+    public void HideConstructionDetails()
+    {
+        canvasAnimator.Play("HideConstructionDetails");
+        nearbyIsland.islandCellScript.DestroyAllCells();
+
+        buttonState = ButtonState.Idle;
+    }
+
+    private void SetConstructionDetails()
+    {
+        UpdatePeasantNumText();
+    }
+
+    public void ManagePawns(bool adding)
+    {
+        if (adding && nearbyIsland.islandScript.GetAvailablePeasants() > 0 || !adding && constructionScript.peasantNum > 0)
+        {
+            nearbyIsland.islandScript.SendPeasantToArea(constructionScript, adding);
+            UpdatePeasantNumText();
+        }
+    }
+
+    public void UpdatePeasantNumText()
+    {
+        constructionPeasantNum.text = constructionScript.peasantNum.ToString();
+    }
+
     public void PatchSelected(bool isPatchEmpty)
     {
-        buildButton.gameObject.SetActive(false);
+        /*buildButton.gameObject.SetActive(false);
         chooseBuildingButtons.SetActive(false);
 
         plantButton.gameObject.SetActive(true);
         if (!isPatchEmpty)
         {
             clearPatchButton.gameObject.SetActive(true);
-        }
+        }*/
     }
 
     public void Plant()
     {
-        nearbyIsland.islandCellScript.Plant();
+        //nearbyIsland.islandCellScript.Plant();
     }
 
     public void ClearPatch()
     {
-        nearbyIsland.islandCellScript.ClearPatch();
+        //nearbyIsland.islandCellScript.ClearPatch();
     }
 
     public void LeaveIsland()
     {
         isInIsland = false;
         cameraScript.ResetPlayerCamera();
-        leaveIslandButton.gameObject.SetActive(false);
-        boardIslandButton.gameObject.SetActive(true);
-        buildButton.gameObject.SetActive(false);
-        chooseBuildingButtons.SetActive(false);
-        createOrchardButton.gameObject.SetActive(false);
-        createBarnButton.gameObject.SetActive(false);
+        canvasAnimator.Play("LeaveIsland");
 
         nearbyIsland.islandScript.PLayerLeft();
         nearbyIsland.islandCellScript.DestroyAllCells();
@@ -177,7 +246,7 @@ public class GameManager : MonoBehaviour
 
     public void PlayerIsFarFromIsland()
     {
-        boardIslandButton.gameObject.SetActive(false);
+        canvasAnimator.Play("GetFarFromIsland");
         isPlayerNearIsland = false;
     }
 }

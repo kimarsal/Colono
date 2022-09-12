@@ -12,12 +12,13 @@ GameObject:
   - component: {fileID: 5881779610052318415}
   - component: {fileID: 8522130104801632261}
   - component: {fileID: 1082627373638571162}
+  - component: {fileID: -2700233591028913345}
   m_Layer: 0
   m_Name: _mashroom_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &7354269276330711914
 Transform:
@@ -98,3 +99,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resourceType: 2
   resourceAmount: 2
+--- !u!208 &-2700233591028913345
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7873502013767713232}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 0.44300002, y: 0.455, z: 0.43800002}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: -0.094000004, y: 0.45600003, z: 0}
+  m_TimeToStationary: 0.5

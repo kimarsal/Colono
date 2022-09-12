@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.EventSystems;
 
 public class IslandScript : MonoBehaviour
@@ -20,14 +21,15 @@ public class IslandScript : MonoBehaviour
     public GameObject miscellaneous;
 
     public GameObject cells;
-    public GameObject buildings;
-    public GameObject zones;
+    public GameObject constructions;
 
-    private List<GameObject> treesList = new List<GameObject>();
+    private int peasantNum = 10;
+
+    /*private List<GameObject> treesList = new List<GameObject>();
     private List<GameObject> bushesList = new List<GameObject>();
     private List<GameObject> rocksList = new List<GameObject>();
     private List<GameObject> flowersList = new List<GameObject>();
-    private List<GameObject> miscellaneousList = new List<GameObject>();
+    private List<GameObject> miscellaneousList = new List<GameObject>();*/
 
     private List<GameObject> zonesList = new List<GameObject>();
     private List<GameObject> buildingsList = new List<GameObject>();
@@ -43,13 +45,9 @@ public class IslandScript : MonoBehaviour
         cells.transform.parent = gameObject.transform;
         cells.transform.localPosition = Vector3.zero;
 
-        buildings = new GameObject("Buildings");
-        buildings.transform.parent = gameObject.transform;
-        buildings.transform.localPosition = Vector3.zero;
-
-        zones = new GameObject("Zones");
-        zones.transform.parent = gameObject.transform;
-        zones.transform.localPosition = Vector3.zero;
+        constructions = new GameObject("Constructions");
+        constructions.transform.parent = gameObject.transform;
+        constructions.transform.localPosition = Vector3.zero;
     }
 
     public void PlayerIsNear()
@@ -137,21 +135,48 @@ public class IslandScript : MonoBehaviour
     public void AddBuilding(GameObject building)
     {
         buildingsList.Add(building);
+        RebakeNavMesh();
     }
 
     public void RemoveBuilding(GameObject building)
     {
         buildingsList.Remove(building);
+        Destroy(building);
+        RebakeNavMesh();
     }
 
     public void AddZone(GameObject zone)
     {
         zonesList.Add(zone);
+        RebakeNavMesh();
     }
 
     public void RemoveZone(GameObject zone)
     {
         zonesList.Remove(zone);
+        Destroy(zone);
+        RebakeNavMesh();
+    }
+
+    public void RebakeNavMesh()
+    {
+        GetComponent<NavMeshSurface>().UpdateNavMesh(GetComponent<NavMeshSurface>().navMeshData);
+
+        /*NavMeshBuildSource s = new NavMeshBuildSource();
+        s.shape = NavMeshBuildSourceShape.Mesh;
+        s.sourceObject = GetComponent<MeshFilter>().sharedMesh;
+        s.transform = transform.localToWorldMatrix;
+        s.size = Vector3.one;
+
+        List<NavMeshBuildSource> list = new List<NavMeshBuildSource>();
+        list.Add(s);
+
+        NavMeshBuilder.UpdateNavMeshDataAsync(
+            GetComponent<NavMeshSurface>().navMeshData,
+            GetComponent<NavMeshSurface>().GetBuildSettings(),
+            list,
+            new Bounds(bounds.center, bounds.size + Vector3.one * 2));*/
+
     }
 
     public GameObject GetZoneByCell(Vector2 cell)
@@ -191,6 +216,22 @@ public class IslandScript : MonoBehaviour
             }
         }
         return null;
+    }
+
+    public int GetAvailablePeasants()
+    {
+        return peasantNum;
+    }
+
+    public void SendPeasantToArea(ConstructionScript constructionScript, bool adding)
+    {
+        peasantNum -= adding ? 1 : -1;
+        constructionScript.peasantNum += adding ? 1 : -1;
+    }
+
+    public void SendPeasantsBack(ConstructionScript constructionScript)
+    {
+        peasantNum += constructionScript.peasantNum;
     }
 
 }

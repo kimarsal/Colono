@@ -12,12 +12,13 @@ GameObject:
   - component: {fileID: 8905864585771818789}
   - component: {fileID: 6661681391290936303}
   - component: {fileID: 3836094326430345693}
+  - component: {fileID: 1670178442414748698}
   m_Layer: 0
   m_Name: Stone_mid_009
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &5492182843606306944
 Transform:
@@ -98,3 +99,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resourceType: 1
   resourceAmount: 6
+--- !u!208 &1670178442414748698
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5148731057261398586}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 0.99700004, y: 0.559, z: 0.73600006}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: -0.010000001, y: 0.554, z: 0.15900001}
+  m_TimeToStationary: 0.5

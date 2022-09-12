@@ -16,7 +16,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &4212759614877374561
 Transform:
@@ -46,12 +46,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0a56d236f14adb4496d54279423d076, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 2
+  cells: []
   length: 3
   width: 3
+  peasantNum: 0
+  type: 2
   orientation: 0
-  islandCellScript: {fileID: 0}
-  cells: []
 --- !u!65 &6398704646448144681
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -63,8 +63,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 0
   serializedVersion: 2
-  m_Size: {x: 2.4956868, y: 2.1217654, z: 2.5312986}
-  m_Center: {x: 1.6737448, y: 0.36501884, z: -1.549104}
+  m_Size: {x: 2.4956868, y: 1.7463049, z: 2.59527}
+  m_Center: {x: 1.6737448, y: 0.5527491, z: -1.5171183}
 --- !u!1001 &9063272056698875497
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -127,10 +127,30 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7903005001077901035, guid: ec9406baab7754445b0f9fbe4e69bc7f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: -2973820865280170066, guid: ec9406baab7754445b0f9fbe4e69bc7f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: ec9406baab7754445b0f9fbe4e69bc7f,
         type: 3}
       propertyPath: m_Name
       value: mine
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: ec9406baab7754445b0f9fbe4e69bc7f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 3130315268405972617, guid: ec9406baab7754445b0f9fbe4e69bc7f,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ec9406baab7754445b0f9fbe4e69bc7f, type: 3}

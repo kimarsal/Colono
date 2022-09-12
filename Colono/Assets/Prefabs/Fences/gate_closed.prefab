@@ -11,13 +11,12 @@ GameObject:
   - component: {fileID: 5847469700310862967}
   - component: {fileID: 7388640225128121298}
   - component: {fileID: 4714510605287716632}
-  - component: {fileID: 2657388484469765450}
   m_Layer: 0
   m_Name: gate_closed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_NavMeshLayer: 1
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &5847469700310862967
 Transform:
@@ -84,16 +83,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &2657388484469765450
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6516060062951397069}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1.0045506, y: 0.59405714, z: 0.20478074}
-  m_Center: {x: -0.46209213, y: 0.29502562, z: 0.03652472}

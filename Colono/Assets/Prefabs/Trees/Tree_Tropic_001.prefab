@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 9043873801135914469}
   - component: {fileID: 5130578103595012481}
   - component: {fileID: -4285922510174799634}
+  - component: {fileID: -2826310736898024400}
   m_Layer: 0
   m_Name: Tree_Tropic_001
   m_TagString: Untagged
@@ -98,3 +99,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resourceType: 0
   resourceAmount: 10
+--- !u!208 &-2826310736898024400
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 987573665392298713}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 1.812, y: 2.5630002, z: 1.5690001}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: -0.080000006, y: 2.5630002, z: 0.223}
+  m_TimeToStationary: 0.5

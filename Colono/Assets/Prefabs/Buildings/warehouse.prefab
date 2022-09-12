@@ -12,11 +12,11 @@ GameObject:
   - component: {fileID: 7439743356064109974}
   - component: {fileID: 6302042194633769990}
   m_Layer: 0
-  m_Name: wood_house
+  m_Name: warehouse
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &6968755648469870603
 Transform:
@@ -46,11 +46,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0a56d236f14adb4496d54279423d076, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 0
+  cells: []
   length: 5
   width: 4
-  islandCellScript: {fileID: 0}
-  cells: []
+  peasantNum: 0
+  type: 0
+  orientation: 0
 --- !u!65 &6302042194633769990
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -126,10 +127,35 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -6763858364670572316, guid: 278dc1d6e13f1624a8b2219912d177ba,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: -1599826595754709761, guid: 278dc1d6e13f1624a8b2219912d177ba,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: -208595431880416365, guid: 278dc1d6e13f1624a8b2219912d177ba,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 278dc1d6e13f1624a8b2219912d177ba,
         type: 3}
       propertyPath: m_Name
       value: wood_house
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 278dc1d6e13f1624a8b2219912d177ba,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 6014503084441653313, guid: 278dc1d6e13f1624a8b2219912d177ba,
+        type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 278dc1d6e13f1624a8b2219912d177ba, type: 3}

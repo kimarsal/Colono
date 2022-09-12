@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class IslandManager : MonoBehaviour
 {
@@ -125,6 +126,8 @@ public class IslandManager : MonoBehaviour
                     col = IslandGenerator.mapChunkSize - col;
                 }
             }
+
+            newIsland.island.GetComponent<NavMeshSurface>().BuildNavMesh();
 
         }
         

@@ -11,12 +11,13 @@ GameObject:
   - component: {fileID: 8783151631414081108}
   - component: {fileID: 5641847371393087985}
   - component: {fileID: 7615350587949567291}
+  - component: {fileID: -5158114207417687250}
   m_Layer: 0
   m_Name: _grass_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &8783151631414081108
 Transform:
@@ -83,3 +84,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!208 &-5158114207417687250
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8264058532159319278}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 0.388, y: 0.38700002, z: 0.29500002}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0.004, y: 0.386, z: -0.064}
+  m_TimeToStationary: 0.5
