@@ -8,33 +8,21 @@ public class IslandScript : MonoBehaviour
 {
     public enum ItemType { Tree, Bush, Rock, Flower, Miscellaneous};
     public bool hasBeenDiscovered = false;
-    public GameManager gameManagerScript;
     public string islandName;
-    public Material selectedMaterial;
+
+    public GameManager gameManagerScript;
     public IslandCellScript islandCellScript;
+    public NPCManager npcManager;
 
     private GameObject convexColliders;
-    public GameObject trees;
-    public GameObject bushes;
-    public GameObject rocks;
-    public GameObject flowers;
-    public GameObject miscellaneous;
-
+    public GameObject items;
     public GameObject cells;
     public GameObject constructions;
 
-    private int peasantNum = 10;
-
-    /*private List<GameObject> treesList = new List<GameObject>();
-    private List<GameObject> bushesList = new List<GameObject>();
-    private List<GameObject> rocksList = new List<GameObject>();
-    private List<GameObject> flowersList = new List<GameObject>();
-    private List<GameObject> miscellaneousList = new List<GameObject>();*/
-
-    private List<GameObject> zonesList = new List<GameObject>();
+    private List<GameObject> enclosuresList = new List<GameObject>();
     private List<GameObject> buildingsList = new List<GameObject>();
 
-    private Dictionary<Vector2, GameObject> items = new Dictionary<Vector2, GameObject>();
+    private Dictionary<Vector2, GameObject> itemsList = new Dictionary<Vector2, GameObject>();
 
     private void Start()
     {
@@ -72,22 +60,12 @@ public class IslandScript : MonoBehaviour
 
     public bool isCellTaken(Vector2 cell)
     {
-        //return !takenCells.Contains(cell);
-        return items.ContainsKey(cell);
+        return itemsList.ContainsKey(cell);
     }
 
-    public void AddItem(GameObject item, ItemType type, Vector2 cell)
+    public void AddItem(GameObject item, Vector2 cell)
     {
-        /*switch (type)
-        {
-            case ItemType.Tree: treesList.Add(item); break;
-            case ItemType.Rock: rocksList.Add(item); break;
-            case ItemType.Bush: bushesList.Add(item); break;
-            case ItemType.Flower: flowersList.Add(item); break;
-            case ItemType.Miscellaneous: miscellaneousList.Add(item); break;
-        }
-        takenCells.Add(cell);*/
-        items.Add(cell, item);
+        itemsList.Add(cell, item);
     }
 
     public void ClearArea(Vector2[] cells)
@@ -103,32 +81,14 @@ public class IslandScript : MonoBehaviour
 
     public void RemoveItemAtCell(Vector2 cell)
     {
-        /*switch (type)
-        {
-            case ItemType.Tree: treesList.Remove(item); break;
-            case ItemType.Rock: rocksList.Remove(item); break;
-            case ItemType.Bush: bushesList.Remove(item); break;
-            case ItemType.Flower: flowersList.Remove(item); break;
-            case ItemType.Miscellaneous: miscellaneousList.Remove(item); break;
-        }
-        takenCells.Remove(cell);*/
-        GameObject item = items[cell];
-        items.Remove(cell);
+        GameObject item = itemsList[cell];
+        itemsList.Remove(cell);
         Destroy(item);
     }
 
     public void RemoveItem(GameObject item, ItemType type, Vector2 cell)
     {
-        /*switch (type)
-        {
-            case ItemType.Tree: treesList.Remove(item); break;
-            case ItemType.Rock: rocksList.Remove(item); break;
-            case ItemType.Bush: bushesList.Remove(item); break;
-            case ItemType.Flower: flowersList.Remove(item); break;
-            case ItemType.Miscellaneous: miscellaneousList.Remove(item); break;
-        }
-        takenCells.Remove(cell);*/
-        items.Remove(cell);
+        itemsList.Remove(cell);
         Destroy(item);
     }
 
@@ -136,25 +96,35 @@ public class IslandScript : MonoBehaviour
     {
         buildingsList.Add(building);
         RebakeNavMesh();
+        if(building.GetComponent<BuildingScript>().type == BuildingScript.BuildingType.Residence)
+        {
+            npcManager.GeneratePeasants(building.GetComponent<BuildingScript>());
+        }
     }
 
     public void RemoveBuilding(GameObject building)
     {
         buildingsList.Remove(building);
         Destroy(building);
+        StartCoroutine(RebakeNavMeshDelayed());
+    }
+
+    public void AddEnclosure(GameObject enclosure)
+    {
+        enclosuresList.Add(enclosure);
         RebakeNavMesh();
     }
 
-    public void AddZone(GameObject zone)
+    public void RemoveEnclosure(GameObject enclosure)
     {
-        zonesList.Add(zone);
-        RebakeNavMesh();
+        enclosuresList.Remove(enclosure);
+        Destroy(enclosure);
+        StartCoroutine(RebakeNavMeshDelayed());
     }
 
-    public void RemoveZone(GameObject zone)
+    private IEnumerator RebakeNavMeshDelayed()
     {
-        zonesList.Remove(zone);
-        Destroy(zone);
+        yield return new WaitForSeconds(0.1f);
         RebakeNavMesh();
     }
 
@@ -179,15 +149,15 @@ public class IslandScript : MonoBehaviour
 
     }
 
-    public GameObject GetZoneByCell(Vector2 cell)
+    public GameObject GetEnclosureByCell(Vector2 cell)
     {
-        foreach(GameObject zone in zonesList)
+        foreach(GameObject enclosure in enclosuresList)
         {
-            Vector2[] cells = zone.GetComponent<ZoneScript>().cells;
+            Vector2[] cells = enclosure.GetComponent<EnclosureScript>().cells;
             if(cell.x >= cells[0].x && cell.x <= cells[cells.Length - 1].x
                 && cell.y >= cells[0].y && cell.y <= cells[cells.Length - 1].y)
             {
-                return zone;
+                return enclosure;
             }
         }
         return null;
@@ -196,13 +166,13 @@ public class IslandScript : MonoBehaviour
     public GameObject GetConstructionByCell(Vector2 cell, out bool isBuilding)
     {
         isBuilding = false;
-        foreach (GameObject zone in zonesList)
+        foreach (GameObject enclosure in enclosuresList)
         {
-            Vector2[] cells = zone.GetComponent<ZoneScript>().cells;
+            Vector2[] cells = enclosure.GetComponent<EnclosureScript>().cells;
             if (cell.x >= cells[0].x && cell.x <= cells[cells.Length - 1].x
                 && cell.y >= cells[0].y && cell.y <= cells[cells.Length - 1].y)
             {
-                return zone;
+                return enclosure;
             }
         }
         isBuilding = true;
@@ -217,21 +187,4 @@ public class IslandScript : MonoBehaviour
         }
         return null;
     }
-
-    public int GetAvailablePeasants()
-    {
-        return peasantNum;
-    }
-
-    public void SendPeasantToArea(ConstructionScript constructionScript, bool adding)
-    {
-        peasantNum -= adding ? 1 : -1;
-        constructionScript.peasantNum += adding ? 1 : -1;
-    }
-
-    public void SendPeasantsBack(ConstructionScript constructionScript)
-    {
-        peasantNum += constructionScript.peasantNum;
-    }
-
 }

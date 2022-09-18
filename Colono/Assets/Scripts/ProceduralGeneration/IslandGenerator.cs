@@ -49,6 +49,7 @@ public class IslandGenerator : MonoBehaviour
     public MapData GenerateMapData(Vector2 centre)
     {
         float[,] noiseMap = Noise.GenerateNoiseMap(mapChunkSize, mapChunkSize, seed, noiseScale, octaves, persistance, lacunarity, centre + offset);
+        float[,] detailMap = Noise.GenerateNoiseMap(mapChunkSize, mapChunkSize, seed, 0.1f, 1, persistance, lacunarity, centre + offset);
         Color[] colourMap = new Color[mapChunkSize * mapChunkSize];
         int[,] regionMap = new int[mapChunkSize, mapChunkSize];
 
@@ -73,7 +74,7 @@ public class IslandGenerator : MonoBehaviour
             }
         }
 
-        return new MapData(noiseMap, colourMap, regionMap);
+        return new MapData(noiseMap, colourMap, detailMap, regionMap);
     }
 
     void OnValidate()
@@ -121,26 +122,16 @@ public class Island
         MapData mapData = islandGenerator.GenerateMapData(position);
         regionMap = mapData.regionMap;
 
-        Texture2D texture = TextureGenerator.TextureFromColourMap(mapData.colourMap, IslandGenerator.mapChunkSize, IslandGenerator.mapChunkSize);
-        meshRenderer.material.mainTexture = texture;
+        Texture2D colorTexture = TextureGenerator.TextureFromColourMap(mapData.colourMap, IslandGenerator.mapChunkSize, IslandGenerator.mapChunkSize);
+        Texture2D detailTexture = TextureGenerator.TextureFromHeightMap(mapData.detailMap);
+        meshRenderer.material.mainTexture = colorTexture;
 
         meshData = islandGenerator.GenerateTerrainMesh(mapData);
         Mesh mesh = meshData.CreateMesh();
         meshFilter.mesh = mesh;
         meshCollider.sharedMesh = mesh;
 
-        /*GameObject coastObstacle = new GameObject("CoastObstacle");
-        coastObstacle.transform.localPosition = new Vector3(0, -1, 0);
-        coastObstacle.transform.localScale = new Vector3(250, 1, 250);
-        coastObstacle.AddComponent<NavMeshObstacle>();
-        coastObstacle.transform.parent = island.transform;*/
-        /*IslandEditor islandEditor = GameObject.FindGameObjectWithTag("GameController").GetComponent<IslandEditor>();
-        GameObject coastObstacle = GameObject.Instantiate(islandEditor.coastObstacle, island.transform);
-        coastObstacle.transform.position = island.transform.position + new Vector3(0, -1, 0);*/
-
         NavMeshSurface surface = island.AddComponent<NavMeshSurface>();
-        //surface.layerMask = 6;
-        //surface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
 
         CMR.ConvexDecomposition.Bake(island, CMR.VHACDSession.Create(), null, false, true, false);
         foreach (MeshCollider triggerCollider in island.transform.GetChild(0).GetComponentsInChildren<MeshCollider>())
@@ -165,12 +156,14 @@ public struct MapData
 {
     public readonly float[,] heightMap;
     public readonly Color[] colourMap;
+    public readonly float[,] detailMap;
     public readonly int[,] regionMap;
 
-    public MapData(float[,] heightMap, Color[] colourMap, int[,] regionMap)
+    public MapData(float[,] heightMap, Color[] colourMap, float[,] detailMap, int[,] regionMap)
     {
         this.heightMap = heightMap;
         this.colourMap = colourMap;
+        this.detailMap = detailMap;
         this.regionMap = regionMap;
     }
 }

@@ -5,16 +5,18 @@ using UnityEngine.AI;
 
 public class PeasantScript : MonoBehaviour
 {
+    public NPCManager npcManager;
     public float walkSpeed;
     public float runSpeed;
     public float rotateSpeed;
     private bool isRunning = false;
-    private Vector3 nextPos;
-    private Rigidbody rb;
 
-    protected enum PeasantState { Moving, Chopping, Planting, Gathering, Dancing };
+    public enum PeasantState { Moving, Chopping, Planting, Gathering, Dancing };
     protected Animator animator;
+    public PeasantState state;
     private NavMeshAgent navMeshAgent;
+    public BuildingScript settlementScript;
+    public ConstructionScript constructionScript;
 
     [Header("Appearence")]
     public GameObject head1;
@@ -36,14 +38,6 @@ public class PeasantScript : MonoBehaviour
     void Start()
     {
         SetAppearence();
-
-        rb = GetComponent<Rigidbody>();
-
-        animator = GetComponent<Animator>();
-
-        navMeshAgent = GetComponent<NavMeshAgent>();
-
-        animator.SetInteger("State", (int)PeasantState.Chopping);
         //StartCoroutine(WaitForNextDestination());
     }
 
@@ -95,7 +89,7 @@ public class PeasantScript : MonoBehaviour
         if (!navMeshAgent.isStopped && Vector3.Distance(transform.position, navMeshAgent.destination) < 0.01f)
         {
             StopCharacter();
-            StartCoroutine(WaitForNextDestination());
+            if (constructionScript == null) gameObject.SetActive(false);
         }
     }
 
@@ -108,7 +102,8 @@ public class PeasantScript : MonoBehaviour
     protected IEnumerator WaitForNextDestination()
     {
         yield return new WaitForSeconds(1f);
-        SetDestination(new Vector3(Random.Range(NPCManager.minX, NPCManager.maxX), 0f, Random.Range(NPCManager.minZ, NPCManager.maxZ)));
+        SetDestination(npcManager.GetRandomPoint(transform.position));
+        //SetDestination(new Vector3(Random.Range(NPCManager.minX, NPCManager.maxX), 0f, Random.Range(NPCManager.minZ, NPCManager.maxZ)));
     }
 
     public void SetDestination(Vector3 destination)
@@ -118,5 +113,21 @@ public class PeasantScript : MonoBehaviour
         navMeshAgent.speed = isRunning ? runSpeed : walkSpeed;
         animator.SetFloat("Speed", isRunning ? 1 : 0.5f);
         animator.SetInteger("State", (int)PeasantState.Moving);
+    }
+
+    public void UpdateTask()
+    {
+        if(constructionScript == null)
+        {
+            SetDestination(settlementScript.center.position);
+        }
+        else
+        {
+            animator = GetComponent<Animator>();
+            navMeshAgent = GetComponent<NavMeshAgent>();
+            animator.SetInteger("State", (int)PeasantState.Moving);
+
+            SetDestination(constructionScript.center.position);
+        }
     }
 }

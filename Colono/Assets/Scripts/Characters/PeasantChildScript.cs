@@ -8,12 +8,12 @@ public class PeasantChildScript : PeasantScript
     void Update()
     {
         //CheckIfArrivedAtDestination();
-        if (Input.GetKeyDown(KeyCode.D))
+        if (Input.GetKeyDown(KeyCode.O))
         {
             StopCharacter();
             animator.SetInteger("State", (int)PeasantState.Dancing);
         }
-        else if (Input.GetKeyDown(KeyCode.W))
+        else if (Input.GetKeyDown(KeyCode.P))
         {
             StopCharacter();
             StartCoroutine(WaitForNextDestination());

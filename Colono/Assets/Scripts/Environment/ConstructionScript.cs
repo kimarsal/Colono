@@ -6,8 +6,11 @@ using UnityEngine.EventSystems;
 
 public class ConstructionScript : MonoBehaviour
 {
+    public IslandScript islandScript;
     public Vector2[] cells;
     public int length;
     public int width;
-    public int peasantNum;
+    public Transform center;
+    public bool isEnclosure;
+    public int numPeasants;
 }

@@ -32,6 +32,7 @@ public class CameraScript : MonoBehaviour
         player = GameObject.Find("Player");
         //offset = gameObject.transform.position;
         navigationOffset = new Vector3(0, 15, -8);
+        //islandOffset = new Vector3(0, 15, -8);
         islandOffset = new Vector3(0, 8, -5);
         offset = navigationOffset;
         playerController = player.GetComponent<PlayerController>();

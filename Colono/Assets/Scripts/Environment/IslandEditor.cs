@@ -5,6 +5,13 @@ using UnityEngine.UI;
 
 public class IslandEditor : MonoBehaviour
 {
+    [Header("NPCs")]
+    public GameObject malePeasantPrefab;
+    public GameObject femalePeasantPrefab;
+    public GameObject childPeasantPrefab;
+    public GameObject maleWarriorPrefab;
+    public GameObject femaleWarriorPrefab;
+
     [Header("Cell materials")]
     public Material hoverMaterial;
     public Material selectingMaterial;
@@ -27,14 +34,12 @@ public class IslandEditor : MonoBehaviour
     [Header("Crops")]
     public GameObject tomato;
 
-    [Header("Decorations")]
-    public GameObject[] trees;
-    public GameObject[] bushes;
-    public GameObject[] rocks;
-    public GameObject[] flowers;
-    public GameObject[] miscellaneous;
+    [Header("Items")]
+    public GameObject[] beachItems;
+    public GameObject[] fieldItems;
+    public GameObject[] hillItems;
+    public GameObject[] mountainItems;
 
     [Header("Others")]
-    public GameObject constructionCanvas;
-    public GameObject coastObstacle;
+    public GameObject constructionCenterPrefab;
 }

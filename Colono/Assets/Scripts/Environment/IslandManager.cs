@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,6 +10,7 @@ public class IslandManager : MonoBehaviour
     public GameObject player;
     public GameObject islandComponentsPrefab;
     private MapController mapController;
+    private IslandGenerator islandGenerator;
     private IslandEditor islandEditor;
     public float spotDistance = 10f;
     public float islandDistance = 20f;
@@ -17,6 +19,7 @@ public class IslandManager : MonoBehaviour
     void Start()
     {
         mapController = player.GetComponent<MapController>();
+        islandGenerator = GetComponent<IslandGenerator>();
         islandEditor = GameObject.Find("GameManager").GetComponent<IslandEditor>();
 
         GenerateIsland(player.transform);
@@ -55,7 +58,7 @@ public class IslandManager : MonoBehaviour
         if (ok)
         {
             //GameObject newIsland = Instantiate(islandPrefab, pos, islandPrefab.transform.rotation);
-            Island newIsland = GetComponent<IslandGenerator>().GenerateIsland(new Vector2(0,80/*pos.x, pos.z*/));
+            Island newIsland = islandGenerator.GenerateIsland(new Vector2(0,80/*pos.x, pos.z*/));
 
             IslandCellScript islandCellScript = newIsland.island.AddComponent<IslandCellScript>();
             islandCellScript.meshData = newIsland.meshData;
@@ -64,70 +67,58 @@ public class IslandManager : MonoBehaviour
             islandScript.islandCellScript = islandCellScript;
             islandCellScript.islandScript = islandScript;
 
+            newIsland.island.GetComponent<NavMeshSurface>().BuildNavMesh();
+            islandScript.npcManager = newIsland.island.AddComponent<NPCManager>();
+            islandScript.npcManager.npcs = new GameObject("NPCs");
+            islandScript.npcManager.npcs.transform.parent = newIsland.island.transform;
+            islandScript.npcManager.npcs.transform.localPosition = Vector3.zero;
+            islandScript.npcManager.islandEditor = islandEditor;
+            //islandScript.npcManager.SpawnPeasants();
+
             mapController.FollowIsland(newIsland.island);
             islands.Add(newIsland.island);
 
-            islandScript.trees = new GameObject("Trees");
-            islandScript.trees.transform.parent = newIsland.island.transform;
-            islandScript.trees.transform.localPosition = Vector3.zero;
-
-            islandScript.bushes = new GameObject("Bushes");
-            islandScript.bushes.transform.parent = newIsland.island.transform;
-            islandScript.bushes.transform.localPosition = Vector3.zero;
-
-            islandScript.rocks = new GameObject("Rocks");
-            islandScript.rocks.transform.parent = newIsland.island.transform;
-            islandScript.rocks.transform.localPosition = Vector3.zero;
-
-            islandScript.flowers = new GameObject("Flowers");
-            islandScript.flowers.transform.parent = newIsland.island.transform;
-            islandScript.flowers.transform.localPosition = Vector3.zero;
-
-            islandScript.miscellaneous = new GameObject("Miscellaneous");
-            islandScript.miscellaneous.transform.parent = newIsland.island.transform;
-            islandScript.miscellaneous.transform.localPosition = Vector3.zero;
+            islandScript.items = new GameObject("Items");
+            islandScript.items.transform.parent = newIsland.island.transform;
+            islandScript.items.transform.localPosition = Vector3.zero;
 
             int row = 0, col = 0;
             while(row < IslandGenerator.mapChunkSize - 1)
             {
                 Vector2 itemCell = new Vector2(col, row);
-                Vector3 itemPos = MeshGenerator.GetItemPosition(itemCell, newIsland.meshData);
-                if (itemPos.y > 0 && !islandScript.isCellTaken(itemCell))
+                Vector3 itemPos = MeshGenerator.GetCellCenter(itemCell, newIsland.meshData);
+                /*if (itemPos.y > 0 && !islandScript.isCellTaken(itemCell))*/
+                GameObject prefab = null;
+
+                try
                 {
-                    float typeFloat = UnityEngine.Random.Range(0f, 1f);
-                    IslandScript.ItemType type = IslandScript.ItemType.Tree;
-                    if (typeFloat >= 0.9f) type = IslandScript.ItemType.Miscellaneous;
-                    else if (typeFloat >= 0.8f) type = IslandScript.ItemType.Flower;
-                    else if (typeFloat >= 0.6f) type = IslandScript.ItemType.Rock;
-                    else if (typeFloat >= 0.4f) type = IslandScript.ItemType.Bush;
-                    //IslandScript.ItemType type = (IslandScript.ItemType)UnityEngine.Random.Range(0, System.Enum.GetNames(typeof(IslandScript.ItemType)).Length);
-
-                    Transform parent = null;
-                    GameObject prefab = null;
-
-                    switch (type)
+                    switch (islandGenerator.regions[newIsland.regionMap[col, row]].name)
                     {
-                        case IslandScript.ItemType.Tree: parent = islandScript.trees.transform; prefab = islandEditor.trees[UnityEngine.Random.Range(0, islandEditor.trees.Length)]; break;
-                        case IslandScript.ItemType.Bush: parent = islandScript.bushes.transform; prefab = islandEditor.bushes[UnityEngine.Random.Range(0, islandEditor.bushes.Length)]; break;
-                        case IslandScript.ItemType.Rock: parent = islandScript.rocks.transform; prefab = islandEditor.rocks[UnityEngine.Random.Range(0, islandEditor.rocks.Length)]; break;
-                        case IslandScript.ItemType.Flower: parent = islandScript.flowers.transform; prefab = islandEditor.flowers[UnityEngine.Random.Range(0, islandEditor.flowers.Length)]; break;
-                        case IslandScript.ItemType.Miscellaneous: parent = islandScript.miscellaneous.transform; prefab = islandEditor.miscellaneous[UnityEngine.Random.Range(0, islandEditor.miscellaneous.Length)]; break;
+                        case "Sand": prefab = islandEditor.beachItems[UnityEngine.Random.Range(0, islandEditor.beachItems.Length)]; break;
+                        case "Grass": prefab = islandEditor.fieldItems[UnityEngine.Random.Range(0, islandEditor.fieldItems.Length)]; break;
+                        case "Grass 2": prefab = islandEditor.hillItems[UnityEngine.Random.Range(0, islandEditor.hillItems.Length)]; break;
+                        case "Rock": prefab = islandEditor.mountainItems[UnityEngine.Random.Range(0, islandEditor.mountainItems.Length)]; break;
                     }
+                }
+                catch(Exception e)
+                {
+                    Debug.Log(e);
+                }
 
-                    GameObject item = GameObject.Instantiate(prefab, newIsland.island.transform.position + itemPos, Quaternion.Euler(0, UnityEngine.Random.Range(0, 360), 0), parent);
-                    islandScript.AddItem(item, type, itemCell);
+                if(prefab != null)
+                {
+                    GameObject item = GameObject.Instantiate(prefab, newIsland.island.transform.position + itemPos, Quaternion.Euler(0, UnityEngine.Random.Range(0, 360), 0), islandScript.items.transform);
+                    islandScript.AddItem(item, itemCell);
                 }
 
                 int inc = UnityEngine.Random.Range(1, 20);
                 col += inc;
-                if(col >= IslandGenerator.mapChunkSize - 2)
+                if(col > IslandGenerator.mapChunkSize - 1)
                 {
                     row++;
-                    col = IslandGenerator.mapChunkSize - col;
+                    col = col - IslandGenerator.mapChunkSize;
                 }
             }
-
-            newIsland.island.GetComponent<NavMeshSurface>().BuildNavMesh();
 
         }
         

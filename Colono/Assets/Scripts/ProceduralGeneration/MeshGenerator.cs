@@ -69,12 +69,12 @@ public static class MeshGenerator {
 		int index = 0;
 		foreach (Vector2 cell in cells)
 		{
-			positions[index] = GetItemPosition(cell, islandMeshData);
+			positions[index] = GetCellCenter(cell, islandMeshData);
 			index++;
 		}
 	}
 
-	public static Vector3 GetItemPosition(Vector2 cell, MeshData islandMeshData)
+	public static Vector3 GetCellCenter(Vector2 cell, MeshData islandMeshData)
     {
 		Vector3[] newVertices = GetCellVertices(cell, islandMeshData);
 		Vector3 center = (newVertices[0] + newVertices[1] + newVertices[2] + newVertices[3]) / 4;
@@ -94,30 +94,30 @@ public static class MeshGenerator {
 		
 		for(int i = minX; i < maxX; i++)
         {
-            positions[index] = GetItemPosition(new Vector2(i, minY), islandMeshData);
+            positions[index] = GetCellCenter(new Vector2(i, minY), islandMeshData);
             rotations[index] = Quaternion.Euler(0, 0, 0);
 			index++;
 
 			if(i != minX)
             {
-				positions[index] = GetItemPosition(new Vector2(i + 1, maxY), islandMeshData);
+				positions[index] = GetCellCenter(new Vector2(i + 1, maxY), islandMeshData);
 				rotations[index] = Quaternion.Euler(0, 180, 0);
 				index++;
 			}
 		}
 		for (int j = minY + 1; j <= maxY; j++)
 		{
-			positions[index] = GetItemPosition(new Vector2(minX, j), islandMeshData);
+			positions[index] = GetCellCenter(new Vector2(minX, j), islandMeshData);
 			rotations[index] = Quaternion.Euler(0, 270, 0);
 			index++;
 
-			positions[index] = GetItemPosition(new Vector2(maxX, j - 1), islandMeshData);
+			positions[index] = GetCellCenter(new Vector2(maxX, j - 1), islandMeshData);
 			rotations[index] = Quaternion.Euler(0, 90, 0);
 			index++;
 		}
 
-		positions[index] = GetItemPosition(new Vector2(minX, maxY), islandMeshData);
-		rotations[index] = Quaternion.Euler(0, 180, 0);
+		positions[index] = GetCellCenter(new Vector2(minX + 1, maxY), islandMeshData);
+		rotations[index] = Quaternion.Euler(0, 0, 0);
 	}
 
 	private static Vector3[] GetCellVertices(Vector2 cell, MeshData islandMeshData)

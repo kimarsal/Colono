@@ -30,7 +30,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     private GameObject selectedBuilding;
     private BuildingScript buildingScript;
     private int buildingOrientation = 0;
-    private GameObject selectedZone;
+    private GameObject selectedEnclosure;
 
     private void Start()
     {
@@ -114,6 +114,8 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             }
             else
             {
+                ChangeSelectedBuildingColor(Color.white);
+
                 buildingScript = selectedBuilding.GetComponent<BuildingScript>();
                 buildingScript.cells = selectedCells;
                 buildingScript.orientation = buildingOrientation;
@@ -128,7 +130,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 }
                 cells[x, y].GetComponent<MeshRenderer>().material = islandEditorScript.selectedHoverMaterial;
 
-                gameManagerScript.SelectBuilding(buildingScript, true);
+                gameManagerScript.SelectBuilding(buildingScript);
             }
             buildingOrientation = 0; //Resetejar l'orientació
         }
@@ -156,7 +158,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 }
                 else
                 {
-                    SelectZone(construction);
+                    SelectEnclosure(construction);
                 }
             }
             else
@@ -260,16 +262,25 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                     endY = y + j * buildingScript.length;
                 }
 
+                if (i == -1)
+                {
+                    int aux = x + 1; x = endX + 1; endX = aux;
+                }
+                if (j == -1)
+                {
+                    int aux = y + 1; y = endY + 1; endY = aux;
+                }
+
                 //es guarden les noves cel·les seleccionades a la llista i es comprova quin color hauran de tenir
                 int index = 0;
                 selectedCells = new Vector2[buildingScript.width * buildingScript.length];
                 isSelectionValid = true;
-                for (int row = x; row != endX; row += i)
+                for (int col = x; col < endX; col++)
                 {
-                    for (int col = y; col != endY; col += j)
+                    for (int row = y; row < endY; row++)
                     {
-                        selectedCells[index] = new Vector2(row, col);
-                        if (regionMap[row, col] < 0 || islandGeneratorScript.regions[regionMap[row, col]].name != "Grass")
+                        selectedCells[index] = new Vector2(col, row);
+                        if (regionMap[col, row] < 0 || islandGeneratorScript.regions[regionMap[col, row]].name != "Grass")
                         {
                             isSelectionValid = false;
                         }
@@ -285,6 +296,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 //s'obté la posició de l'edifici segons el vèrtex inicial i l'alçada mitjana de la zona
                 Vector3 vertex = MeshGenerator.GetBuildingPosition(selectedCells, hoveredCell, vertexIndex, meshData);
                 selectedBuilding.transform.position = transform.position + vertex;
+                ChangeSelectedBuildingColor(isSelectionValid ? Color.gray : Color.red);
 
             }
             else if (selectMode == SelectMode.Selecting)
@@ -442,14 +454,14 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         }
     }
 
-    //--------------------------------- ZONES ---------------------------------------
+    //--------------------------------- ENCLOSURES ---------------------------------------
 
     private void SingleSelection()
     {
-        if (regionMap[(int)selectedCell.x, (int)selectedCell.y] > 10) //Orchard
+        if (regionMap[(int)selectedCell.x, (int)selectedCell.y] > 10) //Garden
         {
-            selectedZone = islandScript.GetZoneByCell(selectedCell);
-            gameManagerScript.PatchSelected(selectedZone.GetComponent<ZoneScript>().isPatchEmpty(selectedCells));
+            selectedEnclosure = islandScript.GetEnclosureByCell(selectedCell);
+            gameManagerScript.PatchSelected(selectedEnclosure.GetComponent<EnclosureScript>().isPatchEmpty(selectedCells));
         }
         else
         {
@@ -459,10 +471,10 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     private void MultipleSelection()
     {
-        if(regionMap[(int)selectedCell.x, (int)selectedCell.y] > 10) //Orchard
+        if(regionMap[(int)selectedCell.x, (int)selectedCell.y] > 10) //Garden
         {
-            selectedZone = islandScript.GetZoneByCell(selectedCell);
-            gameManagerScript.PatchSelected(selectedZone.GetComponent<ZoneScript>().isPatchEmpty(selectedCells));
+            selectedEnclosure = islandScript.GetEnclosureByCell(selectedCell);
+            gameManagerScript.PatchSelected(selectedEnclosure.GetComponent<EnclosureScript>().isPatchEmpty(selectedCells));
         }
         else
         {
@@ -472,20 +484,26 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         }
     }
 
-    public void CreateZone(ZoneScript.ZoneType type)
+    public void CreateEnclosure(EnclosureScript.EnclosureType type)
     {
-        GameObject zone = new GameObject("Zone");
-        zone.transform.parent = islandScript.constructions.transform;
-        zone.transform.localPosition = Vector3.zero;
-        ZoneScript zoneScript = zone.AddComponent<ZoneScript>();
-        zoneScript.cells = selectedCells;
-        zoneScript.type = type;
-        zoneScript.width = (int)selectedCells[selectedCells.Length - 1].x - (int)selectedCells[0].x;
-        zoneScript.length = (int)selectedCells[selectedCells.Length - 1].y - (int)selectedCells[0].y;
+        GameObject enclosure = new GameObject("Enclosure");
+        enclosure.transform.parent = islandScript.constructions.transform;
+        enclosure.transform.localPosition = Vector3.zero;
+        EnclosureScript enclosureScript = enclosure.AddComponent<EnclosureScript>();
+        enclosureScript.cells = selectedCells;
+        enclosureScript.type = type;
+        enclosureScript.width = (int)selectedCells[selectedCells.Length - 1].x - (int)selectedCells[0].x;
+        enclosureScript.length = (int)selectedCells[selectedCells.Length - 1].y - (int)selectedCells[0].y;
+        enclosureScript.isEnclosure = true;
+        Transform enclosureCenter = Instantiate(islandEditorScript.constructionCenterPrefab,
+            transform.position + (MeshGenerator.GetCellCenter(selectedCells[0], meshData) + MeshGenerator.GetCellCenter(selectedCells[selectedCells.Length - 1], meshData)) / 2,
+            islandEditorScript.constructionCenterPrefab.transform.rotation,
+            enclosure.transform).transform;
+        enclosureScript.center = enclosureCenter;
         islandScript.ClearArea(selectedCells);
 
         GameObject fences = new GameObject("Fences");
-        fences.transform.parent = zone.transform;
+        fences.transform.parent = enclosure.transform;
         fences.transform.localPosition = Vector3.zero;
         Vector3[] positions;
         Quaternion[] rotations;
@@ -495,43 +513,43 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             GameObject fence = Instantiate(islandEditorScript.fences[UnityEngine.Random.Range(0, islandEditorScript.fences.Length)], transform.position + positions[i], rotations[i], fences.transform);
         }
 
-        if (type == ZoneScript.ZoneType.Orchard)
+        if (type == EnclosureScript.EnclosureType.Barn)
         {
-            GameObject post = Instantiate(islandEditorScript.post, transform.position + positions[positions.Length - 1], rotations[rotations.Length - 1], fences.transform);
-            GameObject crops = new GameObject("Crops");
-            crops.transform.parent = zone.transform;
-            crops.transform.localPosition = Vector3.zero;
+            enclosureScript.openGate = Instantiate(islandEditorScript.gateOpen, transform.position + positions[positions.Length - 1], rotations[rotations.Length - 1], fences.transform);
+            enclosureScript.openGate.SetActive(false);
+            enclosureScript.closedGate = Instantiate(islandEditorScript.gateClosed, transform.position + positions[positions.Length - 1], rotations[rotations.Length - 1], fences.transform);
+
+            GameObject animals = new GameObject("Animals");
+            animals.transform.parent = enclosure.transform;
+            animals.transform.localPosition = Vector3.zero;
         }
         else
         {
-            zoneScript.openGate = Instantiate(islandEditorScript.gateOpen, transform.position + positions[positions.Length - 1], rotations[rotations.Length - 1], fences.transform);
-            zoneScript.openGate.SetActive(false);
-            zoneScript.closedGate = Instantiate(islandEditorScript.gateClosed, transform.position + positions[positions.Length - 1], rotations[rotations.Length - 1], fences.transform);
-
-            GameObject animals = new GameObject("Animals");
-            animals.transform.parent = zone.transform;
-            animals.transform.localPosition = Vector3.zero;
+            GameObject post = Instantiate(islandEditorScript.post, transform.position + positions[positions.Length - 1], rotations[rotations.Length - 1], fences.transform);
+            GameObject crops = new GameObject("Crops");
+            crops.transform.parent = enclosure.transform;
+            crops.transform.localPosition = Vector3.zero;
         }
-        islandScript.AddZone(zone);
+        islandScript.AddEnclosure(enclosure);
 
-        InvertRegions(selectedCells, type == ZoneScript.ZoneType.Orchard);
+        InvertRegions(selectedCells, type == EnclosureScript.EnclosureType.Garden);
 
-        selectedZone = zone;
-        gameManagerScript.SelectZone(zoneScript, true);
+        selectedEnclosure = enclosure;
+        gameManagerScript.SelectEnclosure(enclosureScript);
     }
 
     public void Plant()
     {
-        ZoneScript zoneScript = selectedZone.GetComponent<ZoneScript>();
+        EnclosureScript enclosureScript = selectedEnclosure.GetComponent<EnclosureScript>();
         Vector3[] positions;
         MeshGenerator.GetCropPositions(selectedCells, meshData, out positions);
         for (int i = 0; i < positions.Length; i++)
         {
-            GameObject crop = Instantiate(islandEditorScript.tomato, transform.position + positions[i], islandEditorScript.tomato.transform.rotation, selectedZone.transform.GetChild(1));
+            GameObject crop = Instantiate(islandEditorScript.tomato, transform.position + positions[i], islandEditorScript.tomato.transform.rotation, selectedEnclosure.transform.GetChild(1));
             CropScript cropScript = crop.AddComponent<CropScript>();
             cropScript.cell = selectedCells[i];
             cropScript.type = CropScript.CropType.Tomato;
-            zoneScript.AddCrop(selectedCells[i], cropScript);
+            enclosureScript.AddCrop(selectedCells[i], cropScript);
         }
 
         DestroyAllCells();
@@ -539,36 +557,36 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     public void ClearPatch()
     {
-        ZoneScript zoneScript = selectedZone.GetComponent<ZoneScript>();
+        EnclosureScript enclosureScript = selectedEnclosure.GetComponent<EnclosureScript>();
         foreach (Vector2 cell in selectedCells)
         {
-            zoneScript.RemoveCrop(cell);
+            enclosureScript.RemoveCrop(cell);
         }
 
         DestroyAllCells();
     }
 
-    public void SelectZone(GameObject zone)
+    public void SelectEnclosure(GameObject enclosure)
     {
-        selectedZone = zone;
-        gameManagerScript.SelectZone(zone.GetComponent<ZoneScript>(), false);
+        selectedEnclosure = enclosure;
+        gameManagerScript.SelectEnclosure(enclosure.GetComponent<EnclosureScript>());
     }
 
-    public void DeleteZone()
+    public void RemoveEnclosure()
     {
-        Vector2[] zoneCells = selectedZone.GetComponent<ZoneScript>().cells;
-        InvertRegions(zoneCells, selectedZone.GetComponent<ZoneScript>().type == ZoneScript.ZoneType.Orchard, true);
-        islandScript.RemoveZone(selectedZone);
+        Vector2[] enclosureCells = selectedEnclosure.GetComponent<EnclosureScript>().cells;
+        InvertRegions(enclosureCells, selectedEnclosure.GetComponent<EnclosureScript>().type == EnclosureScript.EnclosureType.Garden, true);
+        islandScript.RemoveEnclosure(selectedEnclosure);
 
         DestroyAllCells();
     }
 
-    private void InvertRegions(Vector2[] cells, bool isOrchard, bool deletingZone = false)
+    private void InvertRegions(Vector2[] cells, bool isGarden, bool deleting = false)
     {
         int minX = (int)cells[0].x, maxX = (int)cells[cells.Length - 1].x;
         int minY = (int)cells[0].y, maxY = (int)cells[cells.Length - 1].y;
 
-        /*if (isOrchard)
+        /*if (isGarden)
         {
             for (int i = minX + 1; i < maxX; i++)
             {
@@ -576,7 +594,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 regionMap[i, maxY] = -regionMap[i, maxY];
                 for (int j = minY + 1; j < maxY; j++)
                 {
-                    regionMap[i, j] = regionMap[i, j] + (deletingZone?-10:10);
+                    regionMap[i, j] = regionMap[i, j] + (deleting?-10:10);
                 }
             }
             for (int j = minY; j <= maxY; j++)
@@ -587,7 +605,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         }
         else
         {*/
-            for (int i = minX; i <= maxX; i++)
+        for (int i = minX; i <= maxX; i++)
             {
                 for (int j = minY; j <= maxY; j++)
                 {
@@ -617,13 +635,21 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         DestroyAllCells();
     }
 
+    private void ChangeSelectedBuildingColor(Color color)
+    {
+        foreach (MeshRenderer buildingPieceRenderer in selectedBuilding.transform.GetChild(0).GetComponentsInChildren<MeshRenderer>())
+        {
+            buildingPieceRenderer.material.color = color;
+        }
+    }
+
     public void SelectBuilding(GameObject building)
     {
         selectedBuilding = building;
-        gameManagerScript.SelectBuilding(building.GetComponent<BuildingScript>(), false);
+        gameManagerScript.SelectBuilding(building.GetComponent<BuildingScript>());
     }
 
-    public void DeleteBuilding()
+    public void RemoveBuilding()
     {
         Vector2[] buildingCells = selectedBuilding.GetComponent<BuildingScript>().cells;
         islandScript.RemoveBuilding(selectedBuilding);
