@@ -4,10 +4,9 @@ using UnityEngine;
 
 public class PeasantChildScript : PeasantScript
 {
-
     void Update()
     {
-        //CheckIfArrivedAtDestination();
+        CheckIfArrivedAtDestination();
         if (Input.GetKeyDown(KeyCode.O))
         {
             StopCharacter();

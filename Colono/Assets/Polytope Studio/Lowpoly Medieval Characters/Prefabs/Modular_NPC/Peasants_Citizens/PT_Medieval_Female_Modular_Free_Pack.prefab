@@ -2324,6 +2324,7 @@ GameObject:
   - component: {fileID: -1225516197737836024}
   - component: {fileID: 5434705866306788019}
   - component: {fileID: -656344730443757793}
+  - component: {fileID: -6096463771212986977}
   m_Layer: 0
   m_Name: PT_Medieval_Female_Modular_Free_Pack
   m_TagString: Untagged
@@ -2416,10 +2417,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c13b48975d1134468592b6cd0280f17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  npcManager: {fileID: 0}
-  walkSpeed: 2
-  runSpeed: 4
+  walkSpeed: 0.3
+  runSpeed: 1
   rotateSpeed: 4
+  state: 0
+  constructionScript: {fileID: 0}
   head1: {fileID: 7072988294438679710}
   head2: {fileID: 7277769846642262525}
   lowerNaked: {fileID: 2153526700735156509}
@@ -2428,7 +2430,6 @@ MonoBehaviour:
   upperClothed: {fileID: 8231445908065054936}
   material: {fileID: 2100000, guid: c79855c6f54ed954293d041acc3120a8, type: 2}
   isNaked: 0
-  state: 0
   axe: {fileID: 1923715335560470710}
   basket: {fileID: 4953375152052313705}
 --- !u!195 &-656344730443757793
@@ -2453,6 +2454,22 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!208 &-6096463771212986977
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5233567644430770418}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 0.5, y: 1, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 1, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!1 &5350411030875642772
 GameObject:
   m_ObjectHideFlags: 0

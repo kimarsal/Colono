@@ -4,10 +4,9 @@ using UnityEngine;
 
 public class WarriorScript : MonoBehaviour
 {
-    public float speed;
-    public float rotateSpeed;
-    private Vector3 nextPos;
-    private Rigidbody rb;
+    public float walkSpeed;
+    public float runSpeed;
+    private bool isRunning = false;
 
     public GameObject head1;
     public GameObject head2;
@@ -30,6 +29,8 @@ public class WarriorScript : MonoBehaviour
     public GameObject gauntletsEnemy;
     public GameObject helmetEnemy;
 
+    public GameObject sword;
+
     public Material material;
     private GameObject head;
     private GameObject hair;
@@ -39,17 +40,16 @@ public class WarriorScript : MonoBehaviour
     public bool isEnemy = false;
     public bool isMale = false;
     private enum PeasantState { Idle, Attack};
+    private PeasantState state;
     private Animator animator;
 
     void Start()
     {
         SetAppearence();
 
-        rb = GetComponent<Rigidbody>();
-
+        state = PeasantState.Attack;
         animator = GetComponent<Animator>();
-        animator.SetInteger("State", (int)PeasantState.Attack);
-        nextPos = transform.position;
+        animator.SetInteger("State", (int)state);
     }
 
     public void SetAppearence()
@@ -107,38 +107,20 @@ public class WarriorScript : MonoBehaviour
         }
 
         Material newMaterial = new Material(material);
-        //newMaterial.SetColor("_OTHERCOLOR", Random.ColorHSV());
         newMaterial.SetColor("_SKINCOLOR", NPCManager.GetRandomSkinColor()); //Color pell
         newMaterial.SetColor("_HAIRCOLOR", NPCManager.GetRandomHairColor()); //Color cabell
+        newMaterial.SetColor("_CLOTH1COLOR", Random.ColorHSV()); //Color roba 1
+        newMaterial.SetColor("_CLOTH2COLOR", Random.ColorHSV()); //Color roba 2
+        newMaterial.SetColor("_CLOTH3COLOR", Random.ColorHSV()); //Color roba 3
+        //newMaterial.SetTexture("_COATOFARMSMASK", GameManager.coatOfArms);
         head.GetComponent<SkinnedMeshRenderer>().material = newMaterial;
         hair.GetComponent<SkinnedMeshRenderer>().material = newMaterial;
         lower.GetComponent<SkinnedMeshRenderer>().material = newMaterial;
         upper.GetComponent<SkinnedMeshRenderer>().material = newMaterial;
     }
 
-    void Update()
+    public void ToggleSword()
     {
-        /*if (Input.GetKeyDown(KeyCode.W))
-            animator.SetInteger("State", (int)PeasantState.Walking);
-        if (Input.GetKeyDown(KeyCode.C))
-            animator.SetInteger("State", (int)PeasantState.Chopping);
-        if (Input.GetKeyDown(KeyCode.G))
-            animator.SetInteger("State", (int)PeasantState.Gathering);*/
-        if (Vector3.Distance(transform.position, nextPos) < 0.01f)
-        {
-            nextPos = new Vector3(Random.Range(NPCManager.minX, NPCManager.maxX), 0f, Random.Range(NPCManager.minZ, NPCManager.maxZ));
-            //animator.SetInteger("State", (int)PeasantState.Chopping);
-        }
-        if(animator.GetCurrentAnimatorClipInfo(0)[0].clip.name == "Warrior_Run")
-        {
-            transform.position = Vector3.MoveTowards(transform.position, nextPos, speed * Time.deltaTime);
-        }
-
-        Vector3 targetDirection = nextPos - transform.position;
-        if (targetDirection != Vector3.zero)
-        {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetDirection), rotateSpeed * Time.deltaTime);
-            transform.eulerAngles = new Vector3(0, transform.eulerAngles.y, 0);
-        }
+        sword.SetActive(!sword.activeSelf);
     }
 }

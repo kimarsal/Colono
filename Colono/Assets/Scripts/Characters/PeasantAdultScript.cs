@@ -5,11 +5,13 @@ using UnityEngine;
 public class PeasantAdultScript : PeasantScript
 {
     public GameObject axe;
+    public GameObject shovel;
     public GameObject basket;
+    public GameObject wateringCan;
 
     void Update()
     {
-        //CheckIfArrivedAtDestination();
+        CheckIfArrivedAtDestination();
         if (Input.GetKeyDown(KeyCode.Y))
         {
             StopCharacter();
@@ -40,8 +42,18 @@ public class PeasantAdultScript : PeasantScript
         axe.SetActive(!axe.activeSelf);
     }
 
+    public void ToggleShovel()
+    {
+        shovel.SetActive(state == PeasantState.Digging);
+    }
+
     public void ToggleBasket()
     {
         basket.SetActive(!basket.activeSelf);
+    }
+
+    public void ToggleWateringCan()
+    {
+        wateringCan.SetActive(state == PeasantState.Watering);
     }
 }

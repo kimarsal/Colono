@@ -1930,6 +1930,7 @@ GameObject:
   - component: {fileID: -6809046889581306478}
   - component: {fileID: 8777550085024709020}
   - component: {fileID: 7555130144577166092}
+  - component: {fileID: 8792296199089095173}
   m_Layer: 0
   m_Name: PT_Medieval_Male_Modular_Free_Pack
   m_TagString: Untagged
@@ -2021,10 +2022,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c13b48975d1134468592b6cd0280f17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  npcManager: {fileID: 0}
-  walkSpeed: 2
-  runSpeed: 4
+  walkSpeed: 0.3
+  runSpeed: 1
   rotateSpeed: 4
+  state: 0
+  constructionScript: {fileID: 0}
   head1: {fileID: 1953896830827328188}
   head2: {fileID: 2938323828424686716}
   lowerNaked: {fileID: 4187010985156663354}
@@ -2033,7 +2035,6 @@ MonoBehaviour:
   upperClothed: {fileID: 1125232617463963011}
   material: {fileID: 2100000, guid: c79855c6f54ed954293d041acc3120a8, type: 2}
   isNaked: 0
-  state: 0
   axe: {fileID: 3854085465935333273}
   basket: {fileID: 6448953863368073061}
 --- !u!195 &7555130144577166092
@@ -2058,6 +2059,22 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!208 &8792296199089095173
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3938869664887627426}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 0
+  m_Extents: {x: 0.5, y: 1, z: 0.5}
+  m_MoveThreshold: 0.1
+  m_Carve: 0
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: 1, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!1 &3984568644409324313
 GameObject:
   m_ObjectHideFlags: 0

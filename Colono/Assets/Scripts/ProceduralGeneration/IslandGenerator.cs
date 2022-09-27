@@ -36,9 +36,9 @@ public class IslandGenerator : MonoBehaviour
         zoneType.height = 0;
     }
 
-    public Island GenerateIsland(Vector2 position)
+    public Island GenerateIsland(Vector2 position, IslandEditor islandEditor)
     {
-        return new Island(position, transform, mapMaterial, this);
+        return new Island(position, transform, mapMaterial, this, islandEditor);
     }
 
     public MeshData GenerateTerrainMesh(MapData mapData)
@@ -100,7 +100,7 @@ public class Island
     public MeshData meshData;
     public int[,] regionMap;
 
-    public Island(Vector2 coord, Transform parent, Material material, IslandGenerator islandGenerator)
+    public Island(Vector2 coord, Transform parent, Material material, IslandGenerator islandGenerator, IslandEditor islandEditor)
     {
         Vector2 position = coord;
         Vector3 positionV3 = new Vector3(position.x, 0, position.y);
@@ -131,7 +131,6 @@ public class Island
         meshFilter.mesh = mesh;
         meshCollider.sharedMesh = mesh;
 
-        NavMeshSurface surface = island.AddComponent<NavMeshSurface>();
 
         CMR.ConvexDecomposition.Bake(island, CMR.VHACDSession.Create(), null, false, true, false);
         foreach (MeshCollider triggerCollider in island.transform.GetChild(0).GetComponentsInChildren<MeshCollider>())
@@ -139,6 +138,8 @@ public class Island
             triggerCollider.isTrigger = true;
         }
 
+        GameObject coastObstacle = GameObject.Instantiate(islandEditor.coastObstacle, island.transform);
+        NavMeshSurface surface = island.AddComponent<NavMeshSurface>();
 
     }
 

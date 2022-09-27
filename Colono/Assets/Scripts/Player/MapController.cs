@@ -46,10 +46,11 @@ public class MapController : MonoBehaviour
         }*/
 
         bool closeToIsland = false;
+        Vector3 colliderClosestPoint = new Vector3();
         float minDistance = 10;
         foreach(MeshCollider meshCollider in nextIsland.transform.GetChild(0).GetComponentsInChildren<MeshCollider>())
         {
-            Vector3 colliderClosestPoint = Physics.ClosestPoint(transform.position, meshCollider, nextIsland.transform.position, nextIsland.transform.rotation);
+            colliderClosestPoint = Physics.ClosestPoint(transform.position, meshCollider, nextIsland.transform.position, nextIsland.transform.rotation);
             float distanceToClosestPoint = Vector3.Distance(transform.position, colliderClosestPoint);
             if (distanceToClosestPoint < minDistance)
             {
@@ -65,6 +66,7 @@ public class MapController : MonoBehaviour
         //Debug.Log(minDistance);
         if (closeToIsland)
         {
+            GetComponent<ShipScript>().SetClosestPoint(colliderClosestPoint);
             nextIsland.GetComponent<IslandScript>().PlayerIsNear();
         }
         else

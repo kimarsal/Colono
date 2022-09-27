@@ -9,7 +9,7 @@ public class NPCManager : MonoBehaviour
     public GameObject npcs;
     private List<GameObject> peasantsList = new List<GameObject>();
 
-    public int numPeasants = 10;
+    public int availablePeasants;
     public int numWarriors = 0;
     public static float minX = -20;
     public static float maxX = 20;
@@ -61,7 +61,7 @@ public class NPCManager : MonoBehaviour
 
     public void SpawnPeasants()
     {
-        for (int i = 0; i < numPeasants; i++)
+        for (int i = 0; i < availablePeasants; i++)
         {
             GameObject prefab = islandEditor.malePeasantPrefab;
             switch (i % 3)
@@ -72,42 +72,48 @@ public class NPCManager : MonoBehaviour
                     prefab = islandEditor.childPeasantPrefab; break;
             }
             GameObject npc = Instantiate(prefab, GetRandomPoint(transform.position), prefab.transform.rotation, npcs.transform);
-            npc.GetComponent<PeasantScript>().npcManager = this;
-            peasantsList.Add(npc);
-        }
-    }
-
-    public void GeneratePeasants(BuildingScript buildingScript)
-    {
-        for (int i = 0; i < numPeasants; i++)
-        {
-            GameObject prefab = islandEditor.malePeasantPrefab;
-            switch (i % 3)
-            {
-                case 1:
-                    prefab = islandEditor.femalePeasantPrefab; break;
-                case 2:
-                    prefab = islandEditor.childPeasantPrefab; break;
-            }
-            GameObject npc = Instantiate(prefab, buildingScript.center.position, prefab.transform.rotation, npcs.transform);
-            npc.GetComponent<PeasantScript>().npcManager = this;
-            npc.GetComponent<PeasantScript>().settlementScript = buildingScript;
-            npc.SetActive(false);
             peasantsList.Add(npc);
         }
     }
 
     public int GetAvailablePeasants()
     {
-        return numPeasants;
+        return availablePeasants;
+    }
+
+    public void SendPeasantToIsland(ShipScript shipScript, bool adding)
+    {
+        availablePeasants -= adding ? 1 : -1;
+        shipScript.numPeasants += adding ? 1 : -1;
+
+        if (adding)
+        {
+            GameObject peasant = peasantsList[0];
+            peasant.transform.parent = shipScript.npcs.transform;
+            shipScript.peasantsList.Add(peasant);
+            peasantsList.Remove(peasant);
+            peasant.GetComponent<PeasantScript>().constructionScript = shipScript;
+            peasant.GetComponent<PeasantScript>().UpdateTask();
+        }
+        else
+        {
+            GameObject peasant = shipScript.peasantsList[0];
+            peasant.transform.parent = npcs.transform;
+            peasant.transform.localScale = Vector3.one * 0.4f;
+            peasant.transform.position = shipScript.center.position;
+            peasantsList.Add(peasant);
+            shipScript.peasantsList.Remove(peasant);
+            peasant.SetActive(true);
+            peasant.GetComponent<PeasantScript>().UpdateTask();
+        }
     }
 
     public void SendPeasantToArea(ConstructionScript constructionScript, bool adding)
     {
-        numPeasants -= adding ? 1 : -1;
+        availablePeasants -= adding ? 1 : -1;
         constructionScript.numPeasants += adding ? 1 : -1;
 
-        for(int i = 0; i < numPeasants; i++)
+        for (int i = 0; i < peasantsList.Count; i++)
         {
             PeasantScript peasantScript = peasantsList[i].GetComponent<PeasantScript>();
             if (adding && peasantScript.constructionScript == null)
@@ -128,10 +134,19 @@ public class NPCManager : MonoBehaviour
 
     public void SendPeasantsBack(ConstructionScript constructionScript)
     {
-        numPeasants += constructionScript.numPeasants;
+        availablePeasants += constructionScript.numPeasants;
+        for (int i = 0; i < peasantsList.Count; i++)
+        {
+            PeasantScript peasantScript = peasantsList[i].GetComponent<PeasantScript>();
+            if (peasantScript.constructionScript == constructionScript)
+            {
+                peasantScript.constructionScript = null;
+                peasantScript.UpdateTask();
+            }
+        }
     }
 
-    public Vector3 GetRandomPoint(Vector3 originPos)
+    public static Vector3 GetRandomPoint(Vector3 originPos)
     {
         NavMeshHit hit;
         do

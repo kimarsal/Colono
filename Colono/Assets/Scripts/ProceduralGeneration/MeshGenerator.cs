@@ -32,14 +32,14 @@ public static class MeshGenerator {
 
 	}
 
-	public static MeshData GenerateCell(Vector2 pos, MeshData islandMeshData)
+	public static MeshData GenerateCell(Vector2 pos, float heightOffset, MeshData islandMeshData)
     {
 		MeshData meshData = new MeshData(2, 2);
 		int[] triangles = new int[6];
 		int j = (int)(pos.y * (IslandGenerator.mapChunkSize-1) + pos.x) * 6;
 		Vector3[] vertices = new Vector3[6];
 		for (int i = 0; i < 6; i++) {
-			vertices[i] = islandMeshData.vertices[islandMeshData.triangles[j]] + new Vector3(0, 0.1f, 0);
+			vertices[i] = islandMeshData.vertices[islandMeshData.triangles[j]] + new Vector3(0, heightOffset, 0);
 			j++;
 		}
 

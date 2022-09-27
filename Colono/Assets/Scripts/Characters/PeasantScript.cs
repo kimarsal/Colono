@@ -5,17 +5,14 @@ using UnityEngine.AI;
 
 public class PeasantScript : MonoBehaviour
 {
-    public NPCManager npcManager;
     public float walkSpeed;
     public float runSpeed;
-    public float rotateSpeed;
     private bool isRunning = false;
 
-    public enum PeasantState { Moving, Chopping, Planting, Gathering, Dancing };
+    public enum PeasantState { Moving, Chopping, Digging, Planting, Watering, Gathering, Milking, Dancing };
     protected Animator animator;
     public PeasantState state;
     private NavMeshAgent navMeshAgent;
-    public BuildingScript settlementScript;
     public ConstructionScript constructionScript;
 
     [Header("Appearence")]
@@ -35,14 +32,13 @@ public class PeasantScript : MonoBehaviour
 
     public bool isNaked = false;
 
-    void Start()
-    {
-        SetAppearence();
-        //StartCoroutine(WaitForNextDestination());
-    }
 
-    public void SetAppearence()
-    {
+    public void InitializePeasant()
+{
+        animator = GetComponent<Animator>();
+        navMeshAgent = GetComponent<NavMeshAgent>();
+        animator.SetInteger("State", (int)PeasantState.Moving);
+
         if (Random.Range(0, 2) == 0)
         {
             head1.SetActive(false);
@@ -86,10 +82,15 @@ public class PeasantScript : MonoBehaviour
 
     protected void CheckIfArrivedAtDestination()
     {
-        if (!navMeshAgent.isStopped && Vector3.Distance(transform.position, navMeshAgent.destination) < 0.01f)
+        if (!navMeshAgent.isStopped)
         {
-            StopCharacter();
-            if (constructionScript == null) gameObject.SetActive(false);
+            float d = Vector3.Distance(transform.position, navMeshAgent.destination);
+            if (d < 1f)
+            {
+                StopCharacter();
+                if (constructionScript == null) StartCoroutine(WaitForNextDestination());
+                else if (constructionScript.isInterior) gameObject.SetActive(false);
+            }
         }
     }
 
@@ -102,8 +103,7 @@ public class PeasantScript : MonoBehaviour
     protected IEnumerator WaitForNextDestination()
     {
         yield return new WaitForSeconds(1f);
-        SetDestination(npcManager.GetRandomPoint(transform.position));
-        //SetDestination(new Vector3(Random.Range(NPCManager.minX, NPCManager.maxX), 0f, Random.Range(NPCManager.minZ, NPCManager.maxZ)));
+        SetDestination(NPCManager.GetRandomPoint(transform.position));
     }
 
     public void SetDestination(Vector3 destination)
@@ -119,14 +119,10 @@ public class PeasantScript : MonoBehaviour
     {
         if(constructionScript == null)
         {
-            SetDestination(settlementScript.center.position);
+            SetDestination(NPCManager.GetRandomPoint(transform.position));
         }
         else
         {
-            animator = GetComponent<Animator>();
-            navMeshAgent = GetComponent<NavMeshAgent>();
-            animator.SetInteger("State", (int)PeasantState.Moving);
-
             SetDestination(constructionScript.center.position);
         }
     }
