@@ -31,6 +31,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     private BuildingScript buildingScript;
     private int buildingOrientation = 0;
     private GameObject selectedEnclosure;
+    private List<ItemScript> selectedItems;
 
     private void Start()
     {
@@ -120,10 +121,13 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 buildingScript.cells = selectedCells;
                 buildingScript.orientation = buildingOrientation;
                 buildingScript.EnableCollider();
-                buildingScript.isBuilding = true;
+
+                buildingScript.peasants = new GameObject("Peasants");
+                buildingScript.peasants.transform.parent = selectedBuilding.transform;
+                buildingScript.peasants.transform.localPosition = Vector3.zero;
+
                 islandScript.AddBuilding(selectedBuilding); //Col·locar edifici
 
-                islandScript.ClearArea(selectedCells);
                 InvertRegions(selectedCells, false);
                 foreach (Vector2 cell in selectedCells)
                 {
@@ -456,7 +460,16 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         }
         else
         {
-            gameManagerScript.ShowButtons();
+            if (islandScript.isCellTaken(selectedCell))
+            {
+                ItemScript item = islandScript.GetItemByCell(selectedCell);
+                selectedItems = new List<ItemScript>() { item };
+                gameManagerScript.SelectItems(item.isScheduledForClearing);
+            }
+            else
+            {
+                gameManagerScript.ShowButtons();
+            }
         }
     }
 
@@ -469,35 +482,67 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         }
         else
         {
-            bool isValidArea = selectedCells[selectedCells.Length - 1].x - selectedCells[0].x >= 2 && selectedCells[selectedCells.Length - 1].y - selectedCells[0].y >= 2;
-            if (isValidArea) gameManagerScript.SelectArea();
-            else gameManagerScript.ShowButtons();
+            bool areaContainsItems = false;
+            bool areScheduledForClearing = false;
+            selectedItems = new List<ItemScript>();
+            foreach (Vector2 cell in selectedCells)
+            {
+                if (islandScript.isCellTaken(cell))
+                {
+                    areaContainsItems = true;
+                    ItemScript item = islandScript.GetItemByCell(cell);
+                    selectedItems.Add(item);
+                    if (item.isScheduledForClearing) areScheduledForClearing = true;
+                }
+            }
+            if (areaContainsItems)
+            {
+                gameManagerScript.SelectItems(areScheduledForClearing);
+            }
+            else
+            {
+                bool isValidArea = selectedCells[selectedCells.Length - 1].x - selectedCells[0].x >= 2 && selectedCells[selectedCells.Length - 1].y - selectedCells[0].y >= 2;
+                if (isValidArea) gameManagerScript.SelectArea();
+                else gameManagerScript.ShowButtons();
+            }
         }
     }
 
-    public void CreateEnclosure(EnclosureScript.EnclosureType type)
+    public void ChangeSelectedItemsState(bool toClear)
+    {
+        foreach(ItemScript item in selectedItems)
+        {
+            if (item.ChangeItemClearingState(toClear))
+            {
+                if (toClear) islandScript.npcManager.AddTask(item);
+                else islandScript.npcManager.RemoveTask(item);
+            }
+        }
+    }
+
+    public void CreateEnclosure(EnclosureScript.EnclosureType enclosureType)
     {
         GameObject enclosure = new GameObject("Enclosure");
         enclosure.transform.parent = islandScript.constructions.transform;
         enclosure.transform.localPosition = Vector3.zero;
         EnclosureScript enclosureScript = null;
-        switch (type)
+        switch (enclosureType)
         {
             case EnclosureScript.EnclosureType.Garden: enclosureScript = enclosure.AddComponent<GardenScript>(); break;
             case EnclosureScript.EnclosureType.Barn: enclosureScript = enclosure.AddComponent<BarnScript>(); break;
+            case EnclosureScript.EnclosureType.Training: enclosureScript = enclosure.AddComponent<TrainingScript>(); break;
         }
-        
+        enclosureScript.constructionType = ConstructionScript.ConstructionType.Enclosure;
         enclosureScript.cells = selectedCells;
-        enclosureScript.type = type;
+        enclosureScript.enclosureType = enclosureType;
         enclosureScript.width = (int)selectedCells[selectedCells.Length - 1].x - (int)selectedCells[0].x;
         enclosureScript.length = (int)selectedCells[selectedCells.Length - 1].y - (int)selectedCells[0].y;
         Transform enclosureCenter = Instantiate(islandEditorScript.constructionCenterPrefab,
             transform.position + (MeshGenerator.GetCellCenter(selectedCells[0], meshData) + MeshGenerator.GetCellCenter(selectedCells[selectedCells.Length - 1], meshData)) / 2,
-            islandEditorScript.constructionCenterPrefab.transform.rotation,
+            Quaternion.Euler(Vector3.zero),
             enclosure.transform).transform;
         enclosureScript.center = enclosureCenter;
         enclosureScript.islandScript = islandScript;
-        islandScript.ClearArea(selectedCells);
 
         GameObject fences = new GameObject("Fences");
         fences.transform.parent = enclosure.transform;
@@ -510,7 +555,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             GameObject fence = Instantiate(islandEditorScript.fences[UnityEngine.Random.Range(0, islandEditorScript.fences.Length)], transform.position + positions[i], rotations[i], fences.transform);
         }
 
-        if (type == EnclosureScript.EnclosureType.Barn)
+        if (enclosureType == EnclosureScript.EnclosureType.Barn)
         {
             ((BarnScript)enclosureScript).openGate = Instantiate(islandEditorScript.gateOpen, transform.position + positions[positions.Length - 1], rotations[rotations.Length - 1], fences.transform);
             ((BarnScript)enclosureScript).openGate.SetActive(false);
@@ -523,30 +568,37 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         else
         {
             GameObject post = Instantiate(islandEditorScript.post, transform.position + positions[positions.Length - 1], rotations[rotations.Length - 1], fences.transform);
-            ((GardenScript)enclosureScript).patches = new GameObject("Crops");
-            ((GardenScript)enclosureScript).patches.transform.parent = enclosure.transform;
-            ((GardenScript)enclosureScript).patches.transform.localPosition = Vector3.zero;
+            if (enclosureType == EnclosureScript.EnclosureType.Garden)
+            {
+                ((GardenScript)enclosureScript).patches = new GameObject("Crops");
+                ((GardenScript)enclosureScript).patches.transform.parent = enclosure.transform;
+                ((GardenScript)enclosureScript).patches.transform.localPosition = Vector3.zero;
+            }
         }
+
+        enclosureScript.peasants = new GameObject("Peasants");
+        enclosureScript.peasants.transform.parent = enclosure.transform;
+        enclosureScript.peasants.transform.localPosition = Vector3.zero;
         islandScript.AddEnclosure(enclosure);
 
-        InvertRegions(selectedCells, type == EnclosureScript.EnclosureType.Garden);
+        InvertRegions(selectedCells, enclosureType == EnclosureScript.EnclosureType.Garden);
 
         selectedEnclosure = enclosure;
         gameManagerScript.SelectEnclosure(enclosureScript);
     }
 
-    public void Plant()
+    /*public void Plant()
     {
         GardenScript gardenScript = selectedEnclosure.GetComponent<GardenScript>();
         Vector3[] positions;
         MeshGenerator.GetCropPositions(selectedCells, meshData, out positions);
         for (int i = 0; i < positions.Length; i++)
         {
-            GameObject crop = Instantiate(islandEditorScript.tomato[1], transform.position + positions[i], islandEditorScript.tomato[1].transform.rotation, selectedEnclosure.transform.GetChild(1));
-            PatchScript cropScript = crop.AddComponent<PatchScript>();
-            cropScript.cell = selectedCells[i];
-            cropScript.cropType = PatchScript.CropType.Tomato;
-            gardenScript.AddCrop(selectedCells[i], cropScript);
+            GameObject patch = Instantiate(islandEditorScript.tomato[1], transform.position + positions[i], islandEditorScript.tomato[1].transform.rotation, selectedEnclosure.transform.GetChild(1));
+            PatchScript patchScript = patch.AddComponent<PatchScript>();
+            patchScript.cell = selectedCells[i];
+            patchScript.cropType = PatchScript.CropType.Tomato;
+            gardenScript.AddCrop(selectedCells[i], patchScript);
         }
 
         DestroyAllCells();
@@ -561,7 +613,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         }
 
         DestroyAllCells();
-    }
+    }*/
 
     public void SelectEnclosure(GameObject enclosure)
     {
@@ -572,7 +624,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     public void RemoveEnclosure()
     {
         Vector2[] enclosureCells = selectedEnclosure.GetComponent<EnclosureScript>().cells;
-        InvertRegions(enclosureCells, selectedEnclosure.GetComponent<EnclosureScript>().type == EnclosureScript.EnclosureType.Garden, true);
+        InvertRegions(enclosureCells, selectedEnclosure.GetComponent<EnclosureScript>().enclosureType == EnclosureScript.EnclosureType.Garden, true);
         islandScript.RemoveEnclosure(selectedEnclosure);
 
         DestroyAllCells();

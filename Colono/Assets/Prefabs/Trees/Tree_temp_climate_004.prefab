@@ -97,8 +97,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74aa8528bf1ad0344926f14bc722022e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  center: {x: 0, y: 0, z: 0}
+  taskType: 0
+  peasantScript: {fileID: 0}
+  itemType: 0
+  itemStrength: 3
   resourceType: 0
   resourceAmount: 10
+  npcManager: {fileID: 0}
+  clearingCanvas: {fileID: 0}
+  isScheduledForClearing: 0
 --- !u!208 &4903923286555461361
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -109,9 +117,9 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 0
-  m_Extents: {x: 0.711, y: 3.2010002, z: 0.76600003}
+  m_Extents: {x: 1, y: 3, z: 1}
   m_MoveThreshold: 0.1
   m_Carve: 0
   m_CarveOnlyStationary: 1
-  m_Center: {x: 0.054, y: 3.2010002, z: -0.136}
+  m_Center: {x: 0, y: 3, z: 0}
   m_TimeToStationary: 0.5

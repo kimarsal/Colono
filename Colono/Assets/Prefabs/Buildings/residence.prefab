@@ -47,14 +47,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0a56d236f14adb4496d54279423d076, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  constructionType: 2
   islandScript: {fileID: 0}
   cells: []
   length: 4
   width: 4
   center: {fileID: 2660757951229852377}
-  isEnclosure: 0
-  numPeasants: 0
-  type: 1
+  isBuilding: 1
+  isInterior: 1
+  peasants: {fileID: 0}
+  peasantList: []
+  buildingType: 1
   orientation: 0
 --- !u!65 &6398704646448144681
 BoxCollider:

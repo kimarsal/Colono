@@ -63,12 +63,17 @@ public class IslandScript : MonoBehaviour
         return itemsList.ContainsKey(cell);
     }
 
+    public ItemScript GetItemByCell(Vector2 cell)
+    {
+        return itemsList[cell].GetComponent<ItemScript>();
+    }
+
     public void AddItem(GameObject item, Vector2 cell)
     {
         itemsList.Add(cell, item);
     }
 
-    public void ClearArea(Vector2[] cells)
+    /*public void ClearArea(Vector2[] cells)
     {
         foreach(Vector2 cell in cells)
         {
@@ -77,7 +82,7 @@ public class IslandScript : MonoBehaviour
                 RemoveItemAtCell(cell);
             }
         }
-    }
+    }*/
 
     public void RemoveItemAtCell(Vector2 cell)
     {

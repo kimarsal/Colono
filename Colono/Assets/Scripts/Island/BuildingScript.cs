@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 public class BuildingScript : ConstructionScript
 {
     public enum BuildingType { Warehouse, Residence, Mine};
-    public BuildingType type;
+    public BuildingType buildingType;
 
     public int orientation;
 

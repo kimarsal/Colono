@@ -8,14 +8,13 @@ public class ShipScript : ConstructionScript
     public GameObject npcs;
     private IslandEditor islandEditor;
     private GameManager gameManagerScript;
-    public List<GameObject> peasantsList = new List<GameObject>();
 
     void Start()
     {
         gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
         islandEditor = GameObject.Find("GameManager").GetComponent<IslandEditor>();
 
-        for (int i = 0; i < numPeasants; i++)
+        for (int i = 0; i < gameManagerScript.numPeasants; i++)
         {
             GameObject prefab = islandEditor.malePeasantPrefab;
             switch (i % 3)
@@ -26,9 +25,10 @@ public class ShipScript : ConstructionScript
                     prefab = islandEditor.childPeasantPrefab; break;
             }
             GameObject peasant = Instantiate(prefab, center.position, prefab.transform.rotation, npcs.transform);
-            peasant.GetComponent<PeasantScript>().InitializePeasant();
+            PeasantScript peasantScript = peasant.GetComponent<PeasantScript>();
+            peasantScript.InitializePeasant();
             peasant.SetActive(false);
-            peasantsList.Add(peasant);
+            peasantList.Add(peasantScript);
         }
     }
 

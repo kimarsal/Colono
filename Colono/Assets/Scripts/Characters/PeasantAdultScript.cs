@@ -12,21 +12,32 @@ public class PeasantAdultScript : PeasantScript
     void Update()
     {
         CheckIfArrivedAtDestination();
-        if (Input.GetKeyDown(KeyCode.Y))
+        if (Input.GetKeyDown(KeyCode.T))
         {
             StopCharacter();
             animator.SetInteger("State", (int)PeasantState.Chopping);
         }
+        else if (Input.GetKeyDown(KeyCode.Y))
+        {
+            StopCharacter();
+            animator.SetInteger("State", (int)PeasantState.Digging);
+        }
         else if (Input.GetKeyDown(KeyCode.U))
         {
             StopCharacter();
-            animator.SetInteger("State", (int)PeasantState.Planting);
+            animator.SetInteger("State", (int)PeasantState.Pulling);
         }
         else if (Input.GetKeyDown(KeyCode.I))
         {
             StopCharacter();
             animator.SetInteger("Pick", 2);
             animator.SetInteger("State", (int)PeasantState.Gathering);
+        }
+        else if (Input.GetKeyDown(KeyCode.O))
+        {
+            StopCharacter();
+            animator.SetInteger("Pick", 2);
+            animator.SetInteger("State", (int)PeasantState.Watering);
         }
         else if (Input.GetKeyDown(KeyCode.P))
         {
@@ -44,7 +55,7 @@ public class PeasantAdultScript : PeasantScript
 
     public void ToggleShovel()
     {
-        shovel.SetActive(state == PeasantState.Digging);
+        shovel.SetActive(!shovel.activeSelf);
     }
 
     public void ToggleBasket()
@@ -54,6 +65,6 @@ public class PeasantAdultScript : PeasantScript
 
     public void ToggleWateringCan()
     {
-        wateringCan.SetActive(state == PeasantState.Watering);
+        wateringCan.SetActive(!wateringCan.activeSelf);
     }
 }

@@ -6,12 +6,15 @@ using UnityEngine.EventSystems;
 
 public class ConstructionScript : MonoBehaviour
 {
+    public enum ConstructionType { Ship, Enclosure, Building }
+    public ConstructionType constructionType;
+
     public IslandScript islandScript;
     public Vector2[] cells;
     public int length;
     public int width;
     public Transform center;
-    public bool isBuilding;
-    public bool isInterior;
-    public int numPeasants;
+
+    public GameObject peasants;
+    public List<PeasantScript> peasantList = new List<PeasantScript>();
 }

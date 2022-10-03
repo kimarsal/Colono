@@ -93,7 +93,7 @@ public class IslandManager : MonoBehaviour
                 {
                     switch (islandGenerator.regions[newIsland.regionMap[col, row]].name)
                     {
-                        case "Sand": prefab = islandEditor.beachItems[UnityEngine.Random.Range(0, islandEditor.beachItems.Length)]; break;
+                        //case "Sand": prefab = islandEditor.beachItems[UnityEngine.Random.Range(0, islandEditor.beachItems.Length)]; break;
                         case "Grass": prefab = islandEditor.fieldItems[UnityEngine.Random.Range(0, islandEditor.fieldItems.Length)]; break;
                         case "Grass 2": prefab = islandEditor.hillItems[UnityEngine.Random.Range(0, islandEditor.hillItems.Length)]; break;
                         //case "Rock": prefab = islandEditor.mountainItems[UnityEngine.Random.Range(0, islandEditor.mountainItems.Length)]; break;
@@ -106,7 +106,9 @@ public class IslandManager : MonoBehaviour
 
                 if(prefab != null)
                 {
-                    GameObject item = GameObject.Instantiate(prefab, newIsland.island.transform.position + itemPos, Quaternion.Euler(0, UnityEngine.Random.Range(0, 360), 0), islandScript.items.transform);
+                    GameObject item = Instantiate(prefab, newIsland.island.transform.position + itemPos, Quaternion.Euler(0, UnityEngine.Random.Range(0, 360), 0), islandScript.items.transform);
+                    item.GetComponent<ItemScript>().npcManager = islandScript.npcManager;
+                    item.GetComponent<ItemScript>().clearingCanvas = Instantiate(islandEditor.itemClearingCanvas, newIsland.island.transform.position + itemPos, Quaternion.Euler(Vector3.zero), item.transform);
                     islandScript.AddItem(item, itemCell);
                 }
 

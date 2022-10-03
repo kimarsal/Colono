@@ -2,18 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PatchScript : MonoBehaviour
+public class PatchScript : TaskScript
 {
     public IslandEditor islandEditor;
     public enum CropType { Corn, Cucumber, Grape, Pepper, Potato, Tomato }
     public enum CropState { Planted, Grown, Blossomed, Dead, Barren }
     public Vector2 cell;
-    public Vector3 center;
     private GameObject crop;
     private Quaternion orientation;
     public CropType cropType;
     public CropState cropState = CropState.Barren;
     private float timeSinceLastChange = 0f;
+
+    private void Start()
+    {
+        taskType = TaskType.Patch;
+    }
 
     public void PlantCrop(CropType type)
     {

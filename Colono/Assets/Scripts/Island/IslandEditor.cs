@@ -48,6 +48,7 @@ public class IslandEditor : MonoBehaviour
     public GameObject[] mountainItems;
 
     [Header("Others")]
+    public GameObject itemClearingCanvas;
     public GameObject constructionCenterPrefab;
     public GameObject coastObstacle;
 }

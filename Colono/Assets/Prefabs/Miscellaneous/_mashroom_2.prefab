@@ -97,8 +97,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74aa8528bf1ad0344926f14bc722022e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  center: {x: 0, y: 0, z: 0}
+  taskType: 0
+  peasantScript: {fileID: 0}
+  itemType: 3
+  itemStrength: 1
   resourceType: 2
   resourceAmount: 2
+  npcManager: {fileID: 0}
+  clearingCanvas: {fileID: 0}
+  isScheduledForClearing: 0
 --- !u!208 &-5983281828267317261
 NavMeshObstacle:
   m_ObjectHideFlags: 0

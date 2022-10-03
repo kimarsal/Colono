@@ -7,9 +7,9 @@ public class NPCManager : MonoBehaviour
 {
     public IslandEditor islandEditor;
     public GameObject npcs;
-    private List<GameObject> peasantsList = new List<GameObject>();
+    public List<PeasantScript> peasantList = new List<PeasantScript>();
+    private List<ItemScript> itemsToClear = new List<ItemScript>();
 
-    public int availablePeasants;
     public int numWarriors = 0;
     public static float minX = -20;
     public static float maxX = 20;
@@ -61,7 +61,7 @@ public class NPCManager : MonoBehaviour
 
     public void SpawnPeasants()
     {
-        for (int i = 0; i < availablePeasants; i++)
+        for (int i = 0; i < peasantList.Count; i++)
         {
             GameObject prefab = islandEditor.malePeasantPrefab;
             switch (i % 3)
@@ -72,77 +72,107 @@ public class NPCManager : MonoBehaviour
                     prefab = islandEditor.childPeasantPrefab; break;
             }
             GameObject npc = Instantiate(prefab, GetRandomPoint(transform.position), prefab.transform.rotation, npcs.transform);
-            peasantsList.Add(npc);
+            peasantList.Add(npc.GetComponent<PeasantScript>());
         }
-    }
-
-    public int GetAvailablePeasants()
-    {
-        return availablePeasants;
     }
 
     public void SendPeasantToIsland(ShipScript shipScript, bool adding)
     {
-        availablePeasants -= adding ? 1 : -1;
-        shipScript.numPeasants += adding ? 1 : -1;
+        if (adding) // Enviar al vaixell
+        {
+            PeasantScript peasantScript = peasantList[0];
+            peasantScript.transform.parent = shipScript.npcs.transform;
+            shipScript.peasantList.Add(peasantScript);
+            peasantList.Remove(peasantScript);
+            peasantScript.constructionScript = shipScript;
+            ((PeasantAdultScript)peasantScript).UpdateTask();
+        }
+        else // Enviar a l'illa
+        {
+            PeasantScript peasantScript = shipScript.peasantList[0];
+            peasantScript.transform.parent = npcs.transform;
+            peasantScript.transform.localScale = Vector3.one * 0.4f;
+            peasantScript.transform.position = shipScript.center.position;
+            peasantList.Add(peasantScript);
+            shipScript.peasantList.Remove(peasantScript);
+            peasantScript.gameObject.SetActive(true);
 
-        if (adding)
-        {
-            GameObject peasant = peasantsList[0];
-            peasant.transform.parent = shipScript.npcs.transform;
-            shipScript.peasantsList.Add(peasant);
-            peasantsList.Remove(peasant);
-            peasant.GetComponent<PeasantScript>().constructionScript = shipScript;
-            peasant.GetComponent<PeasantScript>().UpdateTask();
+            if(peasantScript.peasantType == PeasantScript.PeasantType.Adult)
+            {
+                for (int i = 0; i < itemsToClear.Count; i++)
+                {
+                    if (itemsToClear[i].peasantScript == null)
+                    {
+                        itemsToClear[i].peasantScript = (PeasantAdultScript)peasantScript;
+                        ((PeasantAdultScript)peasantScript).task = itemsToClear[i];
+                        break;
+                    }
+                }
+            }
+            ((PeasantAdultScript)peasantScript).UpdateTask();
         }
-        else
+    }
+
+    public void AddTask(ItemScript item)
+    {
+        itemsToClear.Add(item);
+        for (int i = 0; i < peasantList.Count; i++)
         {
-            GameObject peasant = shipScript.peasantsList[0];
-            peasant.transform.parent = npcs.transform;
-            peasant.transform.localScale = Vector3.one * 0.4f;
-            peasant.transform.position = shipScript.center.position;
-            peasantsList.Add(peasant);
-            shipScript.peasantsList.Remove(peasant);
-            peasant.SetActive(true);
-            peasant.GetComponent<PeasantScript>().UpdateTask();
+            PeasantAdultScript peasantScript = peasantList[i].GetComponent<PeasantAdultScript>();
+            if (peasantScript != null && peasantScript.constructionScript == null && peasantScript.task == null) //Si és adult i no té tasques
+            {
+                peasantScript.task = item;
+                item.peasantScript = peasantScript;
+                peasantScript.UpdateTask();
+                break;
+            }
         }
+    }
+
+    public void RemoveTask(ItemScript item)
+    {
+        itemsToClear.Remove(item);
     }
 
     public void SendPeasantToArea(ConstructionScript constructionScript, bool adding)
     {
-        availablePeasants -= adding ? 1 : -1;
-        constructionScript.numPeasants += adding ? 1 : -1;
-
-        for (int i = 0; i < peasantsList.Count; i++)
+        if (adding)
         {
-            PeasantScript peasantScript = peasantsList[i].GetComponent<PeasantScript>();
-            if (adding && peasantScript.constructionScript == null)
+            for (int i = 0; i < peasantList.Count; i++)
             {
-                peasantScript.constructionScript = constructionScript;
-                peasantsList[i].SetActive(true);
-                peasantScript.UpdateTask();
-                break;
+                PeasantScript peasantScript = peasantList[i];
+                if(constructionScript.constructionType == ConstructionScript.ConstructionType.Ship
+                    || peasantScript.peasantType == PeasantScript.PeasantType.Adult) //Si la construcció és el vaixell o és adult
+                {
+                    peasantScript.constructionScript = constructionScript;
+                    peasantScript.transform.parent = constructionScript.peasants.transform;
+                    constructionScript.peasantList.Add(peasantScript);
+                    peasantList.Remove(peasantScript);
+                    ((PeasantAdultScript)peasantScript).UpdateTask();
+                    break;
+                }
             }
-            else if(!adding && peasantScript.constructionScript == constructionScript)
-            {
-                peasantScript.constructionScript = null;
-                peasantScript.UpdateTask();
-                break;
-            }
+        }
+        else
+        {
+            PeasantScript peasantScript = constructionScript.peasantList[0];
+            peasantScript.constructionScript = null;
+            peasantScript.transform.parent = npcs.transform;
+            peasantList.Add(peasantScript);
+            constructionScript.peasantList.Remove(peasantScript);
+            ((PeasantAdultScript)peasantScript).UpdateTask();
         }
     }
 
-    public void SendPeasantsBack(ConstructionScript constructionScript)
+    public void SendAllPeasantsBack(ConstructionScript constructionScript)
     {
-        availablePeasants += constructionScript.numPeasants;
-        for (int i = 0; i < peasantsList.Count; i++)
+        for (int i = 0; i < constructionScript.peasantList.Count; i++)
         {
-            PeasantScript peasantScript = peasantsList[i].GetComponent<PeasantScript>();
-            if (peasantScript.constructionScript == constructionScript)
-            {
-                peasantScript.constructionScript = null;
-                peasantScript.UpdateTask();
-            }
+            PeasantScript peasantScript = constructionScript.peasantList[i];
+            peasantScript.constructionScript = null;
+            peasantScript.transform.parent = npcs.transform;
+            peasantList.Add(peasantScript);
+            ((PeasantAdultScript)peasantScript).UpdateTask();
         }
     }
 

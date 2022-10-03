@@ -7,5 +7,5 @@ using UnityEngine.EventSystems;
 public class EnclosureScript : ConstructionScript
 {
     public enum EnclosureType { Garden, Barn, Training };
-    public EnclosureType type;
+    public EnclosureType enclosureType;
 }
