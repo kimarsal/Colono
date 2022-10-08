@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class ConstructionScript : MonoBehaviour
+public abstract class ConstructionScript : MonoBehaviour
 {
     public enum ConstructionType { Ship, Enclosure, Building }
     public ConstructionType constructionType;
@@ -17,4 +17,6 @@ public class ConstructionScript : MonoBehaviour
 
     public GameObject peasants;
     public List<PeasantScript> peasantList = new List<PeasantScript>();
+
+    public abstract TaskScript GetNextPendingTask();
 }

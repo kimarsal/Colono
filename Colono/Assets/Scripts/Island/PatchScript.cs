@@ -19,9 +19,9 @@ public class PatchScript : TaskScript
         taskType = TaskType.Patch;
     }
 
-    public void PlantCrop(CropType type)
+    public void PlantCrop()
     {
-        cropType = type;
+        cropType = (CropType)Random.Range(0, CropType.GetNames(typeof(CropType)).Length);
         orientation = Quaternion.Euler(0f, Random.Range(0, 359), 0f);
         cropState = CropState.Planted;
         crop = Instantiate(GetCropPrefab(), center, orientation, transform);
@@ -29,9 +29,9 @@ public class PatchScript : TaskScript
 
     void Update()
     {
-        timeSinceLastChange += Time.deltaTime;
+        /*timeSinceLastChange += Time.deltaTime;
 
-        if (timeSinceLastChange > 2f)
+        if (timeSinceLastChange > 3f)
         {
             if(cropState < CropState.Blossomed)
             {
@@ -40,7 +40,35 @@ public class PatchScript : TaskScript
                 crop = Instantiate(GetCropPrefab(), center, orientation, transform);
             }
             timeSinceLastChange = 0;
+        }*/
+    }
+
+    public override void TaskProgress()
+    {
+        if (cropState == CropState.Barren) PlantCrop();
+        else
+        {
+            if (cropState < CropState.Blossomed)
+            {
+                cropState++;
+            }
+            else if (cropState == CropState.Blossomed)
+            {
+                cropState = CropState.Grown;
+                peasantScript.CompleteCropHarvesting(cropType);
+            }
+            Destroy(crop);
+            crop = Instantiate(GetCropPrefab(), center, orientation, transform);
         }
+        
+        PeasantAdultScript p = peasantScript;
+        peasantScript = null;
+        TaskScript patch = ((GardenScript)p.constructionScript).GetNextPendingTask();
+        patch.peasantScript = p;
+        p.task = patch;
+        p.UpdateTask();
+
+        timeSinceLastChange = 0;
     }
 
     private GameObject GetCropPrefab()
@@ -58,4 +86,5 @@ public class PatchScript : TaskScript
         if (prefab == null) prefab = islandEditor.grass[Random.Range(0, islandEditor.grass.Length)];
         return prefab;
     }
+
 }

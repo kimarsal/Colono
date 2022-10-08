@@ -14,4 +14,9 @@ public class BuildingScript : ConstructionScript
     {
         //GetComponent<BoxCollider>().enabled = true;
     }
+
+    public override TaskScript GetNextPendingTask()
+    {
+        return null;
+    }
 }

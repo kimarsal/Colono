@@ -85,7 +85,7 @@ public class NPCManager : MonoBehaviour
             shipScript.peasantList.Add(peasantScript);
             peasantList.Remove(peasantScript);
             peasantScript.constructionScript = shipScript;
-            ((PeasantAdultScript)peasantScript).UpdateTask();
+            peasantScript.UpdateTask();
         }
         else // Enviar a l'illa
         {
@@ -105,15 +105,15 @@ public class NPCManager : MonoBehaviour
                     {
                         itemsToClear[i].peasantScript = (PeasantAdultScript)peasantScript;
                         ((PeasantAdultScript)peasantScript).task = itemsToClear[i];
+                        ((PeasantAdultScript)peasantScript).UpdateTask();
                         break;
                     }
                 }
             }
-            ((PeasantAdultScript)peasantScript).UpdateTask();
         }
     }
 
-    public void AddTask(ItemScript item)
+    public void AddItemToClear(ItemScript item)
     {
         itemsToClear.Add(item);
         for (int i = 0; i < peasantList.Count; i++)
@@ -129,14 +129,34 @@ public class NPCManager : MonoBehaviour
         }
     }
 
-    public void RemoveTask(ItemScript item)
+    public void RemoveItemToClear(ItemScript item)
     {
         itemsToClear.Remove(item);
+        PeasantAdultScript peasantScript = item.peasantScript;
+        if(peasantScript != null) //Tenia un NPC vinculat
+        {
+            bool otherItemNeedsClearing = false;
+            foreach(ItemScript itemScript in itemsToClear)
+            {
+                if(itemScript.peasantScript == null)
+                {
+                    otherItemNeedsClearing = true;
+                    peasantScript.task = item;
+                    item.peasantScript = peasantScript;
+                    break;
+                }
+            }
+            if (!otherItemNeedsClearing)
+            {
+                peasantScript.task = null;
+            }
+            peasantScript.UpdateTask();
+        }
     }
 
     public void SendPeasantToArea(ConstructionScript constructionScript, bool adding)
     {
-        if (adding)
+        if (adding) // Enviar a la construcció
         {
             for (int i = 0; i < peasantList.Count; i++)
             {
@@ -148,19 +168,33 @@ public class NPCManager : MonoBehaviour
                     peasantScript.transform.parent = constructionScript.peasants.transform;
                     constructionScript.peasantList.Add(peasantScript);
                     peasantList.Remove(peasantScript);
-                    ((PeasantAdultScript)peasantScript).UpdateTask();
+
+                    if(peasantScript.peasantType == PeasantScript.PeasantType.Adult)
+                    {
+                        TaskScript task = constructionScript.GetNextPendingTask();
+                        if(task != null)
+                        {
+                            task.peasantScript = (PeasantAdultScript)peasantScript;
+                            ((PeasantAdultScript)peasantScript).task = task;
+                        }
+                    }
+                    peasantScript.UpdateTask();
                     break;
                 }
             }
         }
-        else
+        else // Desvincular de la construcció
         {
             PeasantScript peasantScript = constructionScript.peasantList[0];
             peasantScript.constructionScript = null;
+            if(peasantScript.peasantType == PeasantScript.PeasantType.Adult)
+            {
+                ((PeasantAdultScript)peasantScript).task.hasBeenCanceled = true;
+            }
             peasantScript.transform.parent = npcs.transform;
             peasantList.Add(peasantScript);
             constructionScript.peasantList.Remove(peasantScript);
-            ((PeasantAdultScript)peasantScript).UpdateTask();
+            peasantScript.UpdateTask();
         }
     }
 

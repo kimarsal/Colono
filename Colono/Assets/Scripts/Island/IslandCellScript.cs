@@ -44,7 +44,13 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     private void Update()
     {
-        if(selectMode == SelectMode.Building) //Si està col·locant un edifici
+        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D) ||
+            Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow))
+        {
+            OnPointerMove(null);
+        }
+
+        if (selectMode == SelectMode.Building) //Si està col·locant un edifici
         {
             if (Input.GetKeyDown(KeyCode.Comma))
             {
@@ -453,14 +459,14 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     private void SingleSelection()
     {
-        if (regionMap[(int)selectedCell.x, (int)selectedCell.y] > 10) //Garden
+        /*if (regionMap[(int)selectedCell.x, (int)selectedCell.y] > 10) //Garden
         {
             selectedEnclosure = islandScript.GetEnclosureByCell(selectedCell);
-            gameManagerScript.PatchSelected(selectedEnclosure.GetComponent<GardenScript>().isPatchEmpty(selectedCells));
+            gameManagerScript.PatchSelected(selectedEnclosure.GetComponent<GardenScript>().ArePatchesEmpty(selectedCells));
         }
         else
-        {
-            if (islandScript.isCellTaken(selectedCell))
+        {*/
+        if (islandScript.isCellTaken(selectedCell))
             {
                 ItemScript item = islandScript.GetItemByCell(selectedCell);
                 selectedItems = new List<ItemScript>() { item };
@@ -470,19 +476,19 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             {
                 gameManagerScript.ShowButtons();
             }
-        }
+        //}
     }
 
     private void MultipleSelection()
     {
-        if(regionMap[(int)selectedCell.x, (int)selectedCell.y] > 10) //Garden
+        /*if(regionMap[(int)selectedCell.x, (int)selectedCell.y] > 10) //Garden
         {
             selectedEnclosure = islandScript.GetEnclosureByCell(selectedCell);
-            gameManagerScript.PatchSelected(selectedEnclosure.GetComponent<GardenScript>().isPatchEmpty(selectedCells));
+            gameManagerScript.PatchSelected(selectedEnclosure.GetComponent<GardenScript>().ArePatchesEmpty(selectedCells));
         }
         else
-        {
-            bool areaContainsItems = false;
+        {*/
+        bool areaContainsItems = false;
             bool areScheduledForClearing = false;
             selectedItems = new List<ItemScript>();
             foreach (Vector2 cell in selectedCells)
@@ -505,17 +511,17 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 if (isValidArea) gameManagerScript.SelectArea();
                 else gameManagerScript.ShowButtons();
             }
-        }
+        //}
     }
 
     public void ChangeSelectedItemsState(bool toClear)
     {
         foreach(ItemScript item in selectedItems)
         {
-            if (item.ChangeItemClearingState(toClear))
+            if (item.ChangeItemClearingState(toClear)) //Ha canviat d'estat
             {
-                if (toClear) islandScript.npcManager.AddTask(item);
-                else islandScript.npcManager.RemoveTask(item);
+                if (toClear) islandScript.npcManager.AddItemToClear(item);
+                else islandScript.npcManager.RemoveItemToClear(item);
             }
         }
     }

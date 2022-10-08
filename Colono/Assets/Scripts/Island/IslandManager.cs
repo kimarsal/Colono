@@ -107,14 +107,15 @@ public class IslandManager : MonoBehaviour
                 if(prefab != null)
                 {
                     GameObject item = Instantiate(prefab, newIsland.island.transform.position + itemPos, Quaternion.Euler(0, UnityEngine.Random.Range(0, 360), 0), islandScript.items.transform);
-                    item.GetComponent<ItemScript>().npcManager = islandScript.npcManager;
+                    item.GetComponent<ItemScript>().islandScript = islandScript;
+                    item.GetComponent<ItemScript>().itemCell = itemCell;
                     item.GetComponent<ItemScript>().clearingCanvas = Instantiate(islandEditor.itemClearingCanvas, newIsland.island.transform.position + itemPos, Quaternion.Euler(Vector3.zero), item.transform);
                     islandScript.AddItem(item, itemCell);
                 }
 
                 int inc = UnityEngine.Random.Range(1, 20);
                 col += inc;
-                if(col > IslandGenerator.mapChunkSize - 1)
+                if(col >= IslandGenerator.mapChunkSize - 1)
                 {
                     row++;
                     col = col - IslandGenerator.mapChunkSize;

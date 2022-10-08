@@ -4,15 +4,23 @@ using UnityEngine;
 
 public class PeasantAdultScript : PeasantScript
 {
+    public TaskScript task;
+
+    [Header("Tools")]
     public GameObject axe;
     public GameObject shovel;
     public GameObject basket;
     public GameObject wateringCan;
 
+    private ItemScript.ResourceType resourceType;
+    private int resourceAmount;
+
+    private PatchScript.CropType cropType;
+
     void Update()
     {
         CheckIfArrivedAtDestination();
-        if (Input.GetKeyDown(KeyCode.T))
+        /*if (Input.GetKeyDown(KeyCode.T))
         {
             StopCharacter();
             animator.SetInteger("State", (int)PeasantState.Chopping);
@@ -43,9 +51,7 @@ public class PeasantAdultScript : PeasantScript
         {
             StopCharacter();
             StartCoroutine(WaitForNextDestination());
-        }
-
-
+        }*/
     }
 
     public void ToggleAxe()
@@ -66,5 +72,56 @@ public class PeasantAdultScript : PeasantScript
     public void ToggleWateringCan()
     {
         wateringCan.SetActive(!wateringCan.activeSelf);
+    }
+
+    public void CancelTask()
+    {
+        task = null;
+        StopCharacter();
+        StartCoroutine(WaitForNextRandomDestination());
+    }
+
+    public void DoTask()
+    {
+        if (task.taskType == TaskScript.TaskType.Item)
+        {
+            switch (((ItemScript)task).itemType)
+            {
+                case ItemScript.ItemType.Chop: animator.SetInteger("State", (int)PeasantState.Chopping); break;
+                case ItemScript.ItemType.Dig: animator.SetInteger("State", (int)PeasantState.Digging); break;
+                case ItemScript.ItemType.Pull: animator.SetInteger("State", (int)PeasantState.Pulling); break;
+                case ItemScript.ItemType.Pick: animator.SetInteger("Pick", 0); animator.SetInteger("State", (int)PeasantState.Gathering); break;
+            }
+        }
+        else
+        {
+            switch (((PatchScript)task).cropState)
+            {
+                case PatchScript.CropState.Barren: animator.SetInteger("State", (int)PeasantState.Planting); break;
+                case PatchScript.CropState.Planted: case PatchScript.CropState.Grown: animator.SetInteger("State", (int)PeasantState.Watering); break;
+                case PatchScript.CropState.Blossomed: animator.SetInteger("Pick", 1); animator.SetInteger("State", (int)PeasantState.Gathering); break;
+            }
+        }
+    }
+
+    private void TaskProgress()
+    {
+        task.TaskProgress();
+    }
+
+    public void CompleteItemRemoval(ItemScript.ResourceType rt, int ra)
+    {
+        resourceType = rt;
+        resourceAmount = ra;
+        speechBubble.gameObject.SetActive(true);
+        speechBubble.DisplayResource(resourceType);
+        CancelTask();
+    }
+
+    public void CompleteCropHarvesting(PatchScript.CropType ct)
+    {
+        cropType = ct;
+        speechBubble.gameObject.SetActive(true);
+        speechBubble.DisplayCrop(cropType);
     }
 }

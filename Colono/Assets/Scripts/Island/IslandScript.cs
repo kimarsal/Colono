@@ -86,15 +86,7 @@ public class IslandScript : MonoBehaviour
 
     public void RemoveItemAtCell(Vector2 cell)
     {
-        GameObject item = itemsList[cell];
         itemsList.Remove(cell);
-        Destroy(item);
-    }
-
-    public void RemoveItem(GameObject item, ItemType type, Vector2 cell)
-    {
-        itemsList.Remove(cell);
-        Destroy(item);
     }
 
     public void AddBuilding(GameObject building)

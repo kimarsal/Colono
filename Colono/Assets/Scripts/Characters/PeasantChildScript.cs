@@ -15,7 +15,7 @@ public class PeasantChildScript : PeasantScript
         else if (Input.GetKeyDown(KeyCode.P))
         {
             StopCharacter();
-            StartCoroutine(WaitForNextDestination());
+            StartCoroutine(WaitForNextRandomDestination());
         }
     }
 }

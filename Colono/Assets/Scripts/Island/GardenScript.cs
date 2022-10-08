@@ -6,6 +6,7 @@ public class GardenScript : EnclosureScript
 {
     public GameObject patches;
     public Dictionary<Vector2, PatchScript> patchesDictionary = new Dictionary<Vector2, PatchScript>();
+    public int lastWorkedOnPatch = -1;
 
     private void Start()
     {
@@ -40,7 +41,7 @@ public class GardenScript : EnclosureScript
         patchScript.cropType = cropType;
         patchScript.center = islandScript.transform.position + MeshGenerator.GetCellCenter(cell, islandScript.islandCellScript.meshData);
 
-        patchScript.PlantCrop(PatchScript.CropType.Potato);
+        //patchScript.PlantCrop(PatchScript.CropType.Potato);
 
         patchesDictionary.Add(cell, patchScript);
     }
@@ -60,12 +61,36 @@ public class GardenScript : EnclosureScript
         }
     }
 
-    public bool isPatchEmpty(Vector2[] selectedCells)
+    public bool ArePatchesEmpty(Vector2[] selectedCells)
     {
         foreach(Vector2 cell in selectedCells)
         {
             if (patchesDictionary.ContainsKey(cell)) return false;
         }
         return true;
+    }
+
+    public override TaskScript GetNextPendingTask()
+    {
+        PatchScript patch = null;
+        lastWorkedOnPatch = (lastWorkedOnPatch + 1) % patchesDictionary.Count;
+
+        int index = 0;
+        foreach (KeyValuePair<Vector2, PatchScript> pair in patchesDictionary)
+        {
+            if (index < lastWorkedOnPatch)
+            {
+                if(patch == null && pair.Value.peasantScript == null)
+                {
+                    patch = pair.Value;
+                }
+            }
+            else
+            {
+                if (pair.Value.peasantScript == null) return pair.Value;
+            }
+            index++;
+        }
+        return patch;
     }
 }

@@ -54,4 +54,9 @@ public class ShipScript : ConstructionScript
         NavMesh.SamplePosition(colliderClosestPoint, out hit, 10, NavMesh.AllAreas);
         center.position = hit.position;
     }
+
+    public override TaskScript GetNextPendingTask()
+    {
+        return null;
+    }
 }

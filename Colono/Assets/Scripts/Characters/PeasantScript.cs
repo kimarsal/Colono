@@ -16,7 +16,6 @@ public class PeasantScript : MonoBehaviour
     protected Animator animator;
     public PeasantState state;
     private NavMeshAgent navMeshAgent;
-    public ConstructionScript constructionScript;
 
     [Header("Appearence")]
     public GameObject head1;
@@ -35,12 +34,9 @@ public class PeasantScript : MonoBehaviour
 
     public bool isNative = false;
 
-    public TaskScript task;
-
-    private void Start()
-    {
-        InitializePeasant();
-    }
+    [Header("State")]
+    public ConstructionScript constructionScript;
+    public SpeechBubbleScript speechBubble;
 
     public void InitializePeasant()
 {
@@ -87,6 +83,8 @@ public class PeasantScript : MonoBehaviour
         head.GetComponent<SkinnedMeshRenderer>().material = newMaterial;
         lower.GetComponent<SkinnedMeshRenderer>().material = newMaterial;
         upper.GetComponent<SkinnedMeshRenderer>().material = newMaterial;
+
+        tag = "NPC";
     }
 
     protected void CheckIfArrivedAtDestination()
@@ -94,17 +92,39 @@ public class PeasantScript : MonoBehaviour
         if (!navMeshAgent.isStopped)
         {
             float d = Vector3.Distance(transform.position, navMeshAgent.destination);
-            if (d < 0.5f)
+            if (d < 0.8f) //Ha arribat al destí
             {
                 StopCharacter();
-                if(task != null)
+                if (peasantType == PeasantType.Adult)
                 {
-                    DoTask();
+                    PeasantAdultScript peasantAdultScript = (PeasantAdultScript)this;
+                    if (constructionScript == null) //Si no té destí
+                    {
+                        if (peasantAdultScript.task != null) peasantAdultScript.DoTask(); //Si té item pendent de treure
+                        else StartCoroutine(WaitForNextRandomDestination()); //Sinó esperar al següent destí
+                    }
+                    else
+                    {
+                        if(constructionScript.constructionType == ConstructionScript.ConstructionType.Enclosure) //Si el destí és exterior
+                        {
+                            peasantAdultScript.DoTask();
+                        }
+                        else
+                        {
+                            gameObject.SetActive(false);
+                        }
+                    }
                 }
                 else
                 {
-                    if (constructionScript == null) StartCoroutine(WaitForNextDestination());
-                    else if (constructionScript.constructionType != ConstructionScript.ConstructionType.Enclosure) gameObject.SetActive(false);
+                    if (constructionScript == null) //Si no té destí esperar al següent
+                    {
+                        StartCoroutine(WaitForNextRandomDestination());
+                    }
+                    else if (constructionScript.constructionType != ConstructionScript.ConstructionType.Enclosure) //Si té destí i aquest és interior desaparèixer
+                    {
+                        gameObject.SetActive(false);
+                    }
                 }
             }
         }
@@ -117,7 +137,15 @@ public class PeasantScript : MonoBehaviour
         animator.SetInteger("State", (int)PeasantState.Moving);
     }
 
-    protected IEnumerator WaitForNextDestination()
+    public void MoveCharacter()
+    {
+        navMeshAgent.isStopped = false;
+        navMeshAgent.speed = isRunning ? runSpeed : walkSpeed;
+        animator.SetFloat("Speed", isRunning ? 1 : 0.5f);
+        animator.SetInteger("State", (int)PeasantState.Moving);
+    }
+
+    protected IEnumerator WaitForNextRandomDestination()
     {
         yield return new WaitForSeconds(1f);
         SetDestination(NPCManager.GetRandomPoint(transform.position));
@@ -126,10 +154,7 @@ public class PeasantScript : MonoBehaviour
     public void SetDestination(Vector3 destination)
     {
         navMeshAgent.destination = destination;
-        navMeshAgent.isStopped = false;
-        navMeshAgent.speed = isRunning ? runSpeed : walkSpeed;
-        animator.SetFloat("Speed", isRunning ? 1 : 0.5f);
-        animator.SetInteger("State", (int)PeasantState.Moving);
+        if (animator.GetInteger("State") == (int)PeasantState.Moving) MoveCharacter();
     }
 
     public void UpdateTask()
@@ -140,50 +165,15 @@ public class PeasantScript : MonoBehaviour
         }
         else
         {
-            if (task != null) SetDestination(task.center);
+            if (peasantType == PeasantType.Adult && ((PeasantAdultScript)this).task != null)
+            {
+                SetDestination(((PeasantAdultScript)this).task.center);
+            }
             else
             {
                 if (constructionScript != null) SetDestination(constructionScript.center.position);
                 else SetDestination(NPCManager.GetRandomPoint(transform.position));
             }
-        }
-    }
-
-    public void CancelTask()
-    {
-        task = null;
-        StopCharacter();
-        StartCoroutine(WaitForNextDestination());
-    }
-
-    private void DoTask()
-    {
-        if(task.taskType == TaskScript.TaskType.Item)
-        {
-            switch (((ItemScript)task).itemType)
-            {
-                case ItemScript.ItemType.Chop: animator.SetInteger("State", (int)PeasantState.Chopping); break;
-                case ItemScript.ItemType.Dig: animator.SetInteger("State", (int)PeasantState.Digging); break;
-                case ItemScript.ItemType.Pull: animator.SetInteger("State", (int)PeasantState.Pulling); break;
-                case ItemScript.ItemType.Pick: animator.SetInteger("Pick", 0); animator.SetInteger("State", (int)PeasantState.Gathering); break;
-            }
-        }
-        else
-        {
-            switch (((PatchScript)task).cropState)
-            {
-                case PatchScript.CropState.Barren: animator.SetInteger("State", (int)PeasantState.Planting); break;
-                case PatchScript.CropState.Planted: case PatchScript.CropState.Grown: animator.SetInteger("State", (int)PeasantState.Watering); break;
-                case PatchScript.CropState.Blossomed: animator.SetInteger("Pick", 1); animator.SetInteger("State", (int)PeasantState.Gathering); break;
-            }
-        }
-    }
-
-    private void TaskProgress()
-    {
-        if(task.taskType == TaskScript.TaskType.Item)
-        {
-            ((ItemScript)task).ItemProgress();
         }
     }
 }

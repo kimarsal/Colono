@@ -107,6 +107,8 @@ public class GameManager : MonoBehaviour
 
     public void SelectShip()
     {
+        islandScript.islandCellScript.DestroyAllCells();
+
         removeEnclosureButton.gameObject.SetActive(false);
         removeBuildingButton.gameObject.SetActive(false);
         constructionTitle.text = "Ship";
