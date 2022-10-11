@@ -1745,7 +1745,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 84
+  m_Constraints: 80
   m_CollisionDetection: 0
 --- !u!136 &-1776295197919791772
 CapsuleCollider:
@@ -1785,8 +1785,8 @@ MonoBehaviour:
   upperClothed: {fileID: 7252637255923568080}
   material: {fileID: 2100000, guid: c79855c6f54ed954293d041acc3120a8, type: 2}
   isNative: 0
+  npcManager: {fileID: 0}
   constructionScript: {fileID: 0}
-  task: {fileID: 0}
   speechBubble: {fileID: 9081992912393224007}
 --- !u!195 &-4882141568408840787
 NavMeshAgent:

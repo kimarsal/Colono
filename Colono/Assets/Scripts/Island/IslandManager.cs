@@ -29,11 +29,12 @@ public class IslandManager : MonoBehaviour
     {
         /*foreach(GameObject island in islands)
         {
-            if(Vector3.Distance(island.transform.position, player.transform.position) < playerDistance)
+            float distance = Vector3.Distance(island.transform.position, player.transform.position);
+            if(!island.activeInHierarchy && distance < playerDistance)
             {
                 island.SetActive(true);
             }
-            else
+            else if(island.activeInHierarchy && distance > playerDistance)
             {
                 island.SetActive(false);
             }
@@ -86,22 +87,14 @@ public class IslandManager : MonoBehaviour
             {
                 Vector2 itemCell = new Vector2(col, row);
                 Vector3 itemPos = MeshGenerator.GetCellCenter(itemCell, newIsland.meshData);
-                /*if (itemPos.y > 0 && !islandScript.isCellTaken(itemCell))*/
                 GameObject prefab = null;
 
-                try
+                switch (islandGenerator.regions[newIsland.regionMap[col, row]].name)
                 {
-                    switch (islandGenerator.regions[newIsland.regionMap[col, row]].name)
-                    {
-                        //case "Sand": prefab = islandEditor.beachItems[UnityEngine.Random.Range(0, islandEditor.beachItems.Length)]; break;
-                        case "Grass": prefab = islandEditor.fieldItems[UnityEngine.Random.Range(0, islandEditor.fieldItems.Length)]; break;
-                        case "Grass 2": prefab = islandEditor.hillItems[UnityEngine.Random.Range(0, islandEditor.hillItems.Length)]; break;
-                        //case "Rock": prefab = islandEditor.mountainItems[UnityEngine.Random.Range(0, islandEditor.mountainItems.Length)]; break;
-                    }
-                }
-                catch(Exception e)
-                {
-                    Debug.Log(e);
+                    //case "Sand": prefab = islandEditor.beachItems[UnityEngine.Random.Range(0, islandEditor.beachItems.Length)]; break;
+                    case "Grass": prefab = islandEditor.fieldItems[UnityEngine.Random.Range(0, islandEditor.fieldItems.Length)]; break;
+                    case "Grass 2": prefab = islandEditor.hillItems[UnityEngine.Random.Range(0, islandEditor.hillItems.Length)]; break;
+                    //case "Rock": prefab = islandEditor.mountainItems[UnityEngine.Random.Range(0, islandEditor.mountainItems.Length)]; break;
                 }
 
                 if(prefab != null)
@@ -115,7 +108,7 @@ public class IslandManager : MonoBehaviour
 
                 int inc = UnityEngine.Random.Range(1, 20);
                 col += inc;
-                if(col >= IslandGenerator.mapChunkSize - 1)
+                if(col >= IslandGenerator.mapChunkSize)
                 {
                     row++;
                     col = col - IslandGenerator.mapChunkSize;

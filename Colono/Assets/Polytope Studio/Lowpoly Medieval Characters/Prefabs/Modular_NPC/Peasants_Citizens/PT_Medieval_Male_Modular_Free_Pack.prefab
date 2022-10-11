@@ -1995,7 +1995,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 84
+  m_Constraints: 80
   m_CollisionDetection: 0
 --- !u!136 &-6809046889581306478
 CapsuleCollider:
@@ -2035,9 +2035,10 @@ MonoBehaviour:
   upperClothed: {fileID: 1125232617463963011}
   material: {fileID: 2100000, guid: c79855c6f54ed954293d041acc3120a8, type: 2}
   isNative: 0
+  npcManager: {fileID: 0}
   constructionScript: {fileID: 0}
-  task: {fileID: 0}
   speechBubble: {fileID: 8196349547139020954}
+  task: {fileID: 0}
   axe: {fileID: 3854085465935333273}
   shovel: {fileID: 4168797345179873955}
   basket: {fileID: 6448953863368073061}

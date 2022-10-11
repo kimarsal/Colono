@@ -15,8 +15,15 @@ public abstract class ConstructionScript : MonoBehaviour
     public int width;
     public Transform center;
 
-    public GameObject peasants;
     public List<PeasantScript> peasantList = new List<PeasantScript>();
+    public int peasantsOnTheirWay;
+
+    public ConstructionDetailsScript constructionDetailsScript;
 
     public abstract TaskScript GetNextPendingTask();
+
+    public void UpdateConstructionDetails()
+    {
+        constructionDetailsScript?.UpdatePeasantNum();
+    }
 }

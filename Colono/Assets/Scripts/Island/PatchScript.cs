@@ -63,10 +63,13 @@ public class PatchScript : TaskScript
         
         PeasantAdultScript p = peasantScript;
         peasantScript = null;
-        TaskScript patch = ((GardenScript)p.constructionScript).GetNextPendingTask();
-        patch.peasantScript = p;
-        p.task = patch;
-        p.UpdateTask();
+        if(p.constructionScript != null)
+        {
+            TaskScript patch = ((GardenScript)p.constructionScript).GetNextPendingTask();
+            patch.peasantScript = p;
+            p.task = patch;
+            p.UpdateTask();
+        }
 
         timeSinceLastChange = 0;
     }

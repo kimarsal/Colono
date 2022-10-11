@@ -15,7 +15,7 @@ public class PeasantScript : MonoBehaviour
     public enum PeasantState { Moving, Chopping, Digging, Pulling, Planting, Watering, Gathering, Milking, Dancing };
     protected Animator animator;
     public PeasantState state;
-    private NavMeshAgent navMeshAgent;
+    protected NavMeshAgent navMeshAgent;
 
     [Header("Appearence")]
     public GameObject head1;
@@ -35,6 +35,7 @@ public class PeasantScript : MonoBehaviour
     public bool isNative = false;
 
     [Header("State")]
+    public NPCManager npcManager;
     public ConstructionScript constructionScript;
     public SpeechBubbleScript speechBubble;
 
@@ -105,12 +106,23 @@ public class PeasantScript : MonoBehaviour
                     }
                     else
                     {
-                        if(constructionScript.constructionType == ConstructionScript.ConstructionType.Enclosure) //Si el destí és exterior
+                        if (constructionScript.constructionType == ConstructionScript.ConstructionType.Enclosure) //Si el destí és exterior
                         {
-                            peasantAdultScript.DoTask();
+                            if(peasantAdultScript.task == null)
+                            {
+                                StartCoroutine(WaitForNextRandomDestinationInEnclosure());
+                            }
+                            else peasantAdultScript.DoTask();
                         }
                         else
                         {
+                            if(constructionScript.constructionType == ConstructionScript.ConstructionType.Ship)
+                            {
+                                transform.parent = ((ShipScript)constructionScript).npcs.transform;
+                            }
+
+                            constructionScript.peasantsOnTheirWay--;
+                            constructionScript.UpdateConstructionDetails();
                             gameObject.SetActive(false);
                         }
                     }
@@ -123,6 +135,13 @@ public class PeasantScript : MonoBehaviour
                     }
                     else if (constructionScript.constructionType != ConstructionScript.ConstructionType.Enclosure) //Si té destí i aquest és interior desaparèixer
                     {
+                        if (constructionScript.constructionType == ConstructionScript.ConstructionType.Ship)
+                        {
+                            transform.parent = ((ShipScript)constructionScript).npcs.transform;
+                        }
+
+                        constructionScript.peasantsOnTheirWay--;
+                        constructionScript.UpdateConstructionDetails();
                         gameObject.SetActive(false);
                     }
                 }
@@ -151,6 +170,16 @@ public class PeasantScript : MonoBehaviour
         SetDestination(NPCManager.GetRandomPoint(transform.position));
     }
 
+    protected IEnumerator WaitForNextRandomDestinationInEnclosure()
+    {
+        yield return new WaitForSeconds(1f);
+        if (constructionScript != null)
+        {
+            SetDestination(NPCManager.GetRandomPointWithinRange(((EnclosureScript)constructionScript).minPos, ((EnclosureScript)constructionScript).maxPos));
+        }
+        else SetDestination(NPCManager.GetRandomPoint(transform.position));
+    }
+
     public void SetDestination(Vector3 destination)
     {
         navMeshAgent.destination = destination;
@@ -171,7 +200,7 @@ public class PeasantScript : MonoBehaviour
             }
             else
             {
-                if (constructionScript != null) SetDestination(constructionScript.center.position);
+                if (constructionScript != null) SetDestination(NPCManager.GetRandomPointWithinRange(((EnclosureScript)constructionScript).minPos, ((EnclosureScript)constructionScript).maxPos));
                 else SetDestination(NPCManager.GetRandomPoint(transform.position));
             }
         }

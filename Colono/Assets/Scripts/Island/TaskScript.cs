@@ -7,7 +7,6 @@ public abstract class TaskScript : MonoBehaviour
     public enum TaskType { Item, Patch }
     public Vector3 center;
     public TaskType taskType;
-    public bool hasBeenCanceled;
 
     public PeasantAdultScript peasantScript;
 

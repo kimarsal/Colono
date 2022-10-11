@@ -122710,7 +122710,7 @@ AnimationClip:
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 4.6666665
+  - time: 4.5
     functionName: MoveCharacter
     data: 
     objectReferenceParameter: {fileID: 0}

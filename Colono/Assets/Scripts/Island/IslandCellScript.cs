@@ -128,10 +128,6 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 buildingScript.orientation = buildingOrientation;
                 buildingScript.EnableCollider();
 
-                buildingScript.peasants = new GameObject("Peasants");
-                buildingScript.peasants.transform.parent = selectedBuilding.transform;
-                buildingScript.peasants.transform.localPosition = Vector3.zero;
-
                 islandScript.AddBuilding(selectedBuilding); //Col·locar edifici
 
                 InvertRegions(selectedCells, false);
@@ -559,6 +555,8 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         for (int i = 0; i < positions.Length - 1; i++)
         {
             GameObject fence = Instantiate(islandEditorScript.fences[UnityEngine.Random.Range(0, islandEditorScript.fences.Length)], transform.position + positions[i], rotations[i], fences.transform);
+            if (i == 0) enclosureScript.minPos = fence.transform.localPosition;
+            else if (i == positions.Length - 2) enclosureScript.maxPos = fence.transform.localPosition - new Vector3(0, 0, 1);
         }
 
         if (enclosureType == EnclosureScript.EnclosureType.Barn)
@@ -582,9 +580,14 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             }
         }
 
-        enclosureScript.peasants = new GameObject("Peasants");
-        enclosureScript.peasants.transform.parent = enclosure.transform;
-        enclosureScript.peasants.transform.localPosition = Vector3.zero;
+        BoxCollider boxCollider = enclosure.AddComponent<BoxCollider>();
+        boxCollider.center = (enclosureScript.minPos + enclosureScript.maxPos) / 2;
+        boxCollider.size = new Vector3(enclosureScript.maxPos.x - enclosureScript.minPos.x, 3, enclosureScript.minPos.z - enclosureScript.maxPos.z);
+        boxCollider.isTrigger = true;
+
+        enclosureScript.minPos += islandScript.transform.position;
+        enclosureScript.maxPos += islandScript.transform.position;
+
         islandScript.AddEnclosure(enclosure);
 
         InvertRegions(selectedCells, enclosureType == EnclosureScript.EnclosureType.Garden);

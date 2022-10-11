@@ -83,6 +83,7 @@ public class PeasantAdultScript : PeasantScript
 
     public void DoTask()
     {
+        transform.LookAt(task.center);
         if (task.taskType == TaskScript.TaskType.Item)
         {
             switch (((ItemScript)task).itemType)
@@ -102,6 +103,19 @@ public class PeasantAdultScript : PeasantScript
                 case PatchScript.CropState.Blossomed: animator.SetInteger("Pick", 1); animator.SetInteger("State", (int)PeasantState.Gathering); break;
             }
         }
+        //StartCoroutine(PointTowardsTaskCenter());
+    }
+
+    private IEnumerator PointTowardsTaskCenter()
+    {
+        do
+        {
+            Vector3 direction = (task.center - transform.position).normalized;
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * navMeshAgent.angularSpeed);
+            yield return new WaitForSeconds(0.1f);
+        }
+        while (Vector3.Angle(transform.forward, task.center - transform.position) > 10);
     }
 
     private void TaskProgress()

@@ -21,21 +21,18 @@ public class GameManager : MonoBehaviour
     public Animator buildingButtonsAnimator;
     public Animator enclosureButtonsAnimator;
     public Animator constructionDetailsAnimator;
+
     private ConstructionScript constructionScript;
-    public TextMeshProUGUI constructionTitle;
-    public TextMeshProUGUI constructionPeasantNum;
+    public ConstructionDetailsScript constructionDetailsScript;
 
     public Button boardIslandButton;
     public Button cancelClearingButton;
-    public GameObject peasantButtons;
-    public Button peasantMinusButton;
-    public Button peasantPlusButton;
     public Button removeEnclosureButton;
     public Button removeBuildingButton;
     /*public Button plantButton;
     public Button clearPatchButton;*/
     
-    private IslandScript islandScript;
+    public IslandScript islandScript;
 
     private CameraScript cameraScript;
 
@@ -43,6 +40,7 @@ public class GameManager : MonoBehaviour
     {
         cameraScript = GameObject.Find("MainCamera").GetComponent<CameraScript>();
         shipScript = GameObject.FindGameObjectWithTag("Player").GetComponent<ShipScript>();
+        constructionDetailsScript.gameManager = this;
     }
 
     public void PlayerIsNearIsland(IslandScript islandScript)
@@ -111,10 +109,8 @@ public class GameManager : MonoBehaviour
 
         removeEnclosureButton.gameObject.SetActive(false);
         removeBuildingButton.gameObject.SetActive(false);
-        constructionTitle.text = "Ship";
-        constructionScript = shipScript;
 
-        SetConstructionDetails();
+        SetConstructionDetails(shipScript);
     }
 
     public void Build()
@@ -142,10 +138,8 @@ public class GameManager : MonoBehaviour
     {
         removeEnclosureButton.gameObject.SetActive(false);
         removeBuildingButton.gameObject.SetActive(true);
-        constructionTitle.text = buildingScript.buildingType.ToString();
-        constructionScript = buildingScript;
 
-        SetConstructionDetails();
+        SetConstructionDetails(buildingScript);
     }
 
     public void RemoveBuilding()
@@ -186,10 +180,8 @@ public class GameManager : MonoBehaviour
     {
         removeEnclosureButton.gameObject.SetActive(true);
         removeBuildingButton.gameObject.SetActive(false);
-        constructionTitle.text = enclosureScript.enclosureType.ToString();
-        constructionScript = enclosureScript;
 
-        SetConstructionDetails();
+        SetConstructionDetails(enclosureScript);
     }
 
     public void RemoveEnclosure()
@@ -213,17 +205,10 @@ public class GameManager : MonoBehaviour
         buttonState = ButtonState.Idle;
     }
 
-    private void SetConstructionDetails()
+    private void SetConstructionDetails(ConstructionScript newConstructionScript)
     {
-        if(constructionScript.constructionType == ConstructionScript.ConstructionType.Building && ((BuildingScript)constructionScript).buildingType != BuildingScript.BuildingType.Mine)
-        {
-            peasantButtons.SetActive(false);
-        }
-        else
-        {
-            peasantButtons.SetActive(true);
-            UpdatePeasantNum();
-        }
+        constructionScript = newConstructionScript;
+        constructionDetailsScript.SetConstructionDetails(newConstructionScript);
 
         canvasAnimator.Play("HideLeaveIslandButton");
         switch (buttonState)
@@ -236,20 +221,6 @@ public class GameManager : MonoBehaviour
         constructionDetailsAnimator.Play("ShowConstructionDetails");
 
         buttonState = ButtonState.ConstructionDetails;
-    }
-
-    public void ManagePawns(bool adding)
-    {
-        if (constructionScript.constructionType == ConstructionScript.ConstructionType.Ship) islandScript.npcManager.SendPeasantToIsland(shipScript, adding);
-        else islandScript.npcManager.SendPeasantToArea(constructionScript, adding);
-        UpdatePeasantNum();
-    }
-
-    public void UpdatePeasantNum()
-    {
-        constructionPeasantNum.text = constructionScript.peasantList.Count.ToString();
-        peasantMinusButton.enabled = constructionScript.peasantList.Count > 0;
-        peasantPlusButton.enabled = islandScript.npcManager.peasantList.Count > 0;
     }
 
     public void PatchSelected(bool isPatchEmpty)
@@ -287,6 +258,7 @@ public class GameManager : MonoBehaviour
             case ButtonState.EnclosureButtons: enclosureButtonsAnimator.Play("HideEnclosureButtons"); break;
         }
 
+        islandScript.npcManager.CancelAllTripsToShip(shipScript);
         islandScript.PLayerLeft();
         islandScript.islandCellScript.DestroyAllCells();
     }
