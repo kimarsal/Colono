@@ -255,10 +255,10 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
                 switch (buildingOrientation) //segons la orientació de l'edifici
                 {
-                    case 0: i = 1;  j = 1; vertexIndex = 0; break;
-                    case 1: i = -1; j = 1; vertexIndex = 1; break;
-                    case 2: i = -1; j = -1; vertexIndex = 3; break;
-                    case 3: i = 1; j = -1; vertexIndex = 2; break;
+                    case 0: i = -1; j = -1; vertexIndex = 3; break;
+                    case 1: i = 1; j = -1; vertexIndex = 2; break;
+                    case 2: i = 1;  j = 1; vertexIndex = 0; break;
+                    case 3: i = -1; j = 1; vertexIndex = 1; break;
                 }
 
                 int endX = x + i * buildingScript.length;
@@ -287,7 +287,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                     for (int row = y; row < endY; row++)
                     {
                         selectedCells[index] = new Vector2(col, row);
-                        if (regionMap[col, row] < 0 || !islandGeneratorScript.regions[regionMap[col, row]].name.Contains("Grass"))
+                        if (regionMap[col, row] < 0 || !islandGeneratorScript.regions[regionMap[col, row]].name.Contains("Grass") || islandScript.isCellTaken(selectedCells[index]))
                         {
                             isSelectionValid = false;
                         }
@@ -681,7 +681,9 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         switch (type)
         {
             case BuildingScript.BuildingType.Warehouse: buildingPrefab = islandEditorScript.warehouse; break;
-            case BuildingScript.BuildingType.Residence: buildingPrefab = islandEditorScript.residence; break;
+            case BuildingScript.BuildingType.Cabin: buildingPrefab = islandEditorScript.cabin; break;
+            case BuildingScript.BuildingType.Tavern: buildingPrefab = islandEditorScript.tavern; break;
+            case BuildingScript.BuildingType.Alchemist: buildingPrefab = islandEditorScript.alchemist; break;
             case BuildingScript.BuildingType.Mine: buildingPrefab = islandEditorScript.mine; break;
             default: buildingPrefab = null; break;
         }

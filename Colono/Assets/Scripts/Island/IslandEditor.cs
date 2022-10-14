@@ -23,7 +23,9 @@ public class IslandEditor : MonoBehaviour
 
     [Header("Buildings")]
     public GameObject warehouse;
-    public GameObject residence;
+    public GameObject cabin;
+    public GameObject tavern;
+    public GameObject alchemist;
     public GameObject mine;
 
     [Header("Fences")]
