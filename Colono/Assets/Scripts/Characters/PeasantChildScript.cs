@@ -4,17 +4,28 @@ using UnityEngine;
 
 public class PeasantChildScript : PeasantScript
 {
-    void Update()
+    public override void UpdateTask()
     {
-        CheckIfArrivedAtDestination();
-        if (Input.GetKeyDown(KeyCode.O))
+        if (constructionScript != null) //Si té una construcció com a destí
         {
-            StopCharacter();
-            animator.SetInteger("State", (int)PeasantState.Dancing);
+            SetDestination(constructionScript.entry.position);
         }
-        else if (Input.GetKeyDown(KeyCode.P))
+        else SetDestination(NPCManager.GetRandomPoint(transform.position));
+    }
+    public override void ArrivedAtDestination()
+    {
+        if (constructionScript != null) //Si té una construcció com a destí
         {
-            StopCharacter();
+            if(constructionScript.constructionType == ConstructionScript.ConstructionType.Ship)
+            {
+                transform.parent = ((ShipScript)constructionScript).npcs.transform;
+            }
+            constructionScript.peasantsOnTheirWay--;
+            constructionScript.UpdateConstructionDetails();
+            gameObject.SetActive(false);
+        }
+        else
+        {
             StartCoroutine(WaitForNextRandomDestination());
         }
     }

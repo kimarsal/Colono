@@ -2,20 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
-public class PeasantScript : MonoBehaviour
+public abstract class PeasantScript : MonoBehaviour
 {
-    public enum PeasantType { Adult, Child }
+    [Header("Characteristics")]
     public PeasantType peasantType;
-
+    public enum PeasantType { Adult, Child }
     public float walkSpeed;
     public float runSpeed;
     private bool isRunning = false;
-
-    public enum PeasantState { Moving, Chopping, Digging, Pulling, Planting, Watering, Gathering, Milking, Dancing };
-    protected Animator animator;
-    public PeasantState state;
-    protected NavMeshAgent navMeshAgent;
 
     [Header("Appearence")]
     public GameObject head1;
@@ -35,15 +31,29 @@ public class PeasantScript : MonoBehaviour
     public bool isNative = false;
 
     [Header("State")]
+    public float age;
+    public float hunger;
+    public float exhaustion;
+
+    public PeasantAction action;
+    public enum PeasantAction { Moving, Chopping, Digging, Pulling, Planting, Watering, Gathering, Milking, Dancing };
+    protected Animator animator;
+    protected NavMeshAgent navMeshAgent;
+
+    [Header("Scripts")]
+    public GameManager gameManager;
     public NPCManager npcManager;
     public ConstructionScript constructionScript;
     public SpeechBubbleScript speechBubble;
+    public PeasantDetailsScript peasantDetailsScript;
+    private Outline outline;
 
     public void InitializePeasant()
-{
+    {
+        outline = GetComponent<Outline>();
         animator = GetComponent<Animator>();
         navMeshAgent = GetComponent<NavMeshAgent>();
-        animator.SetInteger("State", (int)PeasantState.Moving);
+        animator.SetInteger("State", (int)PeasantAction.Moving);
 
         if (Random.Range(0, 2) == 0)
         {
@@ -88,6 +98,38 @@ public class PeasantScript : MonoBehaviour
         tag = "NPC";
     }
 
+    private void Update()
+    {
+        age += Time.deltaTime / 10;
+        hunger += Time.deltaTime / 500;
+        exhaustion += Time.deltaTime / 500;
+
+        if (gameManager.isInIsland && peasantDetailsScript == null)
+        {
+            RaycastHit raycastHit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out raycastHit, 100f))
+            {
+                if (raycastHit.transform.gameObject.GetComponent<PeasantScript>() == this)
+                {
+                    outline.enabled = true;
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        gameManager.SelectPeasant(this);
+                    }
+                }
+                else
+                {
+                    outline.enabled = false;
+                }
+            }
+        }
+
+        peasantDetailsScript?.UpdateDetails();
+
+        CheckIfArrivedAtDestination();
+    }
+
     protected void CheckIfArrivedAtDestination()
     {
         if (!navMeshAgent.isStopped)
@@ -96,55 +138,7 @@ public class PeasantScript : MonoBehaviour
             if (d < 0.8f) //Ha arribat al destí
             {
                 StopCharacter();
-                if (peasantType == PeasantType.Adult)
-                {
-                    PeasantAdultScript peasantAdultScript = (PeasantAdultScript)this;
-                    if (constructionScript == null) //Si no té destí
-                    {
-                        if (peasantAdultScript.task != null) peasantAdultScript.DoTask(); //Si té item pendent de treure
-                        else StartCoroutine(WaitForNextRandomDestination()); //Sinó esperar al següent destí
-                    }
-                    else
-                    {
-                        if (constructionScript.constructionType == ConstructionScript.ConstructionType.Enclosure) //Si el destí és exterior
-                        {
-                            if(peasantAdultScript.task == null)
-                            {
-                                StartCoroutine(WaitForNextRandomDestinationInEnclosure());
-                            }
-                            else peasantAdultScript.DoTask();
-                        }
-                        else
-                        {
-                            if(constructionScript.constructionType == ConstructionScript.ConstructionType.Ship)
-                            {
-                                transform.parent = ((ShipScript)constructionScript).npcs.transform;
-                            }
-
-                            constructionScript.peasantsOnTheirWay--;
-                            constructionScript.UpdateConstructionDetails();
-                            gameObject.SetActive(false);
-                        }
-                    }
-                }
-                else
-                {
-                    if (constructionScript == null) //Si no té destí esperar al següent
-                    {
-                        StartCoroutine(WaitForNextRandomDestination());
-                    }
-                    else if (constructionScript.constructionType != ConstructionScript.ConstructionType.Enclosure) //Si té destí i aquest és interior desaparèixer
-                    {
-                        if (constructionScript.constructionType == ConstructionScript.ConstructionType.Ship)
-                        {
-                            transform.parent = ((ShipScript)constructionScript).npcs.transform;
-                        }
-
-                        constructionScript.peasantsOnTheirWay--;
-                        constructionScript.UpdateConstructionDetails();
-                        gameObject.SetActive(false);
-                    }
-                }
+                ArrivedAtDestination();
             }
         }
     }
@@ -153,7 +147,7 @@ public class PeasantScript : MonoBehaviour
     {
         navMeshAgent.isStopped = true;
         animator.SetFloat("Speed", 0);
-        animator.SetInteger("State", (int)PeasantState.Moving);
+        animator.SetInteger("State", (int)PeasantAction.Moving);
     }
 
     public void MoveCharacter()
@@ -161,7 +155,7 @@ public class PeasantScript : MonoBehaviour
         navMeshAgent.isStopped = false;
         navMeshAgent.speed = isRunning ? runSpeed : walkSpeed;
         animator.SetFloat("Speed", isRunning ? 1 : 0.5f);
-        animator.SetInteger("State", (int)PeasantState.Moving);
+        animator.SetInteger("State", (int)PeasantAction.Moving);
     }
 
     protected IEnumerator WaitForNextRandomDestination()
@@ -170,39 +164,16 @@ public class PeasantScript : MonoBehaviour
         SetDestination(NPCManager.GetRandomPoint(transform.position));
     }
 
-    protected IEnumerator WaitForNextRandomDestinationInEnclosure()
-    {
-        yield return new WaitForSeconds(1f);
-        if (constructionScript != null)
-        {
-            SetDestination(NPCManager.GetRandomPointWithinRange(((EnclosureScript)constructionScript).minPos, ((EnclosureScript)constructionScript).maxPos));
-        }
-        else SetDestination(NPCManager.GetRandomPoint(transform.position));
-    }
-
     public void SetDestination(Vector3 destination)
     {
         navMeshAgent.destination = destination;
-        if (animator.GetInteger("State") == (int)PeasantState.Moving) MoveCharacter();
+        if (animator.GetCurrentAnimatorClipInfo(0)[0].clip.name == "Peasant_Idle"
+            || animator.GetCurrentAnimatorClipInfo(0)[0].clip.name == "Peasant_Walking"
+            || animator.GetCurrentAnimatorClipInfo(0)[0].clip.name == "Peasant_Running") MoveCharacter();
     }
 
-    public void UpdateTask()
-    {
-        if (constructionScript != null && constructionScript.constructionType == ConstructionScript.ConstructionType.Ship)
-        {
-            SetDestination(constructionScript.center.position);
-        }
-        else
-        {
-            if (peasantType == PeasantType.Adult && ((PeasantAdultScript)this).task != null)
-            {
-                SetDestination(((PeasantAdultScript)this).task.center);
-            }
-            else
-            {
-                if (constructionScript != null) SetDestination(NPCManager.GetRandomPointWithinRange(((EnclosureScript)constructionScript).minPos, ((EnclosureScript)constructionScript).maxPos));
-                else SetDestination(NPCManager.GetRandomPoint(transform.position));
-            }
-        }
-    }
+    public abstract void UpdateTask();
+
+    public abstract void ArrivedAtDestination();
+
 }

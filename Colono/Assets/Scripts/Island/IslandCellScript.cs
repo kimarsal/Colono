@@ -27,10 +27,9 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     private SelectMode selectMode;
     private bool isSelectionValid = false;
 
-    private GameObject selectedBuilding;
-    private BuildingScript buildingScript;
+    private BuildingScript selectedBuilding;
     private int buildingOrientation = 0;
-    private GameObject selectedEnclosure;
+    private EnclosureScript selectedEnclosure;
     private List<ItemScript> selectedItems;
 
     private void Start()
@@ -123,10 +122,9 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             {
                 ChangeSelectedBuildingColor(Color.white);
 
-                buildingScript = selectedBuilding.GetComponent<BuildingScript>();
-                buildingScript.cells = selectedCells;
-                buildingScript.orientation = buildingOrientation;
-                buildingScript.EnableCollider();
+                selectedBuilding.cells = selectedCells;
+                selectedBuilding.orientation = buildingOrientation;
+                selectedBuilding.EnableCollider();
 
                 islandScript.AddBuilding(selectedBuilding); //Col·locar edifici
 
@@ -137,7 +135,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 }
                 cells[x, y].GetComponent<MeshRenderer>().material = islandEditorScript.selectedHoverMaterial;
 
-                gameManagerScript.SelectBuilding(buildingScript);
+                gameManagerScript.SelectBuilding(selectedBuilding);
             }
             buildingOrientation = 0; //Resetejar l'orientació
         }
@@ -150,7 +148,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 DestroyAllCells();
 
                 bool isBuilding;
-                GameObject construction = islandScript.GetConstructionByCell(hoveredCell, out isBuilding);
+                ConstructionScript constructionScript = islandScript.GetConstructionByCell(hoveredCell, out isBuilding);
                 selectedCells = hoveredCells;
                 foreach (Vector2 cell in selectedCells)
                 {
@@ -161,11 +159,11 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 hoveredCells = new Vector2[0];
                 if (isBuilding)
                 {
-                    SelectBuilding(construction);
+                    SelectBuilding((BuildingScript)constructionScript);
                 }
                 else
                 {
-                    SelectEnclosure(construction);
+                    SelectEnclosure((EnclosureScript)constructionScript);
                 }
             }
             else
@@ -261,12 +259,12 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                     case 3: i = -1; j = 1; vertexIndex = 1; break;
                 }
 
-                int endX = x + i * buildingScript.length;
-                int endY = y + j * buildingScript.width;
+                int endX = x + i * selectedBuilding.length;
+                int endY = y + j * selectedBuilding.width;
                 if (buildingOrientation % 2 != 0) //la meitat de les orientacions tindran la llargada i l'amplada intercanviades
                 {
-                    endX = x + i * buildingScript.width;
-                    endY = y + j * buildingScript.length;
+                    endX = x + i * selectedBuilding.width;
+                    endY = y + j * selectedBuilding.length;
                 }
 
                 if (i == -1)
@@ -280,7 +278,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
                 //es guarden les noves cel·les seleccionades a la llista i es comprova quin color hauran de tenir
                 int index = 0;
-                selectedCells = new Vector2[buildingScript.width * buildingScript.length];
+                selectedCells = new Vector2[selectedBuilding.width * selectedBuilding.length];
                 isSelectionValid = true;
                 for (int col = x; col < endX; col++)
                 {
@@ -384,8 +382,8 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                     else if (!hoveredCells.Contains(hoveredCell))
                     {
                         bool isBuilding;
-                        GameObject construction = islandScript.GetConstructionByCell(hoveredCell, out isBuilding);
-                        hoveredCells = construction.GetComponent<ConstructionScript>().cells;
+                        ConstructionScript constructionScript = islandScript.GetConstructionByCell(hoveredCell, out isBuilding);
+                        hoveredCells = constructionScript.cells;
 
                         foreach (Vector2 cell in hoveredCells)
                         {
@@ -543,7 +541,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             transform.position + (MeshGenerator.GetCellCenter(selectedCells[0], meshData) + MeshGenerator.GetCellCenter(selectedCells[selectedCells.Length - 1], meshData)) / 2,
             Quaternion.Euler(Vector3.zero),
             enclosure.transform).transform;
-        enclosureScript.center = enclosureCenter;
+        enclosureScript.entry = enclosureCenter;
         enclosureScript.islandScript = islandScript;
 
         GameObject fences = new GameObject("Fences");
@@ -588,11 +586,11 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         enclosureScript.minPos += islandScript.transform.position;
         enclosureScript.maxPos += islandScript.transform.position;
 
-        islandScript.AddEnclosure(enclosure);
+        islandScript.AddEnclosure(enclosureScript);
 
         InvertRegions(selectedCells, enclosureType == EnclosureScript.EnclosureType.Garden);
 
-        selectedEnclosure = enclosure;
+        selectedEnclosure = enclosureScript;
         gameManagerScript.SelectEnclosure(enclosureScript);
     }
 
@@ -624,10 +622,10 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         DestroyAllCells();
     }*/
 
-    public void SelectEnclosure(GameObject enclosure)
+    public void SelectEnclosure(EnclosureScript enclosure)
     {
         selectedEnclosure = enclosure;
-        gameManagerScript.SelectEnclosure(enclosure.GetComponent<EnclosureScript>());
+        gameManagerScript.SelectEnclosure(enclosure);
     }
 
     public void RemoveEnclosure()
@@ -688,8 +686,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             default: buildingPrefab = null; break;
         }
 
-        selectedBuilding = Instantiate(buildingPrefab, transform.position, buildingPrefab.transform.rotation, islandScript.constructions.transform);
-        buildingScript = selectedBuilding.GetComponent<BuildingScript>();
+        selectedBuilding = Instantiate(buildingPrefab, transform.position, buildingPrefab.transform.rotation, islandScript.constructions.transform).GetComponent<BuildingScript>();
 
         selectMode = SelectMode.Building;
         DestroyAllCells();
@@ -703,15 +700,15 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         }
     }
 
-    public void SelectBuilding(GameObject building)
+    public void SelectBuilding(BuildingScript building)
     {
         selectedBuilding = building;
-        gameManagerScript.SelectBuilding(building.GetComponent<BuildingScript>());
+        gameManagerScript.SelectBuilding(building);
     }
 
     public void RemoveBuilding()
     {
-        Vector2[] buildingCells = selectedBuilding.GetComponent<BuildingScript>().cells;
+        Vector2[] buildingCells = selectedBuilding.cells;
         islandScript.RemoveBuilding(selectedBuilding);
 
         InvertRegions(buildingCells, false, true);

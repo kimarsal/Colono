@@ -1681,6 +1681,7 @@ GameObject:
   - component: {fileID: 1509241269054908937}
   - component: {fileID: -4882141568408840787}
   - component: {fileID: 1371654617861279929}
+  - component: {fileID: -2109673547217780251}
   m_Layer: 0
   m_Name: PT_Medieval_Boy_Modular_Free_Pack
   m_TagString: NPC
@@ -1757,7 +1758,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.3
+  m_Radius: 0.5
   m_Height: 1.5
   m_Direction: 1
   m_Center: {x: 0, y: 0.75, z: 0}
@@ -1776,7 +1777,6 @@ MonoBehaviour:
   peasantType: 1
   walkSpeed: 0.5
   runSpeed: 1
-  state: 0
   head1: {fileID: 5609577799815616537}
   head2: {fileID: 310041706251708457}
   lowerNaked: {fileID: 2537537499416523722}
@@ -1785,9 +1785,15 @@ MonoBehaviour:
   upperClothed: {fileID: 7252637255923568080}
   material: {fileID: 2100000, guid: c79855c6f54ed954293d041acc3120a8, type: 2}
   isNative: 0
+  state: 0
+  age: 0
+  hunger: 0
+  exhaustion: 0
+  gameManager: {fileID: 0}
   npcManager: {fileID: 0}
   constructionScript: {fileID: 0}
   speechBubble: {fileID: 9081992912393224007}
+  peasantDetailsScript: {fileID: 0}
 --- !u!195 &-4882141568408840787
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -1826,6 +1832,24 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 0.75, z: 0}
   m_TimeToStationary: 0.5
+--- !u!114 &-2109673547217780251
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6186233313534555122}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineMode: 0
+  outlineColor: {r: 1, g: 1, b: 1, a: 1}
+  outlineWidth: 10
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &6396343014494306794
 GameObject:
   m_ObjectHideFlags: 0

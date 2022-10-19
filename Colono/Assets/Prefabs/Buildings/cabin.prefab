@@ -51,7 +51,7 @@ MonoBehaviour:
   cells: []
   length: 2
   width: 2
-  center: {fileID: 2660757951229852377}
+  entry: {fileID: 2660757951229852377}
   peasantList: []
   peasantsOnTheirWay: 0
   constructionDetailsScript: {fileID: 0}

@@ -1931,6 +1931,7 @@ GameObject:
   - component: {fileID: 8777550085024709020}
   - component: {fileID: 7555130144577166092}
   - component: {fileID: 8792296199089095173}
+  - component: {fileID: -8592455357991466922}
   m_Layer: 0
   m_Name: PT_Medieval_Male_Modular_Free_Pack
   m_TagString: NPC
@@ -2007,7 +2008,7 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.5
+  m_Radius: 0.8
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
@@ -2026,7 +2027,6 @@ MonoBehaviour:
   peasantType: 0
   walkSpeed: 1
   runSpeed: 2
-  state: 0
   head1: {fileID: 1953896830827328188}
   head2: {fileID: 2938323828424686716}
   lowerNaked: {fileID: 4187010985156663354}
@@ -2035,14 +2035,26 @@ MonoBehaviour:
   upperClothed: {fileID: 1125232617463963011}
   material: {fileID: 2100000, guid: c79855c6f54ed954293d041acc3120a8, type: 2}
   isNative: 0
+  age: 20
+  hunger: 0
+  exhaustion: 0
+  action: 0
+  gameManager: {fileID: 0}
   npcManager: {fileID: 0}
   constructionScript: {fileID: 0}
   speechBubble: {fileID: 8196349547139020954}
+  peasantDetailsScript: {fileID: 0}
   task: {fileID: 0}
   axe: {fileID: 3854085465935333273}
   shovel: {fileID: 4168797345179873955}
   basket: {fileID: 6448953863368073061}
   wateringCan: {fileID: 5341225516695430111}
+  capacity: 10
+  usage: 0
+  materials: 000000000000000000000000
+  crops: 000000000000000000000000000000000000000000000000
+  peasantState: 0
+  warehouseScript: {fileID: 0}
 --- !u!195 &7555130144577166092
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -2081,6 +2093,24 @@ NavMeshObstacle:
   m_CarveOnlyStationary: 1
   m_Center: {x: 0, y: 1, z: 0}
   m_TimeToStationary: 0.5
+--- !u!114 &-8592455357991466922
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3938869664887627426}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fea29bb7c508c244a1f805a5fd3fc4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineMode: 0
+  outlineColor: {r: 1, g: 1, b: 1, a: 1}
+  outlineWidth: 10
+  precomputeOutline: 0
+  bakeKeys: []
+  bakeValues: []
 --- !u!1 &3984568644409324313
 GameObject:
   m_ObjectHideFlags: 0

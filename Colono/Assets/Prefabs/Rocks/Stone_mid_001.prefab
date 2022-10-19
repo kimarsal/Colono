@@ -101,11 +101,10 @@ MonoBehaviour:
   taskType: 0
   peasantScript: {fileID: 0}
   itemType: 1
-  itemStrength: 2
-  resourceType: 1
-  resourceAmount: 6
-  npcManager: {fileID: 0}
-  clearingCanvas: {fileID: 0}
+  itemCell: {x: 0, y: 0}
+  materialType: 1
+  materialAmount: 2
+  islandScript: {fileID: 0}
   isScheduledForClearing: 0
 --- !u!208 &-7264864317506898233
 NavMeshObstacle:

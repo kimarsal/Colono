@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour
     private ShipScript shipScript;
     public int numPeasants = 10;
 
-    private enum ButtonState { Idle, ItemButtons, BuildingButtons, EnclosureButtons, ConstructionDetails };
+    private enum ButtonState { Idle, ItemButtons, BuildingButtons, EnclosureButtons, ConstructionDetails, PeasantDetails };
 
     private bool isPlayerNearIsland = false;
     public bool isInIsland = false;
@@ -21,9 +21,11 @@ public class GameManager : MonoBehaviour
     public Animator buildingButtonsAnimator;
     public Animator enclosureButtonsAnimator;
     public Animator constructionDetailsAnimator;
+    public Animator peasantDetailsAnimator;
 
     private ConstructionScript constructionScript;
     public ConstructionDetailsScript constructionDetailsScript;
+    public PeasantDetailsScript peasantDetailsScript;
 
     public Button boardIslandButton;
     public Button cancelClearingButton;
@@ -41,6 +43,7 @@ public class GameManager : MonoBehaviour
         cameraScript = GameObject.Find("MainCamera").GetComponent<CameraScript>();
         shipScript = GameObject.FindGameObjectWithTag("Player").GetComponent<ShipScript>();
         constructionDetailsScript.gameManager = this;
+        peasantDetailsScript.gameManager = this;
     }
 
     public void PlayerIsNearIsland(IslandScript islandScript)
@@ -73,7 +76,8 @@ public class GameManager : MonoBehaviour
             case ButtonState.ItemButtons: itemButtonsAnimator.Play("HideItemButtons"); break;
             case ButtonState.BuildingButtons: buildingButtonsAnimator.Play("HideAllBuildingButtons"); break;
             case ButtonState.EnclosureButtons: enclosureButtonsAnimator.Play("HideEnclosureButtons"); break;
-            case ButtonState.ConstructionDetails: constructionDetailsAnimator.Play("HideConstructionDetails"); break;
+            case ButtonState.ConstructionDetails: constructionDetailsAnimator.Play("HideDetails"); break;
+            case ButtonState.PeasantDetails: peasantDetailsAnimator.Play("HideDetails"); break;
         }
 
         buttonState = ButtonState.Idle;
@@ -113,6 +117,13 @@ public class GameManager : MonoBehaviour
         SetConstructionDetails(shipScript);
     }
 
+    public void SelectPeasant(PeasantScript peasantScript)
+    {
+        islandScript.islandCellScript.DestroyAllCells();
+
+        SetPeasantDetails(peasantScript);
+    }
+
     public void Build()
     {
         if(buttonState == ButtonState.Idle)
@@ -148,7 +159,7 @@ public class GameManager : MonoBehaviour
         islandScript.islandCellScript.RemoveBuilding();
         canvasAnimator.Play("ShowLeaveIslandButton");
         buildingButtonsAnimator.Play("ShowBuildingButtons");
-        constructionDetailsAnimator.Play("HideConstructionDetails");
+        constructionDetailsAnimator.Play("HideDetails");
 
         buttonState = ButtonState.Idle;
     }
@@ -190,7 +201,7 @@ public class GameManager : MonoBehaviour
         islandScript.islandCellScript.RemoveEnclosure();
         canvasAnimator.Play("ShowLeaveIslandButton");
         buildingButtonsAnimator.Play("ShowBuildingButtons");
-        constructionDetailsAnimator.Play("HideConstructionDetails");
+        constructionDetailsAnimator.Play("HideDetails");
 
         buttonState = ButtonState.Idle;
     }
@@ -199,8 +210,21 @@ public class GameManager : MonoBehaviour
     {
         canvasAnimator.Play("ShowLeaveIslandButton");
         buildingButtonsAnimator.Play("ShowBuildingButtons");
-        constructionDetailsAnimator.Play("HideConstructionDetails");
+        constructionDetailsAnimator.Play("HideDetails");
+
+        constructionScript.constructionDetailsScript = null;
         islandScript.islandCellScript.DestroyAllCells();
+
+        buttonState = ButtonState.Idle;
+    }
+
+    public void HidePeasantDetails()
+    {
+        canvasAnimator.Play("ShowLeaveIslandButton");
+        buildingButtonsAnimator.Play("ShowBuildingButtons");
+        peasantDetailsAnimator.Play("HideDetails");
+
+        peasantDetailsScript.peasantScript.peasantDetailsScript = null;
 
         buttonState = ButtonState.Idle;
     }
@@ -217,8 +241,27 @@ public class GameManager : MonoBehaviour
             case ButtonState.ItemButtons: buildingButtonsAnimator.Play("HideItemButtons"); break;
             case ButtonState.BuildingButtons: buildingButtonsAnimator.Play("HideAllBuildingButtons"); break;
             case ButtonState.EnclosureButtons: enclosureButtonsAnimator.Play("HideEnclosureButtons"); break;
+            case ButtonState.PeasantDetails: peasantDetailsAnimator.Play("HideDetails"); break;
         }
-        constructionDetailsAnimator.Play("ShowConstructionDetails");
+        constructionDetailsAnimator.Play("ShowDetails");
+
+        buttonState = ButtonState.ConstructionDetails;
+    }
+
+    private void SetPeasantDetails(PeasantScript peasantScript)
+    {
+        peasantDetailsScript.SetPeasantDetails(peasantScript);
+
+        canvasAnimator.Play("HideLeaveIslandButton");
+        switch (buttonState)
+        {
+            case ButtonState.Idle: buildingButtonsAnimator.Play("HideBuildingButtons"); break;
+            case ButtonState.ItemButtons: buildingButtonsAnimator.Play("HideItemButtons"); break;
+            case ButtonState.BuildingButtons: buildingButtonsAnimator.Play("HideAllBuildingButtons"); break;
+            case ButtonState.EnclosureButtons: enclosureButtonsAnimator.Play("HideEnclosureButtons"); break;
+            case ButtonState.ConstructionDetails: constructionDetailsAnimator.Play("HideDetails"); break;
+        }
+        peasantDetailsAnimator.Play("ShowDetails");
 
         buttonState = ButtonState.ConstructionDetails;
     }

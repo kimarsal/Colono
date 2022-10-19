@@ -19,8 +19,8 @@ public class IslandScript : MonoBehaviour
     public GameObject cells;
     public GameObject constructions;
 
-    private List<GameObject> enclosuresList = new List<GameObject>();
-    private List<GameObject> buildingsList = new List<GameObject>();
+    private List<EnclosureScript> enclosuresList = new List<EnclosureScript>();
+    private List<BuildingScript> buildingsList = new List<BuildingScript>();
 
     private Dictionary<Vector2, GameObject> itemsList = new Dictionary<Vector2, GameObject>();
 
@@ -89,33 +89,29 @@ public class IslandScript : MonoBehaviour
         itemsList.Remove(cell);
     }
 
-    public void AddBuilding(GameObject building)
+    public void AddBuilding(BuildingScript building)
     {
         buildingsList.Add(building);
         RebakeNavMesh();
-        /*if(building.GetComponent<BuildingScript>().type == BuildingScript.BuildingType.Residence)
-        {
-            npcManager.GeneratePeasants(building.GetComponent<BuildingScript>());
-        }*/
     }
 
-    public void RemoveBuilding(GameObject building)
+    public void RemoveBuilding(BuildingScript building)
     {
         buildingsList.Remove(building);
-        Destroy(building);
+        Destroy(building.gameObject);
         StartCoroutine(RebakeNavMeshDelayed());
     }
 
-    public void AddEnclosure(GameObject enclosure)
+    public void AddEnclosure(EnclosureScript enclosure)
     {
         enclosuresList.Add(enclosure);
         RebakeNavMesh();
     }
 
-    public void RemoveEnclosure(GameObject enclosure)
+    public void RemoveEnclosure(EnclosureScript enclosure)
     {
         enclosuresList.Remove(enclosure);
-        Destroy(enclosure);
+        Destroy(enclosure.gameObject);
         StartCoroutine(RebakeNavMeshDelayed());
     }
 
@@ -146,11 +142,11 @@ public class IslandScript : MonoBehaviour
 
     }
 
-    public GameObject GetEnclosureByCell(Vector2 cell)
+    public EnclosureScript GetEnclosureByCell(Vector2 cell)
     {
-        foreach(GameObject enclosure in enclosuresList)
+        foreach(EnclosureScript enclosure in enclosuresList)
         {
-            Vector2[] cells = enclosure.GetComponent<EnclosureScript>().cells;
+            Vector2[] cells = enclosure.cells;
             if(cell.x >= cells[0].x && cell.x <= cells[cells.Length - 1].x
                 && cell.y >= cells[0].y && cell.y <= cells[cells.Length - 1].y)
             {
@@ -160,12 +156,12 @@ public class IslandScript : MonoBehaviour
         return null;
     }
 
-    public GameObject GetConstructionByCell(Vector2 cell, out bool isBuilding)
+    public ConstructionScript GetConstructionByCell(Vector2 cell, out bool isBuilding)
     {
         isBuilding = false;
-        foreach (GameObject enclosure in enclosuresList)
+        foreach (EnclosureScript enclosure in enclosuresList)
         {
-            Vector2[] cells = enclosure.GetComponent<EnclosureScript>().cells;
+            Vector2[] cells = enclosure.cells;
             if (cell.x >= cells[0].x && cell.x <= cells[cells.Length - 1].x
                 && cell.y >= cells[0].y && cell.y <= cells[cells.Length - 1].y)
             {
@@ -173,11 +169,25 @@ public class IslandScript : MonoBehaviour
             }
         }
         isBuilding = true;
-        foreach (GameObject building in buildingsList)
+        foreach (BuildingScript building in buildingsList)
         {
-            Vector2[] cells = building.GetComponent<BuildingScript>().cells;
+            Vector2[] cells = building.cells;
             if (cell.x >= cells[0].x && cell.x <= cells[cells.Length - 1].x
                 && cell.y >= cells[0].y && cell.y <= cells[cells.Length - 1].y)
+            {
+                return building;
+            }
+        }
+        return null;
+    }
+
+    public BuildingScript GetAvailableBuilding(BuildingScript.BuildingType buildingType)
+    {
+        foreach (BuildingScript building in buildingsList)
+        {
+            if (building.buildingType == buildingType &&
+                ((buildingType != BuildingScript.BuildingType.Warehouse && building.peasantList.Count < building.maxPeasants) ||
+                (buildingType == BuildingScript.BuildingType.Warehouse && ((WarehouseScript)building).usage < ((WarehouseScript)building).capacity)))
             {
                 return building;
             }

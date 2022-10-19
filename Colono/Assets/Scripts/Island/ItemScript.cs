@@ -6,19 +6,23 @@ public class ItemScript : TaskScript
 {
     public enum ItemType { Chop, Dig, Pull, Pick }
     public ItemType itemType;
-    public int itemStrength = 1;
     public Vector2 itemCell;
 
-    public enum ResourceType { Wood, Stone, Medicine };
-    public ResourceType resourceType;
-    public int resourceAmount = 1;
+    public ResourceScript.MaterialType materialType;
+    public int materialAmount;
 
     public IslandScript islandScript;
-    public GameObject clearingCanvas;
     public bool isScheduledForClearing;
+    private Outline outline;
 
     private void Start()
     {
+        outline = gameObject.AddComponent<Outline>();
+        outline.OutlineColor = Color.red;
+        outline.OutlineMode = Outline.Mode.OutlineAll;
+        outline.OutlineWidth = 10;
+        outline.enabled = false;
+
         taskType = TaskType.Item;
         center = transform.position;
     }
@@ -28,7 +32,7 @@ public class ItemScript : TaskScript
         if (isScheduledForClearing != toClear)
         {
             isScheduledForClearing = toClear;
-            clearingCanvas.SetActive(toClear);
+            outline.enabled = toClear;
             if (!toClear && peasantScript != null)
             {
                 peasantScript.CancelTask();
@@ -39,19 +43,12 @@ public class ItemScript : TaskScript
         return false;
     }
 
-    private void Update()
-    {
-        clearingCanvas.transform.GetChild(0).position = Camera.main.WorldToScreenPoint(transform.position) + new Vector3(0, 30f, 0);
-    }
-
     public override void TaskProgress()
     {
-        itemStrength--;
-        Debug.Log(itemStrength);
-        if (itemStrength == 0)
+        materialAmount--;
+        peasantScript.GatherMaterialFromItem(materialType);
+        if (materialAmount == 0)
         {
-            Debug.Log(resourceType.ToString() + ": " + resourceAmount);
-            peasantScript.CompleteItemRemoval(resourceType, resourceAmount);
             islandScript.npcManager.RemoveItemToClear(this);
             islandScript.RemoveItemAtCell(itemCell);
             Destroy(gameObject);

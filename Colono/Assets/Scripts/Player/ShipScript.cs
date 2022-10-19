@@ -7,14 +7,15 @@ public class ShipScript : ConstructionScript
 {
     public GameObject npcs;
     private IslandEditor islandEditor;
-    private GameManager gameManagerScript;
+    private GameManager gameManager;
+    public Outline outline;
 
     void Start()
     {
-        gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         islandEditor = GameObject.Find("GameManager").GetComponent<IslandEditor>();
 
-        for (int i = 0; i < gameManagerScript.numPeasants; i++)
+        for (int i = 0; i < gameManager.numPeasants; i++)
         {
             GameObject prefab = islandEditor.malePeasantPrefab;
             switch (i % 3)
@@ -24,8 +25,9 @@ public class ShipScript : ConstructionScript
                 case 2:
                     prefab = islandEditor.childPeasantPrefab; break;
             }
-            GameObject peasant = Instantiate(prefab, center.position, prefab.transform.rotation, npcs.transform);
+            GameObject peasant = Instantiate(prefab, entry.position, prefab.transform.rotation, npcs.transform);
             PeasantScript peasantScript = peasant.GetComponent<PeasantScript>();
+            peasantScript.gameManager = gameManager;
             peasantScript.InitializePeasant();
             peasant.SetActive(false);
             peasantList.Add(peasantScript);
@@ -34,7 +36,7 @@ public class ShipScript : ConstructionScript
 
     void Update()
     {
-        if (gameManagerScript.isInIsland && Input.GetMouseButtonDown(0))
+        if (gameManager.isInIsland && constructionDetailsScript == null)
         {
             RaycastHit raycastHit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -42,7 +44,15 @@ public class ShipScript : ConstructionScript
             {
                 if (raycastHit.transform.gameObject.CompareTag("Player"))
                 {
-                    gameManagerScript.SelectShip();
+                    outline.enabled = true;
+                    if (Input.GetMouseButtonDown(0))
+                    {
+                        gameManager.SelectShip();
+                    }
+                }
+                else
+                {
+                    outline.enabled = false;
                 }
             }
         }
@@ -52,7 +62,7 @@ public class ShipScript : ConstructionScript
     {
         NavMeshHit hit;
         NavMesh.SamplePosition(colliderClosestPoint, out hit, 10, NavMesh.AllAreas);
-        center.position = hit.position;
+        entry.position = hit.position;
     }
 
     public override TaskScript GetNextPendingTask()

@@ -15,12 +15,12 @@ public class GardenScript : EnclosureScript
             if(cell.x != cells[0].x && cell.x != cells[cells.Length-1].x
                 && cell.y != cells[0].y && cell.y != cells[cells.Length - 1].y)
             {
-                CreatePatch(cell, PatchScript.CropType.Tomato);
+                CreatePatch(cell, ResourceScript.CropType.Tomato);
             }
         }
     }
 
-    private void CreatePatch(Vector2 cell, PatchScript.CropType cropType)
+    private void CreatePatch(Vector2 cell, ResourceScript.CropType cropType)
     {
         GameObject patch = new GameObject("patch");
         MeshRenderer meshRenderer = patch.AddComponent<MeshRenderer>();

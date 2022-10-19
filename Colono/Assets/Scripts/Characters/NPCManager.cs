@@ -4,6 +4,7 @@ using UnityEngine.AI;
 
 public class NPCManager : MonoBehaviour
 {
+    public IslandScript islandScript;
     public IslandEditor islandEditor;
     public GameObject npcs;
     public List<PeasantScript> peasantList = new List<PeasantScript>();
@@ -97,7 +98,7 @@ public class NPCManager : MonoBehaviour
             peasantScript.npcManager = this;
             peasantScript.transform.parent = npcs.transform;
             peasantScript.transform.localScale = Vector3.one * 0.4f;
-            peasantScript.transform.position = shipScript.center.position;
+            peasantScript.transform.position = shipScript.entry.position;
             peasantList.Add(peasantScript);
             shipScript.peasantList.Remove(peasantScript);
             peasantScript.gameObject.SetActive(true);
@@ -150,7 +151,7 @@ public class NPCManager : MonoBehaviour
     {
         itemsToClear.Remove(item);
         PeasantAdultScript peasantScript = item.peasantScript;
-        if(peasantScript != null) //Tenia un NPC vinculat
+        if(peasantScript != null && peasantScript.peasantState != PeasantAdultScript.PeasantState.Working) //Tenia un NPC vinculat
         {
             AsignItemToPeasant(peasantScript);
         }
@@ -191,7 +192,9 @@ public class NPCManager : MonoBehaviour
             peasantScript.constructionScript = null;
             peasantList.Add(peasantScript);
             constructionScript.peasantList.Remove(peasantScript);
-            constructionScript.peasantsOnTheirWay--;
+
+            if (!peasantScript.gameObject.activeInHierarchy) peasantScript.gameObject.SetActive(true);
+            else constructionScript.peasantsOnTheirWay--;
 
             if(peasantScript.peasantType == PeasantScript.PeasantType.Adult)
             {

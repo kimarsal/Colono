@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6968755648469870603}
-  - component: {fileID: 7439743356064109974}
+  - component: {fileID: 2242332488940608706}
   m_Layer: 0
   m_Name: warehouse
   m_TagString: Untagged
@@ -34,7 +34,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7439743356064109974
+--- !u!114 &2242332488940608706
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -43,7 +43,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7781708863916176049}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a0a56d236f14adb4496d54279423d076, type: 3}
+  m_Script: {fileID: 11500000, guid: 7d6e732caeac0774faa8a5cee706a96f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   constructionType: 2
@@ -51,12 +51,17 @@ MonoBehaviour:
   cells: []
   length: 5
   width: 3
-  center: {fileID: 2659500063952886743}
+  entry: {fileID: 2659500063952886743}
+  maxPeasants: 0
   peasantList: []
   peasantsOnTheirWay: 0
   constructionDetailsScript: {fileID: 0}
   buildingType: 0
   orientation: 0
+  capacity: 50
+  usage: 0
+  materials: 000000000000000000000000
+  crops: 000000000000000000000000000000000000000000000000
 --- !u!1001 &55199954664440583
 PrefabInstance:
   m_ObjectHideFlags: 0

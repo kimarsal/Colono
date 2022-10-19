@@ -74,6 +74,7 @@ public class IslandManager : MonoBehaviour
             islandScript.npcManager.npcs.transform.parent = newIsland.island.transform;
             islandScript.npcManager.npcs.transform.localPosition = Vector3.zero;
             islandScript.npcManager.islandEditor = islandEditor;
+            islandScript.npcManager.islandScript = islandScript;
 
             mapController.FollowIsland(newIsland.island);
             islands.Add(newIsland.island);
@@ -86,7 +87,18 @@ public class IslandManager : MonoBehaviour
             while(row < IslandGenerator.mapChunkSize - 1)
             {
                 Vector2 itemCell = new Vector2(col, row);
-                Vector3 itemPos = MeshGenerator.GetCellCenter(itemCell, newIsland.meshData);
+                Vector3 itemPos = Vector3.zero;
+
+                try
+                {
+                    itemPos = MeshGenerator.GetCellCenter(itemCell, newIsland.meshData);
+                }
+                catch(Exception e)
+                {
+                    Debug.Log(e);
+                    Debug.Log(itemCell);
+                }
+
                 GameObject prefab = null;
 
                 switch (islandGenerator.regions[newIsland.regionMap[col, row]].name)
@@ -102,7 +114,6 @@ public class IslandManager : MonoBehaviour
                     GameObject item = Instantiate(prefab, newIsland.island.transform.position + itemPos, Quaternion.Euler(0, UnityEngine.Random.Range(0, 360), 0), islandScript.items.transform);
                     item.GetComponent<ItemScript>().islandScript = islandScript;
                     item.GetComponent<ItemScript>().itemCell = itemCell;
-                    item.GetComponent<ItemScript>().clearingCanvas = Instantiate(islandEditor.itemClearingCanvas, newIsland.island.transform.position + itemPos, Quaternion.Euler(Vector3.zero), item.transform);
                     islandScript.AddItem(item, itemCell);
                 }
 

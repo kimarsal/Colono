@@ -13,8 +13,9 @@ public abstract class ConstructionScript : MonoBehaviour
     public Vector2[] cells;
     public int length;
     public int width;
-    public Transform center;
+    public Transform entry;
 
+    public int maxPeasants;
     public List<PeasantScript> peasantList = new List<PeasantScript>();
     public int peasantsOnTheirWay;
 

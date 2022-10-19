@@ -21,29 +21,29 @@ public class SpeechBubbleScript : MonoBehaviour
         transform.rotation = Quaternion.Euler(0, -transform.parent.rotation.y, 0);
     }
 
-    public void DisplayResource(ItemScript.ResourceType resourceType)
+    public void DisplayMaterial(ResourceScript.MaterialType materialType)
     {
         if (activeSprite != null) activeSprite.SetActive(false);
-        switch (resourceType)
+        switch (materialType)
         {
-            case ItemScript.ResourceType.Wood: activeSprite = wood; break;
-            case ItemScript.ResourceType.Stone: activeSprite = stone; break;
-            case ItemScript.ResourceType.Medicine: activeSprite = medicine; break;
+            case ResourceScript.MaterialType.Wood: activeSprite = wood; break;
+            case ResourceScript.MaterialType.Stone: activeSprite = stone; break;
+            case ResourceScript.MaterialType.Medicine: activeSprite = medicine; break;
         }
         activeSprite.SetActive(true);
     }
 
-    public void DisplayCrop(PatchScript.CropType cropType)
+    public void DisplayCrop(ResourceScript.CropType cropType)
     {
         if (activeSprite != null) activeSprite.SetActive(false);
         switch (cropType)
         {
-            case PatchScript.CropType.Corn: activeSprite = corn; break;
-            case PatchScript.CropType.Cucumber: activeSprite = cucumber; break;
-            case PatchScript.CropType.Grape: activeSprite = grape; break;
-            case PatchScript.CropType.Pepper: activeSprite = pepper; break;
-            case PatchScript.CropType.Potato: activeSprite = potato; break;
-            case PatchScript.CropType.Tomato: activeSprite = tomato; break;
+            case ResourceScript.CropType.Corn: activeSprite = corn; break;
+            case ResourceScript.CropType.Cucumber: activeSprite = cucumber; break;
+            case ResourceScript.CropType.Grape: activeSprite = grape; break;
+            case ResourceScript.CropType.Pepper: activeSprite = pepper; break;
+            case ResourceScript.CropType.Potato: activeSprite = potato; break;
+            case ResourceScript.CropType.Tomato: activeSprite = tomato; break;
         }
         activeSprite.SetActive(true);
     }

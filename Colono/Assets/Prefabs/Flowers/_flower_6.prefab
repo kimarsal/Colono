@@ -99,15 +99,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   center: {x: 0, y: 0, z: 0}
   taskType: 0
-  hasBeenCanceled: 0
   peasantScript: {fileID: 0}
   itemType: 3
-  itemStrength: 1
   itemCell: {x: 0, y: 0}
-  resourceType: 2
-  resourceAmount: 5
+  materialType: 2
+  materialAmount: 1
   islandScript: {fileID: 0}
-  clearingCanvas: {fileID: 0}
   isScheduledForClearing: 0
 --- !u!208 &4553668699896538947
 NavMeshObstacle:

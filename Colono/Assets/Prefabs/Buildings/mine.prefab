@@ -52,7 +52,7 @@ MonoBehaviour:
   cells: []
   length: 3
   width: 3
-  center: {fileID: 5666154522394969465}
+  entry: {fileID: 5666154522394969465}
   peasantList: []
   peasantsOnTheirWay: 0
   constructionDetailsScript: {fileID: 0}
@@ -136,7 +136,7 @@ PrefabInstance:
     - target: {fileID: 3192485407342391892, guid: 34b7e0ee1989fe24390e94b452610abd,
         type: 3}
       propertyPath: m_Name
-      value: Center
+      value: Entry
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 34b7e0ee1989fe24390e94b452610abd, type: 3}
