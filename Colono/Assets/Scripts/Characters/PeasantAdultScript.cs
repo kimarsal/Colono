@@ -14,16 +14,6 @@ public class PeasantAdultScript : PeasantScript
     public GameObject basket;
     public GameObject wateringCan;
 
-    [Header("Resources")]
-    public int capacity;
-    public int usage;
-    public int[] materials = new int[Enum.GetValues(typeof(ResourceScript.MaterialType)).Length];
-    public int[] crops = new int[Enum.GetValues(typeof(ResourceScript.CropType)).Length];
-
-    public enum PeasantState { HangingOut, Working, GoingToEat, GoingToSleep, CarryingToWarehouse, CarryingToShip }
-    public PeasantState peasantState;
-    public WarehouseScript warehouseScript;
-
     public void ToggleAxe()
     {
         axe.SetActive(!axe.activeSelf);
@@ -47,7 +37,7 @@ public class PeasantAdultScript : PeasantScript
     protected IEnumerator WaitForNextRandomDestinationInEnclosure()
     {
         yield return new WaitForSeconds(1f);
-        if (constructionScript != null)
+        if (constructionScript != null) //Si encara està vinculat a la construcció
         {
             SetDestination(NPCManager.GetRandomPointWithinRange(((EnclosureScript)constructionScript).minPos, ((EnclosureScript)constructionScript).maxPos));
         }
@@ -56,12 +46,16 @@ public class PeasantAdultScript : PeasantScript
 
     public override void UpdateTask()
     {
-        animator.SetInteger("State", (int)PeasantAction.Moving);
-        if (peasantState == PeasantState.CarryingToWarehouse) //Si està portant recursos al magatzem
+        StopCharacter();
+        if (tavern != null) //Si ha d'anar a menjar
         {
-            SetDestination(warehouseScript.entry.position);
+            SetDestination(tavern.entry.position);
         }
-        else if (task != null) //Si té una tasca encarregada
+        else if (cabin != null) //Si ha d'anar a dormir
+        {
+            SetDestination(cabin.entry.position);
+        }
+        else if (task != null && hunger < 1 && exhaustion < 1) //Si té una tasca encarregada i pot fer-la
         {
             SetDestination(task.center);
         }
@@ -81,9 +75,13 @@ public class PeasantAdultScript : PeasantScript
 
     public override void ArrivedAtDestination()
     {
-        if (peasantState == PeasantState.CarryingToWarehouse) //Si està portant recursos al magatzem
+        if (tavern != null) //Si ha anat a menjar
         {
-            AddToWarehouse();
+            tavern.FeedPeasant(this);
+        }
+        else if (cabin != null) //Si ha anat a dormir
+        {
+            cabin.RestPeasant(this);
         }
         else if (task != null) //Si té una tasca encarregada
         {
@@ -113,13 +111,6 @@ public class PeasantAdultScript : PeasantScript
         }
     }
 
-    public void CancelTask()
-    {
-        task = null;
-        StopCharacter();
-        StartCoroutine(WaitForNextRandomDestination());
-    }
-
     public void DoTask()
     {
         transform.LookAt(task.center);
@@ -145,7 +136,7 @@ public class PeasantAdultScript : PeasantScript
         //StartCoroutine(PointTowardsTaskCenter());
     }
 
-    private IEnumerator PointTowardsTaskCenter()
+    /*private IEnumerator PointTowardsTaskCenter()
     {
         do
         {
@@ -155,72 +146,12 @@ public class PeasantAdultScript : PeasantScript
             yield return new WaitForSeconds(0.1f);
         }
         while (Vector3.Angle(transform.forward, task.center - transform.position) > 10);
-    }
+    }*/
 
     private void TaskProgress()
     {
         task.TaskProgress();
         hunger += 0.05f;
         exhaustion += 0.05f;
-    }
-
-    public void GatherMaterialFromItem(ResourceScript.MaterialType materialType)
-    {
-        materials[(int)materialType]++;
-        usage++;
-        /*speechBubble.gameObject.SetActive(true);
-        speechBubble.DisplayMaterial(materialType);*/
-
-        if (usage == capacity)
-        {
-            warehouseScript = (WarehouseScript)npcManager.islandScript.GetAvailableBuilding(BuildingScript.BuildingType.Warehouse);
-            if(warehouseScript != null)
-            {
-                peasantState = PeasantState.CarryingToWarehouse;
-            }
-            CancelTask();
-        }
-    }
-
-    public void CompleteCropHarvesting(ResourceScript.CropType cropType, int cropAmount)
-    {
-        if (capacity - usage < cropAmount) cropAmount = capacity - usage;
-        crops[(int)cropType] += cropAmount;
-        usage += cropAmount;
-        /*speechBubble.gameObject.SetActive(true);
-        speechBubble.DisplayCrop(cropType);*/
-
-        if(usage == capacity)
-        {
-            peasantState = PeasantState.CarryingToWarehouse;
-        }
-
-        CancelTask();
-    }
-
-    public void AddToWarehouse()
-    {
-        bool warehouseIsFull = false;
-        int i = 0;
-        while(i < materials.Length && !warehouseIsFull)
-        {
-            int materialAmount = warehouseScript.AddMaterials(i, materials[i]);
-            if (materialAmount < materials[i]) warehouseIsFull = true;
-            materials[i] -= materialAmount;
-            usage -= materialAmount;
-            i++;
-        }
-        i = 0;
-        while (i < crops.Length && !warehouseIsFull)
-        {
-            int cropAmount = warehouseScript.AddCrops(i, crops[i]);
-            if (cropAmount < crops[i]) warehouseIsFull = true;
-            crops[i] -= cropAmount;
-            usage -= cropAmount;
-            i++;
-        }
-        peasantState = (constructionScript == null ? PeasantState.HangingOut : PeasantState.Working);
-        UpdateTask();
-
     }
 }

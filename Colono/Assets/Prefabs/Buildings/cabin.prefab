@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4212759614877374561}
-  - component: {fileID: 4466449268142896528}
+  - component: {fileID: 555100743939469867}
   m_Layer: 0
   m_Name: cabin
   m_TagString: Untagged
@@ -34,7 +34,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4466449268142896528
+--- !u!114 &555100743939469867
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -43,7 +43,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3548108767819252443}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a0a56d236f14adb4496d54279423d076, type: 3}
+  m_Script: {fileID: 11500000, guid: c1684f2837d338648b54c204f5a8d2b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   constructionType: 2
@@ -52,6 +52,7 @@ MonoBehaviour:
   length: 2
   width: 2
   entry: {fileID: 2660757951229852377}
+  maxPeasants: 0
   peasantList: []
   peasantsOnTheirWay: 0
   constructionDetailsScript: {fileID: 0}

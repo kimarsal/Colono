@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PatchScript : TaskScript
 {
+    public GardenScript gardenScript;
     public IslandEditor islandEditor;
     public enum CropState { Planted, Grown, Blossomed, Dead, Barren }
     public Vector2 cell;
@@ -11,7 +12,7 @@ public class PatchScript : TaskScript
     public ResourceScript.CropType cropType;
     private Quaternion orientation;
     public CropState cropState = CropState.Barren;
-    private float timeSinceLastChange = 0f;
+    private int cropAmount = 3;
 
     private void Start()
     {
@@ -26,51 +27,45 @@ public class PatchScript : TaskScript
         crop = Instantiate(GetCropPrefab(), center, orientation, transform);
     }
 
-    void Update()
-    {
-        /*timeSinceLastChange += Time.deltaTime;
-
-        if (timeSinceLastChange > 3f)
-        {
-            if(cropState < CropState.Blossomed)
-            {
-                cropState++;
-                Destroy(crop);
-                crop = Instantiate(GetCropPrefab(), center, orientation, transform);
-            }
-            timeSinceLastChange = 0;
-        }*/
-    }
-
     public override void TaskProgress()
     {
+        bool shouldPeasantChangeTask = true;
         if (cropState == CropState.Barren) PlantCrop();
         else
         {
             if (cropState < CropState.Blossomed)
             {
                 cropState++;
+                Destroy(crop);
+                crop = Instantiate(GetCropPrefab(), center, orientation, transform);
             }
             else if (cropState == CropState.Blossomed)
             {
-                cropState = CropState.Grown;
-                peasantScript.CompleteCropHarvesting(cropType, 1);
+                cropAmount--;
+                gardenScript.islandScript.AddCrop(cropType);
+                if (cropAmount == 0)
+                {
+                    cropState = CropState.Grown;
+                    cropAmount = 3;
+                    Destroy(crop);
+                    crop = Instantiate(GetCropPrefab(), center, orientation, transform);
+                }
+                else shouldPeasantChangeTask = false;
             }
-            Destroy(crop);
-            crop = Instantiate(GetCropPrefab(), center, orientation, transform);
-        }
-        
-        PeasantAdultScript p = peasantScript;
-        peasantScript = null;
-        if(p.constructionScript != null) //Si el granjer encara no ha marxat
-        {
-            TaskScript patch = ((GardenScript)p.constructionScript).GetNextPendingTask();
-            patch.peasantScript = p;
-            p.task = patch;
-            p.UpdateTask();
         }
 
-        timeSinceLastChange = 0;
+        if (shouldPeasantChangeTask)
+        {
+            PeasantAdultScript p = peasantScript;
+            peasantScript = null;
+            if (p.constructionScript != null) //Si el granjer encara no ha marxat
+            {
+                TaskScript patch = ((GardenScript)p.constructionScript).GetNextPendingTask();
+                patch.peasantScript = p;
+                p.task = patch;
+                p.UpdateTask();
+            }
+        }
     }
 
     private GameObject GetCropPrefab()

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -23,6 +24,11 @@ public class IslandScript : MonoBehaviour
     private List<BuildingScript> buildingsList = new List<BuildingScript>();
 
     private Dictionary<Vector2, GameObject> itemsList = new Dictionary<Vector2, GameObject>();
+
+    public int capacity;
+    public int usage;
+    public int[] materials = new int[Enum.GetValues(typeof(ResourceScript.MaterialType)).Length];
+    public int[] crops = new int[Enum.GetValues(typeof(ResourceScript.CropType)).Length];
 
     private void Start()
     {
@@ -125,21 +131,6 @@ public class IslandScript : MonoBehaviour
     {
         GetComponent<NavMeshSurface>().UpdateNavMesh(GetComponent<NavMeshSurface>().navMeshData);
 
-        /*NavMeshBuildSource s = new NavMeshBuildSource();
-        s.shape = NavMeshBuildSourceShape.Mesh;
-        s.sourceObject = GetComponent<MeshFilter>().sharedMesh;
-        s.transform = transform.localToWorldMatrix;
-        s.size = Vector3.one;
-
-        List<NavMeshBuildSource> list = new List<NavMeshBuildSource>();
-        list.Add(s);
-
-        NavMeshBuilder.UpdateNavMeshDataAsync(
-            GetComponent<NavMeshSurface>().navMeshData,
-            GetComponent<NavMeshSurface>().GetBuildSettings(),
-            list,
-            new Bounds(bounds.center, bounds.size + Vector3.one * 2));*/
-
     }
 
     public EnclosureScript GetEnclosureByCell(Vector2 cell)
@@ -193,5 +184,33 @@ public class IslandScript : MonoBehaviour
             }
         }
         return null;
+    }
+
+    public void AddMaterial(ResourceScript.MaterialType materialType)
+    {
+        if (usage < capacity)
+        {
+            materials[(int)materialType]++;
+            usage++;
+        }
+        else
+        {
+            gameManagerScript.shipScript.AddMaterial(materialType);
+        }
+        gameManagerScript.UpdateMaterial(materialType);
+    }
+
+    public void AddCrop(ResourceScript.CropType cropType)
+    {
+        if (usage < capacity)
+        {
+            crops[(int)cropType]++;
+            usage++;
+        }
+        else
+        {
+            gameManagerScript.shipScript.AddCrop(cropType);
+        }
+        gameManagerScript.UpdateCrop(cropType);
     }
 }

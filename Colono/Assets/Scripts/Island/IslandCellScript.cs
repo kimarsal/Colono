@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -43,8 +44,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     private void Update()
     {
-        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.D) ||
-            Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow))
+        if (gameManagerScript.buttonState != GameManager.ButtonState.ManageInventory && (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0))
         {
             OnPointerMove(null);
         }
@@ -67,7 +67,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             else if (Input.GetKeyDown(KeyCode.Escape))
             {
                 selectMode = SelectMode.None;
-                Destroy(selectedBuilding); //Eliminar l'edifici
+                Destroy(selectedBuilding.gameObject); //Eliminar l'edifici
                 buildingOrientation = 0; //Resetejar l'orientació
                 DestroyAllCells();
                 gameManagerScript.ShowButtons();
@@ -114,7 +114,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         {
             if (!isSelectionValid) //Si la posició no és vàlida
             {
-                Destroy(selectedBuilding); //Eliminar l'edifici
+                Destroy(selectedBuilding.gameObject); //Eliminar l'edifici
                 DestroyAllCells();
                 gameManagerScript.ShowButtons();
             }
@@ -431,6 +431,10 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         newCell.transform.parent = islandScript.cells.transform;
         newCell.transform.localPosition = Vector3.zero;
 
+        newCell.isStatic = true;
+        GameObjectUtility.SetNavMeshArea(newCell, 1);
+        //newCell.GetComponent<MeshRenderer>().
+
         cells[(int)position.x, (int)position.y] = newCell;
     }
 
@@ -537,11 +541,6 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         enclosureScript.enclosureType = enclosureType;
         enclosureScript.width = (int)selectedCells[selectedCells.Length - 1].x - (int)selectedCells[0].x;
         enclosureScript.length = (int)selectedCells[selectedCells.Length - 1].y - (int)selectedCells[0].y;
-        Transform enclosureCenter = Instantiate(islandEditorScript.constructionCenterPrefab,
-            transform.position + (MeshGenerator.GetCellCenter(selectedCells[0], meshData) + MeshGenerator.GetCellCenter(selectedCells[selectedCells.Length - 1], meshData)) / 2,
-            Quaternion.Euler(Vector3.zero),
-            enclosure.transform).transform;
-        enclosureScript.entry = enclosureCenter;
         enclosureScript.islandScript = islandScript;
 
         GameObject fences = new GameObject("Fences");
@@ -572,7 +571,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             GameObject post = Instantiate(islandEditorScript.post, transform.position + positions[positions.Length - 1], rotations[rotations.Length - 1], fences.transform);
             if (enclosureType == EnclosureScript.EnclosureType.Garden)
             {
-                ((GardenScript)enclosureScript).patches = new GameObject("Crops");
+                ((GardenScript)enclosureScript).patches = new GameObject("Patches");
                 ((GardenScript)enclosureScript).patches.transform.parent = enclosure.transform;
                 ((GardenScript)enclosureScript).patches.transform.localPosition = Vector3.zero;
             }

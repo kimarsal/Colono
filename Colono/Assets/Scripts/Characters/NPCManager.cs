@@ -111,12 +111,12 @@ public class NPCManager : MonoBehaviour
         }
     }
 
-    private void AsignItemToPeasant(PeasantAdultScript peasantScript)
+    public void AsignItemToPeasant(PeasantAdultScript peasantScript)
     {
         bool otherItemNeedsClearing = false;
         foreach (ItemScript itemScript in itemsToClear)
         {
-            if (itemScript.peasantScript == null)
+            if (itemScript.peasantScript == null) //Si no té un NPC vinculat
             {
                 otherItemNeedsClearing = true;
                 itemScript.peasantScript = peasantScript;
@@ -151,7 +151,8 @@ public class NPCManager : MonoBehaviour
     {
         itemsToClear.Remove(item);
         PeasantAdultScript peasantScript = item.peasantScript;
-        if(peasantScript != null && peasantScript.peasantState != PeasantAdultScript.PeasantState.Working) //Tenia un NPC vinculat
+        item.peasantScript = null;
+        if(peasantScript != null) //Tenia un NPC vinculat
         {
             AsignItemToPeasant(peasantScript);
         }

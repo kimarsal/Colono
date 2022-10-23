@@ -34,7 +34,9 @@ public class IslandEditor : MonoBehaviour
     public GameObject gateClosed;
     public GameObject gateOpen;
 
-    [Header("Crops")]
+    [Header("Resources")]
+    public Sprite[] materialSprites;
+    public Sprite[] cropSprites;
     public GameObject[] corn;
     public GameObject[] cucumber;
     public GameObject[] grape;
@@ -50,7 +52,5 @@ public class IslandEditor : MonoBehaviour
     public GameObject[] mountainItems;
 
     [Header("Others")]
-    public GameObject itemClearingCanvas;
-    public GameObject constructionCenterPrefab;
     public GameObject coastObstacle;
 }

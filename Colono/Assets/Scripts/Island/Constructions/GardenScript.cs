@@ -36,6 +36,7 @@ public class GardenScript : EnclosureScript
         patch.transform.localPosition = Vector3.zero;
 
         PatchScript patchScript = patch.AddComponent<PatchScript>();
+        patchScript.gardenScript = this;
         patchScript.islandEditor = islandScript.islandCellScript.islandEditorScript;
         patchScript.cell = cell;
         patchScript.cropType = cropType;
@@ -73,7 +74,7 @@ public class GardenScript : EnclosureScript
     public override TaskScript GetNextPendingTask()
     {
         PatchScript patch = null;
-        lastWorkedOnPatch = (lastWorkedOnPatch + 1) % patchesDictionary.Count;
+        //lastWorkedOnPatch = (lastWorkedOnPatch + 1) % patchesDictionary.Count;
 
         int index = 0;
         foreach (KeyValuePair<Vector2, PatchScript> pair in patchesDictionary)

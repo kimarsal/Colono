@@ -34,6 +34,9 @@ public abstract class PeasantScript : MonoBehaviour
     public float age;
     public float hunger;
     public float exhaustion;
+    private float ageSpeed = 0.1f;
+    private float hungerSpeed = 0.005f;
+    private float exhaustionSpeed = 0.001f;
 
     public PeasantAction action;
     public enum PeasantAction { Moving, Chopping, Digging, Pulling, Planting, Watering, Gathering, Milking, Dancing };
@@ -47,6 +50,9 @@ public abstract class PeasantScript : MonoBehaviour
     public SpeechBubbleScript speechBubble;
     public PeasantDetailsScript peasantDetailsScript;
     private Outline outline;
+
+    public CabinScript cabin;
+    public TavernScript tavern;
 
     public void InitializePeasant()
     {
@@ -94,17 +100,37 @@ public abstract class PeasantScript : MonoBehaviour
         head.GetComponent<SkinnedMeshRenderer>().material = newMaterial;
         lower.GetComponent<SkinnedMeshRenderer>().material = newMaterial;
         upper.GetComponent<SkinnedMeshRenderer>().material = newMaterial;
-
-        tag = "NPC";
     }
 
     private void Update()
     {
-        age += Time.deltaTime / 10;
-        hunger += Time.deltaTime / 500;
-        exhaustion += Time.deltaTime / 500;
+        age += Time.deltaTime * ageSpeed;
 
-        if (gameManager.isInIsland && peasantDetailsScript == null)
+        peasantDetailsScript?.UpdateDetails();
+
+        if (hunger < 1)
+        {
+            hunger += Time.deltaTime * hungerSpeed;
+        }
+        else if (hunger > 1)
+        {
+            hunger = 1;
+            tavern = (TavernScript)npcManager.islandScript.GetAvailableBuilding(BuildingScript.BuildingType.Tavern);
+            UpdateTask();
+        }
+
+        if (exhaustion < 1)
+        {
+            exhaustion += Time.deltaTime * exhaustionSpeed;
+        }
+        else if (exhaustion > 1)
+        {
+            exhaustion = 1;
+            cabin = (CabinScript)npcManager.islandScript.GetAvailableBuilding(BuildingScript.BuildingType.Cabin);
+            UpdateTask();
+        }
+
+        if (gameManager.isInIsland && gameManager.buttonState != GameManager.ButtonState.ManageInventory && peasantDetailsScript == null)
         {
             RaycastHit raycastHit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -124,8 +150,6 @@ public abstract class PeasantScript : MonoBehaviour
                 }
             }
         }
-
-        peasantDetailsScript?.UpdateDetails();
 
         CheckIfArrivedAtDestination();
     }

@@ -7,25 +7,27 @@ using System;
 
 public class GameManager : MonoBehaviour
 {
-    private ShipScript shipScript;
+    public ShipScript shipScript;
     public int numPeasants = 10;
 
-    private enum ButtonState { Idle, ItemButtons, BuildingButtons, EnclosureButtons, ConstructionDetails, PeasantDetails };
+    public enum ButtonState { Idle, ItemButtons, BuildingButtons, EnclosureButtons, ConstructionDetails, PeasantDetails, ManageInventory };
 
     private bool isPlayerNearIsland = false;
     public bool isInIsland = false;
 
-    private ButtonState buttonState = ButtonState.Idle;
+    public ButtonState buttonState = ButtonState.Idle;
     public Animator canvasAnimator;
     public Animator itemButtonsAnimator;
     public Animator buildingButtonsAnimator;
     public Animator enclosureButtonsAnimator;
     public Animator constructionDetailsAnimator;
     public Animator peasantDetailsAnimator;
+    public Animator manageInventoryAnimator;
 
     private ConstructionScript constructionScript;
     public ConstructionDetailsScript constructionDetailsScript;
     public PeasantDetailsScript peasantDetailsScript;
+    public ManageInventoryScript manageInventoryScript;
 
     public Button boardIslandButton;
     public Button cancelClearingButton;
@@ -264,6 +266,35 @@ public class GameManager : MonoBehaviour
         peasantDetailsAnimator.Play("ShowDetails");
 
         buttonState = ButtonState.ConstructionDetails;
+    }
+
+    public void ShowManageInventory()
+    {
+        constructionScript.constructionDetailsScript = null;
+        constructionDetailsAnimator.Play("HideDetails");
+
+        manageInventoryScript.gameObject.SetActive(true);
+        manageInventoryScript.islandScript = islandScript;
+        manageInventoryScript.SetGrid();
+        manageInventoryAnimator.Play("ShowPopUp");
+
+        buttonState = ButtonState.ManageInventory;
+    }
+
+    public void UpdateMaterial(ResourceScript.MaterialType materialType)
+    {
+        manageInventoryScript.UpdateMaterial(materialType);
+    }
+
+    public void UpdateCrop(ResourceScript.CropType cropType)
+    {
+        manageInventoryScript.UpdateCrop(cropType);
+    }
+
+    public void HideManageInventory()
+    {
+        manageInventoryAnimator.Play("HidePopUp");
+        ShowButtons();
     }
 
     public void PatchSelected(bool isPatchEmpty)

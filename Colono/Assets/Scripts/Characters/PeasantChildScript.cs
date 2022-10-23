@@ -6,20 +6,40 @@ public class PeasantChildScript : PeasantScript
 {
     public override void UpdateTask()
     {
-        if (constructionScript != null) //Si té una construcció com a destí
+        if (tavern != null) //Si ha d'anar a menjar
         {
-            SetDestination(constructionScript.entry.position);
+            SetDestination(tavern.entry.position);
         }
-        else SetDestination(NPCManager.GetRandomPoint(transform.position));
+        else if (cabin != null) //Si ha d'anar a dormir
+        {
+            SetDestination(cabin.entry.position);
+        }
+        else
+        {
+            if (constructionScript != null) //Si té el vaixell com a destí
+            {
+                SetDestination(constructionScript.entry.position);
+            }
+            else //Si no té destí
+            {
+                SetDestination(NPCManager.GetRandomPoint(transform.position));
+            }
+        }
     }
+
     public override void ArrivedAtDestination()
     {
-        if (constructionScript != null) //Si té una construcció com a destí
+        if (tavern != null) //Si ha anat a menjar
         {
-            if(constructionScript.constructionType == ConstructionScript.ConstructionType.Ship)
-            {
-                transform.parent = ((ShipScript)constructionScript).npcs.transform;
-            }
+            tavern.FeedPeasant(this);
+        }
+        else if (cabin != null) //Si ha anat a dormir
+        {
+            cabin.RestPeasant(this);
+        }
+        else if (constructionScript != null) //Si té el vaixell com a destí
+        {
+            transform.parent = ((ShipScript)constructionScript).npcs.transform;
             constructionScript.peasantsOnTheirWay--;
             constructionScript.UpdateConstructionDetails();
             gameObject.SetActive(false);

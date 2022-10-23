@@ -9,9 +9,11 @@ public class ConstructionDetailsScript : MonoBehaviour
     public TextMeshProUGUI title;
     public TextMeshProUGUI peasantsOnTheirWayText;
     public TextMeshProUGUI peasantNumText;
-    public GameObject buttons;
+    public GameObject peasantButtons;
     public Button minusButton;
     public Button plusButton;
+
+    public Button manageInventoryButton;
 
     public GameManager gameManager;
     public ConstructionScript constructionScript;
@@ -31,11 +33,23 @@ public class ConstructionDetailsScript : MonoBehaviour
         
         if (constructionScript.constructionType == ConstructionScript.ConstructionType.Building && ((BuildingScript)constructionScript).buildingType != BuildingScript.BuildingType.Mine)
         {
-            buttons.SetActive(false);
+            peasantButtons.SetActive(false);
+            if (((BuildingScript)constructionScript).buildingType == BuildingScript.BuildingType.Warehouse)
+            {
+                peasantNumText.enabled = false;
+                manageInventoryButton.gameObject.SetActive(true);
+            }
+            else
+            {
+                peasantNumText.enabled = true;
+                manageInventoryButton.gameObject.SetActive(false);
+            }
         }
         else
         {
-            buttons.SetActive(true);
+            peasantButtons.SetActive(true);
+            peasantNumText.enabled = true;
+            manageInventoryButton.gameObject.SetActive(constructionScript.constructionType == ConstructionScript.ConstructionType.Ship);
             UpdatePeasantNum();
         }
     }

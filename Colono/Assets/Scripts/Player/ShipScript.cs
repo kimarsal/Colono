@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,6 +10,11 @@ public class ShipScript : ConstructionScript
     private IslandEditor islandEditor;
     private GameManager gameManager;
     public Outline outline;
+
+    public int capacity;
+    public int usage;
+    public int[] materials = new int[Enum.GetValues(typeof(ResourceScript.MaterialType)).Length];
+    public int[] crops = new int[Enum.GetValues(typeof(ResourceScript.CropType)).Length];
 
     void Start()
     {
@@ -36,7 +42,7 @@ public class ShipScript : ConstructionScript
 
     void Update()
     {
-        if (gameManager.isInIsland && constructionDetailsScript == null)
+        if (gameManager.isInIsland && gameManager.buttonState != GameManager.ButtonState.ManageInventory && constructionDetailsScript == null)
         {
             RaycastHit raycastHit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -68,5 +74,23 @@ public class ShipScript : ConstructionScript
     public override TaskScript GetNextPendingTask()
     {
         return null;
+    }
+
+    public void AddMaterial(ResourceScript.MaterialType materialType)
+    {
+        if (usage < capacity)
+        {
+            materials[(int)materialType]++;
+            usage++;
+        }
+    }
+
+    public void AddCrop(ResourceScript.CropType cropType)
+    {
+        if (usage < capacity)
+        {
+            crops[(int)cropType]++;
+            usage++;
+        }
     }
 }

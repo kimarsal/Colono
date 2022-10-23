@@ -33,10 +33,9 @@ public class ItemScript : TaskScript
         {
             isScheduledForClearing = toClear;
             outline.enabled = toClear;
-            if (!toClear && peasantScript != null)
+            if (!toClear)
             {
-                peasantScript.CancelTask();
-                peasantScript = null;
+                islandScript.npcManager.RemoveItemToClear(this);
             }
             return true;
         }
@@ -46,7 +45,7 @@ public class ItemScript : TaskScript
     public override void TaskProgress()
     {
         materialAmount--;
-        peasantScript.GatherMaterialFromItem(materialType);
+        islandScript.AddMaterial(materialType);
         if (materialAmount == 0)
         {
             islandScript.npcManager.RemoveItemToClear(this);
