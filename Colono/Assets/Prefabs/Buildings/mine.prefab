@@ -53,6 +53,7 @@ MonoBehaviour:
   length: 3
   width: 3
   entry: {fileID: 5666154522394969465}
+  maxPeasants: 10
   peasantList: []
   peasantsOnTheirWay: 0
   constructionDetailsScript: {fileID: 0}

@@ -10,11 +10,6 @@ public class BuildingScript : ConstructionScript
 
     public int orientation;
 
-    public void EnableCollider()
-    {
-        //GetComponent<BoxCollider>().enabled = true;
-    }
-
     public override TaskScript GetNextPendingTask()
     {
         return null;

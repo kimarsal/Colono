@@ -140,6 +140,7 @@ public class Island
 
         GameObject coastObstacle = GameObject.Instantiate(islandEditor.coastObstacle, island.transform);
         NavMeshSurface surface = island.AddComponent<NavMeshSurface>();
+        surface.collectObjects = CollectObjects.Children;
 
     }
 

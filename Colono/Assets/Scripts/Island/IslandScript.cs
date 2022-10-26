@@ -17,7 +17,6 @@ public class IslandScript : MonoBehaviour
 
     private GameObject convexColliders;
     public GameObject items;
-    public GameObject cells;
     public GameObject constructions;
 
     private List<EnclosureScript> enclosuresList = new List<EnclosureScript>();
@@ -34,10 +33,6 @@ public class IslandScript : MonoBehaviour
     {
         gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
         convexColliders = transform.GetChild(0).gameObject;
-
-        cells = new GameObject("Cells");
-        cells.transform.parent = gameObject.transform;
-        cells.transform.localPosition = Vector3.zero;
 
         constructions = new GameObject("Constructions");
         constructions.transform.parent = gameObject.transform;
@@ -97,12 +92,20 @@ public class IslandScript : MonoBehaviour
 
     public void AddBuilding(BuildingScript building)
     {
+        if(building.buildingType == BuildingScript.BuildingType.Warehouse)
+        {
+            capacity += 30;
+        }
         buildingsList.Add(building);
         RebakeNavMesh();
     }
 
     public void RemoveBuilding(BuildingScript building)
     {
+        if (building.buildingType == BuildingScript.BuildingType.Warehouse)
+        {
+            capacity -= 30;
+        }
         buildingsList.Remove(building);
         Destroy(building.gameObject);
         StartCoroutine(RebakeNavMeshDelayed());
@@ -147,9 +150,8 @@ public class IslandScript : MonoBehaviour
         return null;
     }
 
-    public ConstructionScript GetConstructionByCell(Vector2 cell, out bool isBuilding)
+    public ConstructionScript GetConstructionByCell(Vector2 cell)
     {
-        isBuilding = false;
         foreach (EnclosureScript enclosure in enclosuresList)
         {
             Vector2[] cells = enclosure.cells;
@@ -159,7 +161,6 @@ public class IslandScript : MonoBehaviour
                 return enclosure;
             }
         }
-        isBuilding = true;
         foreach (BuildingScript building in buildingsList)
         {
             Vector2[] cells = building.cells;
@@ -176,9 +177,7 @@ public class IslandScript : MonoBehaviour
     {
         foreach (BuildingScript building in buildingsList)
         {
-            if (building.buildingType == buildingType &&
-                ((buildingType != BuildingScript.BuildingType.Warehouse && building.peasantList.Count < building.maxPeasants) ||
-                (buildingType == BuildingScript.BuildingType.Warehouse && ((WarehouseScript)building).usage < ((WarehouseScript)building).capacity)))
+            if (building.buildingType == buildingType && building.peasantList.Count < building.maxPeasants)
             {
                 return building;
             }
@@ -193,24 +192,52 @@ public class IslandScript : MonoBehaviour
             materials[(int)materialType]++;
             usage++;
         }
-        else
+        else if (gameManagerScript.isInIsland && gameManagerScript.islandScript == this)
         {
             gameManagerScript.shipScript.AddMaterial(materialType);
         }
         gameManagerScript.UpdateMaterial(materialType);
     }
 
-    public void AddCrop(ResourceScript.CropType cropType)
+    public void AddCrops(ResourceScript.CropType cropType, int cropAmount)
     {
-        if (usage < capacity)
+        int originalAmount = cropAmount;
+        if(capacity - usage < originalAmount)
         {
-            crops[(int)cropType]++;
-            usage++;
+            cropAmount = capacity - usage;
         }
-        else
+
+        crops[(int)cropType] += cropAmount;
+        usage += cropAmount;
+
+        if(cropAmount < originalAmount && gameManagerScript.isInIsland && gameManagerScript.islandScript == this)
         {
-            gameManagerScript.shipScript.AddCrop(cropType);
+            gameManagerScript.shipScript.AddCrops(cropType, originalAmount - cropAmount);
         }
         gameManagerScript.UpdateCrop(cropType);
+    }
+
+    public int GetCropAmount(ResourceScript.CropType cropType)
+    {
+        int seedAmount = crops[(int)cropType];
+        if (gameManagerScript.isInIsland) seedAmount += gameManagerScript.shipScript.crops[(int)cropType];
+        return seedAmount;
+    }
+
+    public bool UseCrop(ResourceScript.CropType cropType)
+    {
+        if (crops[(int)cropType] > 0)
+        {
+            crops[(int)cropType]--;
+            usage--;
+            return true;
+        }
+        else if (gameManagerScript.isInIsland && gameManagerScript.shipScript.crops[(int)cropType] > 0)
+        {
+            gameManagerScript.shipScript.crops[(int)cropType]--;
+            gameManagerScript.shipScript.usage--;
+            return true;
+        }
+        return false;
     }
 }

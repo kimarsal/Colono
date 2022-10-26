@@ -12,6 +12,7 @@ public class GridRowScript : MonoBehaviour
     public ResourceScript.MaterialType materialType;
     public ResourceScript.CropType cropType;
 
+    public GameObject blocker;
     public Image resourceImage;
     public TextMeshProUGUI resourcesInIslandText;
     public Button discardResourceFromIslandButton;
@@ -29,6 +30,7 @@ public class GridRowScript : MonoBehaviour
         resourceSlider.maxValue = totalResources;
         resourceSlider.value = resourcesInShip;
         resourceSlider.enabled = totalResources > 0;
+        blocker.SetActive(totalResources == 0);
 
         UpdateText();
     }

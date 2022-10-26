@@ -42,7 +42,7 @@ public class ShipScript : ConstructionScript
 
     void Update()
     {
-        if (gameManager.isInIsland && gameManager.buttonState != GameManager.ButtonState.ManageInventory && constructionDetailsScript == null)
+        if (gameManager.isInIsland && gameManager.buttonState != GameManager.ButtonState.PopUp && constructionDetailsScript == null)
         {
             RaycastHit raycastHit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -85,12 +85,14 @@ public class ShipScript : ConstructionScript
         }
     }
 
-    public void AddCrop(ResourceScript.CropType cropType)
+    public void AddCrops(ResourceScript.CropType cropType, int cropAmount)
     {
-        if (usage < capacity)
+        if (capacity - usage < cropAmount)
         {
-            crops[(int)cropType]++;
-            usage++;
+            cropAmount = capacity - usage;
         }
+
+        crops[(int)cropType] += cropAmount;
+        usage += cropAmount;
     }
 }

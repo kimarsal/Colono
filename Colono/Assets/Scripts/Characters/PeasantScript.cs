@@ -35,8 +35,8 @@ public abstract class PeasantScript : MonoBehaviour
     public float hunger;
     public float exhaustion;
     private float ageSpeed = 0.1f;
-    private float hungerSpeed = 0.005f;
-    private float exhaustionSpeed = 0.001f;
+    private float hungerSpeed = 0.05f;
+    private float exhaustionSpeed = 0.01f;
 
     public PeasantAction action;
     public enum PeasantAction { Moving, Chopping, Digging, Pulling, Planting, Watering, Gathering, Milking, Dancing };
@@ -112,25 +112,25 @@ public abstract class PeasantScript : MonoBehaviour
         {
             hunger += Time.deltaTime * hungerSpeed;
         }
-        else if (hunger > 1)
+        else if (tavern == null)
         {
             hunger = 1;
             tavern = (TavernScript)npcManager.islandScript.GetAvailableBuilding(BuildingScript.BuildingType.Tavern);
-            UpdateTask();
+            if(tavern != null) UpdateTask();
         }
 
         if (exhaustion < 1)
         {
             exhaustion += Time.deltaTime * exhaustionSpeed;
         }
-        else if (exhaustion > 1)
+        else if (cabin == null)
         {
             exhaustion = 1;
             cabin = (CabinScript)npcManager.islandScript.GetAvailableBuilding(BuildingScript.BuildingType.Cabin);
-            UpdateTask();
+            if(cabin != null) UpdateTask();
         }
 
-        if (gameManager.isInIsland && gameManager.buttonState != GameManager.ButtonState.ManageInventory && peasantDetailsScript == null)
+        if (gameManager.isInIsland && gameManager.buttonState != GameManager.ButtonState.PopUp && peasantDetailsScript == null)
         {
             RaycastHit raycastHit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);

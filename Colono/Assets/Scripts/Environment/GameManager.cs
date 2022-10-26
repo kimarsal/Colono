@@ -9,8 +9,9 @@ public class GameManager : MonoBehaviour
 {
     public ShipScript shipScript;
     public int numPeasants = 10;
+    public Transform cellsTransform;
 
-    public enum ButtonState { Idle, ItemButtons, BuildingButtons, EnclosureButtons, ConstructionDetails, PeasantDetails, ManageInventory };
+    public enum ButtonState { Idle, ItemButtons, BuildingButtons, EnclosureButtons, ConstructionDetails, PeasantDetails, PopUp };
 
     private bool isPlayerNearIsland = false;
     public bool isInIsland = false;
@@ -23,25 +24,25 @@ public class GameManager : MonoBehaviour
     public Animator constructionDetailsAnimator;
     public Animator peasantDetailsAnimator;
     public Animator manageInventoryAnimator;
+    public Animator gardenEditorAnimator;
 
     private ConstructionScript constructionScript;
     public ConstructionDetailsScript constructionDetailsScript;
     public PeasantDetailsScript peasantDetailsScript;
     public ManageInventoryScript manageInventoryScript;
+    public GardenEditor gardenEditorScript;
 
     public Button boardIslandButton;
     public Button cancelClearingButton;
     public Button removeEnclosureButton;
     public Button removeBuildingButton;
-    /*public Button plantButton;
-    public Button clearPatchButton;*/
     
     public IslandScript islandScript;
-
     private CameraScript cameraScript;
 
     private void Start()
     {
+        cellsTransform = transform.GetChild(0);
         cameraScript = GameObject.Find("MainCamera").GetComponent<CameraScript>();
         shipScript = GameObject.FindGameObjectWithTag("Player").GetComponent<ShipScript>();
         constructionDetailsScript.gameManager = this;
@@ -268,6 +269,26 @@ public class GameManager : MonoBehaviour
         buttonState = ButtonState.ConstructionDetails;
     }
 
+    public void ShowGardenEditor()
+    {
+        constructionDetailsAnimator.Play("HideDetails");
+
+        gardenEditorScript.gameObject.SetActive(true);
+        gardenEditorScript.gardenScript = (GardenScript)constructionScript;
+        gardenEditorScript.SetGrid();
+        gardenEditorAnimator.Play("ShowPopUp");
+
+        buttonState = ButtonState.PopUp;
+    }
+
+    public void HideGardenEditor()
+    {
+        gardenEditorAnimator.Play("HidePopUp");
+        constructionDetailsAnimator.Play("ShowDetails");
+
+        buttonState = ButtonState.ConstructionDetails;
+    }
+
     public void ShowManageInventory()
     {
         constructionScript.constructionDetailsScript = null;
@@ -278,7 +299,7 @@ public class GameManager : MonoBehaviour
         manageInventoryScript.SetGrid();
         manageInventoryAnimator.Play("ShowPopUp");
 
-        buttonState = ButtonState.ManageInventory;
+        buttonState = ButtonState.PopUp;
     }
 
     public void UpdateMaterial(ResourceScript.MaterialType materialType)
@@ -295,28 +316,6 @@ public class GameManager : MonoBehaviour
     {
         manageInventoryAnimator.Play("HidePopUp");
         ShowButtons();
-    }
-
-    public void PatchSelected(bool isPatchEmpty)
-    {
-        /*buildButton.gameObject.SetActive(false);
-        chooseBuildingButtons.SetActive(false);
-
-        plantButton.gameObject.SetActive(true);
-        if (!isPatchEmpty)
-        {
-            clearPatchButton.gameObject.SetActive(true);
-        }*/
-    }
-
-    public void Plant()
-    {
-        //nearbyIsland.islandCellScript.Plant();
-    }
-
-    public void ClearPatch()
-    {
-        //nearbyIsland.islandCellScript.ClearPatch();
     }
 
     public void LeaveIsland()
@@ -342,4 +341,5 @@ public class GameManager : MonoBehaviour
         canvasAnimator.Play("GetFarFromIsland");
         isPlayerNearIsland = false;
     }
+
 }

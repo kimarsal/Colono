@@ -14,8 +14,8 @@ public class ManageInventoryScript : MonoBehaviour
     public TextMeshProUGUI shipInventoryText;
 
     public Transform rows;
-    public GridRowScript[] materialsGridRows = new GridRowScript[System.Enum.GetValues(typeof(ResourceScript.MaterialType)).Length];
-    public GridRowScript[] cropsGridRows = new GridRowScript[System.Enum.GetValues(typeof(ResourceScript.CropType)).Length];
+    public GridRowScript[] materialsGridRows;
+    public GridRowScript[] cropsGridRows;
     public GameObject gridRowPrefab;
 
     private void Awake()
@@ -32,7 +32,10 @@ public class ManageInventoryScript : MonoBehaviour
             Destroy(row.gameObject);
         }
 
-        for (int i = 0; i < System.Enum.GetValues(typeof(ResourceScript.MaterialType)).Length; i++)
+        materialsGridRows = new GridRowScript[System.Enum.GetValues(typeof(ResourceScript.MaterialType)).Length];
+        cropsGridRows = new GridRowScript[System.Enum.GetValues(typeof(ResourceScript.CropType)).Length];
+
+        for (int i = 0; i < materialsGridRows.Length; i++)
         {
             GameObject gridRow = Instantiate(gridRowPrefab, rows);
             GridRowScript gridRowScript = gridRow.GetComponent<GridRowScript>();
@@ -46,7 +49,7 @@ public class ManageInventoryScript : MonoBehaviour
             materialsGridRows[i] = gridRowScript;
         }
 
-        for (int i = 0; i < System.Enum.GetValues(typeof(ResourceScript.CropType)).Length; i++)
+        for (int i = 0; i < cropsGridRows.Length; i++)
         {
             GameObject gridRow = Instantiate(gridRowPrefab, rows);
             GridRowScript gridRowScript = gridRow.GetComponent<GridRowScript>();
@@ -65,18 +68,24 @@ public class ManageInventoryScript : MonoBehaviour
 
     public void UpdateMaterial(ResourceScript.MaterialType materialType)
     {
-        materialsGridRows[(int)materialType].resourcesInIsland = islandScript.materials[(int)materialType];
-        materialsGridRows[(int)materialType].resourcesInShip = shipScript.materials[(int)materialType];
-        materialsGridRows[(int)materialType].UpdateValues();
-        UpdateInventoryText();
+        if(materialsGridRows != null && materialsGridRows[0] != null)
+        {
+            materialsGridRows[(int)materialType].resourcesInIsland = islandScript.materials[(int)materialType];
+            materialsGridRows[(int)materialType].resourcesInShip = shipScript.materials[(int)materialType];
+            materialsGridRows[(int)materialType].UpdateValues();
+            UpdateInventoryText();
+        }
     }
 
     public void UpdateCrop(ResourceScript.CropType cropType)
     {
-        cropsGridRows[(int)cropType].resourcesInIsland = islandScript.crops[(int)cropType];
-        cropsGridRows[(int)cropType].resourcesInShip = shipScript.crops[(int)cropType];
-        cropsGridRows[(int)cropType].UpdateValues();
-        UpdateInventoryText();
+        if(cropsGridRows != null && cropsGridRows[0] != null)
+        {
+            cropsGridRows[(int)cropType].resourcesInIsland = islandScript.crops[(int)cropType];
+            cropsGridRows[(int)cropType].resourcesInShip = shipScript.crops[(int)cropType];
+            cropsGridRows[(int)cropType].UpdateValues();
+            UpdateInventoryText();
+        }
     }
 
     public void UpdateInventoryText()
@@ -147,13 +156,5 @@ public class ManageInventoryScript : MonoBehaviour
             shipScript.usage--;
         }
         UpdateInventoryText();
-    }
-
-    public void EndAnim()
-    {
-        if (GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName("HidePopUp"))
-        {
-            gameObject.SetActive(false);
-        }
     }
 }

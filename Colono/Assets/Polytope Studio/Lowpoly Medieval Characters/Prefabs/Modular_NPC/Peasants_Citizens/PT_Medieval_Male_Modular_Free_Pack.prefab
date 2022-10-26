@@ -2044,17 +2044,13 @@ MonoBehaviour:
   constructionScript: {fileID: 0}
   speechBubble: {fileID: 8196349547139020954}
   peasantDetailsScript: {fileID: 0}
+  cabin: {fileID: 0}
+  tavern: {fileID: 0}
   task: {fileID: 0}
   axe: {fileID: 3854085465935333273}
   shovel: {fileID: 4168797345179873955}
   basket: {fileID: 6448953863368073061}
   wateringCan: {fileID: 5341225516695430111}
-  capacity: 10
-  usage: 0
-  materials: 000000000000000000000000
-  crops: 000000000000000000000000000000000000000000000000
-  peasantState: 0
-  warehouseScript: {fileID: 0}
 --- !u!195 &7555130144577166092
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -2064,7 +2060,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 3938869664887627426}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.2
+  m_Radius: 0.1
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -2076,7 +2072,7 @@ NavMeshAgent:
   m_Height: 2
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 2
+  m_ObstacleAvoidanceType: 1
 --- !u!208 &8792296199089095173
 NavMeshObstacle:
   m_ObjectHideFlags: 0

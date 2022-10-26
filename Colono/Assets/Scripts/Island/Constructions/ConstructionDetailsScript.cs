@@ -13,6 +13,7 @@ public class ConstructionDetailsScript : MonoBehaviour
     public Button minusButton;
     public Button plusButton;
 
+    public Button editGardenButton;
     public Button manageInventoryButton;
 
     public GameManager gameManager;
@@ -49,6 +50,8 @@ public class ConstructionDetailsScript : MonoBehaviour
         {
             peasantButtons.SetActive(true);
             peasantNumText.enabled = true;
+            editGardenButton.gameObject.SetActive(constructionScript.constructionType == ConstructionScript.ConstructionType.Enclosure
+                && ((EnclosureScript)constructionScript).enclosureType == EnclosureScript.EnclosureType.Garden);
             manageInventoryButton.gameObject.SetActive(constructionScript.constructionType == ConstructionScript.ConstructionType.Ship);
             UpdatePeasantNum();
         }
@@ -72,8 +75,8 @@ public class ConstructionDetailsScript : MonoBehaviour
         {
             peasantsOnTheirWayText.gameObject.SetActive(false);
         }
-        peasantNumText.text = (constructionScript.peasantList.Count - constructionScript.peasantsOnTheirWay).ToString();
+        peasantNumText.text = (constructionScript.peasantList.Count - constructionScript.peasantsOnTheirWay).ToString() + "/" + constructionScript.maxPeasants;
         minusButton.enabled = constructionScript.peasantList.Count > 0;
-        plusButton.enabled = gameManager.islandScript.npcManager.peasantList.Count > 0;
+        plusButton.enabled = constructionScript.peasantList.Count < constructionScript.maxPeasants && gameManager.islandScript.npcManager.peasantList.Count > 0;
     }
 }
