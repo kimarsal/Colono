@@ -35,8 +35,8 @@ public abstract class PeasantScript : MonoBehaviour
     public float hunger;
     public float exhaustion;
     private float ageSpeed = 0.1f;
-    private float hungerSpeed = 0.05f;
-    private float exhaustionSpeed = 0.01f;
+    private float hungerSpeed = 0.001f;
+    private float exhaustionSpeed = 0.001f;
 
     public PeasantAction action;
     public enum PeasantAction { Moving, Chopping, Digging, Pulling, Planting, Watering, Gathering, Milking, Dancing };
@@ -159,7 +159,7 @@ public abstract class PeasantScript : MonoBehaviour
         if (!navMeshAgent.isStopped)
         {
             float d = Vector3.Distance(transform.position, navMeshAgent.destination);
-            if (d < 0.8f) //Ha arribat al destí
+            if (d < 0.3f) //Ha arribat al destí
             {
                 StopCharacter();
                 ArrivedAtDestination();
@@ -190,7 +190,7 @@ public abstract class PeasantScript : MonoBehaviour
 
     public void SetDestination(Vector3 destination)
     {
-        navMeshAgent.destination = destination;
+        navMeshAgent.SetDestination(destination);
         if (animator.GetCurrentAnimatorClipInfo(0)[0].clip.name == "Peasant_Idle"
             || animator.GetCurrentAnimatorClipInfo(0)[0].clip.name == "Peasant_Walking"
             || animator.GetCurrentAnimatorClipInfo(0)[0].clip.name == "Peasant_Running") MoveCharacter();

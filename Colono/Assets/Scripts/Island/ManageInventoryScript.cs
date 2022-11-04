@@ -14,8 +14,8 @@ public class ManageInventoryScript : MonoBehaviour
     public TextMeshProUGUI shipInventoryText;
 
     public Transform rows;
-    public GridRowScript[] materialsGridRows;
-    public GridRowScript[] cropsGridRows;
+    public InventoryRowScript[] materialsGridRows;
+    public InventoryRowScript[] cropsGridRows;
     public GameObject gridRowPrefab;
 
     private void Awake()
@@ -32,13 +32,13 @@ public class ManageInventoryScript : MonoBehaviour
             Destroy(row.gameObject);
         }
 
-        materialsGridRows = new GridRowScript[System.Enum.GetValues(typeof(ResourceScript.MaterialType)).Length];
-        cropsGridRows = new GridRowScript[System.Enum.GetValues(typeof(ResourceScript.CropType)).Length];
+        materialsGridRows = new InventoryRowScript[System.Enum.GetValues(typeof(ResourceScript.MaterialType)).Length];
+        cropsGridRows = new InventoryRowScript[System.Enum.GetValues(typeof(ResourceScript.CropType)).Length];
 
         for (int i = 0; i < materialsGridRows.Length; i++)
         {
             GameObject gridRow = Instantiate(gridRowPrefab, rows);
-            GridRowScript gridRowScript = gridRow.GetComponent<GridRowScript>();
+            InventoryRowScript gridRowScript = gridRow.GetComponent<InventoryRowScript>();
             gridRowScript.manageInventoryScript = this;
             gridRowScript.resourceType = ResourceScript.ResourceType.Material;
             gridRowScript.materialType = (ResourceScript.MaterialType)i;
@@ -52,7 +52,7 @@ public class ManageInventoryScript : MonoBehaviour
         for (int i = 0; i < cropsGridRows.Length; i++)
         {
             GameObject gridRow = Instantiate(gridRowPrefab, rows);
-            GridRowScript gridRowScript = gridRow.GetComponent<GridRowScript>();
+            InventoryRowScript gridRowScript = gridRow.GetComponent<InventoryRowScript>();
             gridRowScript.manageInventoryScript = this;
             gridRowScript.resourceType = ResourceScript.ResourceType.Crop;
             gridRowScript.cropType = (ResourceScript.CropType)i;

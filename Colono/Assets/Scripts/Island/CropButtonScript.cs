@@ -7,19 +7,10 @@ public class CropButtonScript : MonoBehaviour
 {
     public GardenEditor gardenEditor;
     public Image cropImage;
-    public ResourceScript.CropType cropType;
-    public Vector2 cell;
-    public bool isOnGrid;
+    public int index;
 
     public void SelectCrop()
     {
-        if (isOnGrid)
-        {
-            gardenEditor.ChangeCrop(this);
-        }
-        else
-        {
-            gardenEditor.SelectCrop(cropType);
-        }
+        gardenEditor.ChangeCrop(this);
     }
 }

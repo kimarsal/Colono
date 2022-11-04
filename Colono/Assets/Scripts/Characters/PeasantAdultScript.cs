@@ -126,11 +126,19 @@ public class PeasantAdultScript : PeasantScript
         }
         else
         {
-            switch (((PatchScript)task).cropState)
+            PatchScript patchScript = (PatchScript)task;
+            if (patchScript.cropType != patchScript.gardenScript.crops[patchScript.index])
             {
-                case PatchScript.CropState.Barren: animator.SetInteger("State", (int)PeasantAction.Planting); break;
-                case PatchScript.CropState.Planted: case PatchScript.CropState.Grown: animator.SetInteger("State", (int)PeasantAction.Watering); break;
-                case PatchScript.CropState.Blossomed: animator.SetInteger("Pick", 1); animator.SetInteger("State", (int)PeasantAction.Gathering); break;
+                animator.SetInteger("State", (int)PeasantAction.Pulling);
+            }
+            else
+            {
+                switch (patchScript.cropState)
+                {
+                    case PatchScript.CropState.Barren: animator.SetInteger("State", (int)PeasantAction.Planting); break;
+                    case PatchScript.CropState.Planted: case PatchScript.CropState.Grown: animator.SetInteger("State", (int)PeasantAction.Watering); break;
+                    case PatchScript.CropState.Blossomed: animator.SetInteger("Pick", 1); animator.SetInteger("State", (int)PeasantAction.Gathering); break;
+                }
             }
         }
         //StartCoroutine(PointTowardsTaskCenter());

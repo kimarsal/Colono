@@ -9,68 +9,50 @@ public class GardenEditor : MonoBehaviour
 {
     public GardenScript gardenScript;
 
-    public Transform listTransform;
-    private CropButtonScript[] listButtons;
+    public Dropdown cropDropdown;
     public Transform gridTransform;
     public GridLayoutGroup gridLayoutGroup;
     public GameObject cropButtonPrefab;
 
     public ResourceScript.CropType selectedCropType;
 
-    private void Awake()
-    {
-        listTransform.GetComponent<RectTransform>().sizeDelta = new Vector2(listTransform.GetComponent<RectTransform>().sizeDelta.x,
-            System.Enum.GetValues(typeof(ResourceScript.CropType)).Length * cropButtonPrefab.GetComponent<RectTransform>().sizeDelta.y);
-    }
-
     public void SetGrid()
     {
-        foreach (Transform cropButton in listTransform)
-        {
-            Destroy(cropButton.gameObject);
-        }
         foreach (Transform cropButton in gridTransform)
         {
             Destroy(cropButton.gameObject);
         }
 
-        listButtons = new CropButtonScript[System.Enum.GetValues(typeof(ResourceScript.CropType)).Length];
-        for (int i = 0; i < listButtons.Length; i++)
+        int cropTypes = System.Enum.GetValues(typeof(ResourceScript.CropType)).Length;
+        cropDropdown.options = new List<Dropdown.OptionData>(cropTypes);
+        for(int i = 0; i < cropTypes; i++)
         {
-            GameObject cropButton = Instantiate(cropButtonPrefab, listTransform);
-            CropButtonScript cropButtonScript = cropButton.GetComponent<CropButtonScript>();
-            cropButtonScript.gardenEditor = this;
-            cropButtonScript.cropType = (ResourceScript.CropType)i;
-            cropButtonScript.cropImage.sprite = gardenScript.islandScript.islandCellScript.islandEditorScript.cropSprites[i];
-            listButtons[i] = cropButtonScript;
+            cropDropdown.options.Add(new Dropdown.OptionData(gardenScript.islandScript.islandCellScript.islandEditorScript.cropSprites[i]));
         }
-
+        cropDropdown.template.GetComponent<RectTransform>().sizeDelta = new Vector2(cropDropdown.template.GetComponent<RectTransform>().sizeDelta.x, cropTypes * 100 / 2);
+        cropDropdown.value = 0;
+        
         gridLayoutGroup.cellSize = new Vector2(cropButtonPrefab.GetComponent<RectTransform>().sizeDelta.x, cropButtonPrefab.GetComponent<RectTransform>().sizeDelta.y);
         gridTransform.GetComponent<RectTransform>().sizeDelta = new Vector2((gardenScript.width - 2) * gridLayoutGroup.cellSize.x, (gardenScript.length - 2) * gridLayoutGroup.cellSize.y);
-        foreach (KeyValuePair<Vector2, PatchScript> pair in gardenScript.patchesDictionary)
+
+        for(int i = 0; i < gardenScript.crops.Length; i++)
         {
             GameObject cropButton = Instantiate(cropButtonPrefab, gridTransform);
             CropButtonScript cropButtonScript = cropButton.GetComponent<CropButtonScript>();
             cropButtonScript.gardenEditor = this;
-            cropButtonScript.cropType = pair.Value.cropType;
-            cropButtonScript.cropImage.sprite = gardenScript.islandScript.islandCellScript.islandEditorScript.cropSprites[(int)pair.Value.cropType];
-            cropButtonScript.cell = pair.Key;
-            cropButtonScript.isOnGrid = true;
+            cropButtonScript.cropImage.sprite = gardenScript.islandScript.islandCellScript.islandEditorScript.cropSprites[(int)gardenScript.crops[i]];
+            cropButtonScript.index = i;
         }
     }
 
-    public void SelectCrop(ResourceScript.CropType cropType)
+    public void DropdownChange(int value)
     {
-        selectedCropType = cropType;
-        for (int i = 0; i < listButtons.Length; i++)
-        {
-            listButtons[i].gameObject.GetComponent<Button>().enabled = i != (int)cropType;
-        }
+        selectedCropType = (ResourceScript.CropType)value;
     }
 
     public void ChangeCrop(CropButtonScript cropButtonScript)
     {
-        //gardenScript.patchesDictionary[cropButtonScript.cell].cropType = cropButtonScript.cropType;
+        gardenScript.crops[cropButtonScript.index] = selectedCropType;
         cropButtonScript.cropImage.sprite = gardenScript.islandScript.islandCellScript.islandEditorScript.cropSprites[(int)selectedCropType];
     }
 }

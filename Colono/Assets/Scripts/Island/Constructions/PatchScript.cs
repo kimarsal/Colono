@@ -7,7 +7,7 @@ public class PatchScript : TaskScript
     public GardenScript gardenScript;
     public IslandEditor islandEditor;
     public enum CropState { Planted, Grown, Blossomed, Dead, Barren }
-    public Vector2 cell;
+    public int index;
     public GameObject crop;
     public ResourceScript.CropType cropType;
     private Quaternion orientation;
@@ -30,9 +30,8 @@ public class PatchScript : TaskScript
         }
         else
         {
-            TaskScript patch = ((GardenScript)peasantScript.constructionScript).GetNextPendingTask();
-            patch.peasantScript = peasantScript;
-            peasantScript.task = patch;
+            peasantScript.task = ((GardenScript)peasantScript.constructionScript).GetNextPendingTask();
+            peasantScript.task.peasantScript = peasantScript;
             peasantScript.UpdateTask();
             peasantScript = null;
         }
@@ -40,31 +39,49 @@ public class PatchScript : TaskScript
 
     public override void TaskProgress()
     {
-        if (cropState == CropState.Barren) PlantCrop();
+        if (cropType != gardenScript.crops[index])
+        {
+            cropState = CropState.Barren;
+            cropType = gardenScript.crops[index];
+            Destroy(crop);
+        }
+        else if (cropState == CropState.Barren)
+        {
+            cropType = gardenScript.crops[index];
+            PlantCrop();
+        }
         else
         {
             if (cropState < CropState.Blossomed)
             {
                 cropState++;
-                Destroy(crop);
-                crop = Instantiate(GetCropPrefab(), center, orientation, transform);
             }
-            else if (cropState == CropState.Blossomed)
+            else //if (cropState == CropState.Blossomed)
             {
                 gardenScript.islandScript.AddCrops(cropType, 3);
                 cropState = CropState.Grown;
-                Destroy(crop);
-                crop = Instantiate(GetCropPrefab(), center, orientation, transform);
             }
+            Destroy(crop);
+            crop = Instantiate(GetCropPrefab(), center, orientation, transform);
         }
 
         PeasantAdultScript p = peasantScript;
         peasantScript = null;
-        if (p.constructionScript != null && p.constructionScript == gardenScript) //Si el granjer encara no ha marxat
+        if (p == null)
         {
-            TaskScript patch = ((GardenScript)p.constructionScript).GetNextPendingTask();
-            patch.peasantScript = p;
-            p.task = patch;
+            Debug.Log("Fuck bitches");
+        }
+        else if (p.constructionScript != null && p.constructionScript == gardenScript) //Si el granjer encara no ha marxat
+        {
+            if (p.hunger < 1 && p.exhaustion < 1) //Si el granjer no té gana i no està cansat
+            {
+                p.task = ((GardenScript)p.constructionScript).GetNextPendingTask();
+                p.task.peasantScript = p;
+            }
+            else
+            {
+                p.task = null;
+            }
             p.UpdateTask();
         }
     }
@@ -74,14 +91,19 @@ public class PatchScript : TaskScript
         GameObject prefab = null;
         switch (cropType)
         {
-            case ResourceScript.CropType.Corn: prefab = islandEditor.corn[(int)cropState]; break;
+            case ResourceScript.CropType.Onion: prefab = islandEditor.onion[(int)cropState]; break;
+            case ResourceScript.CropType.Carrot: prefab = islandEditor.carrot[(int)cropState]; break;
+            case ResourceScript.CropType.Eggplant: prefab = islandEditor.eggplant[(int)cropState]; break;
             case ResourceScript.CropType.Cucumber: prefab = islandEditor.cucumber[(int)cropState]; break;
-            case ResourceScript.CropType.Grape: prefab = islandEditor.grape[(int)cropState]; break;
-            case ResourceScript.CropType.Pepper: prefab = islandEditor.pepper[(int)cropState]; break;
+            case ResourceScript.CropType.Cabbage: prefab = islandEditor.cabbage[(int)cropState]; break;
+
             case ResourceScript.CropType.Potato: prefab = islandEditor.potato[(int)cropState]; break;
             case ResourceScript.CropType.Tomato: prefab = islandEditor.tomato[(int)cropState]; break;
+            case ResourceScript.CropType.Zucchini: prefab = islandEditor.zucchini[(int)cropState]; break;
+            case ResourceScript.CropType.Pepper: prefab = islandEditor.pepper[(int)cropState]; break;
+            case ResourceScript.CropType.Corn: prefab = islandEditor.corn[(int)cropState]; break;
         }
-        if (prefab == null) prefab = islandEditor.grass[Random.Range(0, islandEditor.grass.Length)];
+        if (prefab == null) prefab = islandEditor.grass[(int)cropState];
         return prefab;
     }
 

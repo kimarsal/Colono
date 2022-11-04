@@ -1,9 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -85,28 +82,27 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         }
     }
 
-    private void GetPointerCoordinates(out int x, out int y)
+    private bool GetPointerCoordinates(PointerEventData eventData, out int x, out int y)
     {
-        x = y = -1;
-
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-
-        if (_collider.Raycast(ray, out hit, 100)) //Si el ratolí és sobre l'illa
+        if(eventData == null)
         {
-            Vector3 islandPoint = hit.point - transform.position;
-            Vector2 mapPoint = new Vector2(IslandGenerator.mapChunkSize / 2 + islandPoint.x, IslandGenerator.mapChunkSize / 2 - islandPoint.z);
-            x = Mathf.FloorToInt(mapPoint.x);
-            y = Mathf.FloorToInt(mapPoint.y);
-        }
+            x = y = -1;
+            return false;
+        };
+        Vector3 islandPoint = eventData.pointerCurrentRaycast.worldPosition - transform.position;
+        Vector2 mapPoint = new Vector2(IslandGenerator.mapChunkSize / 2 + islandPoint.x, IslandGenerator.mapChunkSize / 2 - islandPoint.z);
+        x = Mathf.FloorToInt(mapPoint.x);
+        y = Mathf.FloorToInt(mapPoint.y);
+        return true;
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
         int x, y;
-        GetPointerCoordinates(out x, out y);
-        if (!gameManagerScript.isInIsland || x == -1 && y == -1)
+        if (!gameManagerScript.isInIsland || !GetPointerCoordinates(eventData, out x, out y)) return;
+        if (gameManagerScript.hasSelectedPeasant)
         {
+            gameManagerScript.hasSelectedPeasant = false;
             return;
         }
 
@@ -121,6 +117,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             else
             {
                 ChangeSelectedBuildingColor(Color.white);
+                selectedBuilding.islandScript = islandScript;
                 selectedBuilding.cells = selectedCells;
                 selectedBuilding.orientation = buildingOrientation;
                 islandScript.AddBuilding(selectedBuilding); //Col·locar edifici
@@ -148,7 +145,6 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 selectedCells = hoveredCells;
                 foreach (Vector2 cell in selectedCells)
                 {
-                    //CreateCell(cell, islandEditorScript.selectedMaterial);
                     cells[(int)cell.x, (int)cell.y].GetComponent<MeshRenderer>().material = islandEditorScript.selectedMaterial;
                 }
                 cells[x, y].GetComponent<MeshRenderer>().material = islandEditorScript.selectedHoverMaterial;
@@ -189,13 +185,9 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     public void OnPointerUp(PointerEventData eventData)
     {
         int x, y;
-        GetPointerCoordinates(out x, out y);
-        if (!gameManagerScript.isInIsland || x == -1 && y == -1)
-        {
-            return;
-        }
+        if (!gameManagerScript.isInIsland || !GetPointerCoordinates(eventData, out x, out y)) return;
 
-        if(selectMode == SelectMode.Selecting)
+        if (selectMode == SelectMode.Selecting)
         {
             if (isSelectionValid)
             {
@@ -230,11 +222,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     public void OnPointerMove(PointerEventData eventData)
     {
         int x, y;
-        GetPointerCoordinates(out x, out y);
-        if (!gameManagerScript.isInIsland || x == -1 && y == -1)
-        {
-            return;
-        }
+        if (!gameManagerScript.isInIsland || !GetPointerCoordinates(eventData, out x, out y)) return;
 
         if (!wasOtherCellHovered //No hi havia cap cel·la hovered
             || !(hoveredCell.x == x && hoveredCell.y == y)) //La cel·la és diferent a la hovered
@@ -418,7 +406,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
         meshRenderer.material = cellMaterial;
 
-        MeshData cellMeshData = MeshGenerator.GenerateCell(position, 0.1f, meshData);
+        MeshData cellMeshData = MeshGenerator.GenerateCell(position, 0.02f, meshData);
         Mesh mesh = cellMeshData.CreateMesh();
         meshFilter.mesh = mesh;
 

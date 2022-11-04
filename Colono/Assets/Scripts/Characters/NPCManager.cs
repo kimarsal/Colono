@@ -239,10 +239,10 @@ public class NPCManager : MonoBehaviour
         NavMeshHit hit;
         do
         {
-            Vector2 randomPos = Random.insideUnitCircle * IslandGenerator.mapChunkSize / 2;
-            NavMesh.SamplePosition(originPos + new Vector3(randomPos.x, 0, randomPos.y), out hit, 20, NavMesh.AllAreas);
+            Vector2 randomPos = Random.insideUnitCircle * IslandGenerator.mapChunkSize / 4;
+            NavMesh.SamplePosition(originPos + new Vector3(randomPos.x, 0, randomPos.y), out hit, 5, NavMesh.AllAreas);
         }
-        while (hit.position.y < 0);
+        while (hit.position == Vector3.positiveInfinity);
         return hit.position;
     }
 

@@ -40,7 +40,6 @@ public class SpeechBubbleScript : MonoBehaviour
         {
             case ResourceScript.CropType.Corn: activeSprite = corn; break;
             case ResourceScript.CropType.Cucumber: activeSprite = cucumber; break;
-            case ResourceScript.CropType.Grape: activeSprite = grape; break;
             case ResourceScript.CropType.Pepper: activeSprite = pepper; break;
             case ResourceScript.CropType.Potato: activeSprite = potato; break;
             case ResourceScript.CropType.Tomato: activeSprite = tomato; break;

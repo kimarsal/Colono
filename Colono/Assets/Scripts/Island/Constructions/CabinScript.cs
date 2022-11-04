@@ -17,6 +17,15 @@ public class CabinScript : BuildingScript
         peasantScript.gameObject.SetActive(true);
         peasantScript.exhaustion = 0;
         peasantScript.cabin = null;
+        if (peasantScript.peasantType == PeasantScript.PeasantType.Adult && peasantScript.constructionScript != null && peasantScript.hunger < 1)
+        {
+            PeasantAdultScript peasantAdultScript = (PeasantAdultScript)peasantScript;
+            if (peasantAdultScript.task == null)
+            {
+                peasantAdultScript.task = peasantAdultScript.constructionScript.GetNextPendingTask();
+                peasantAdultScript.task.peasantScript = peasantAdultScript;
+            }
+        }
         peasantScript.UpdateTask();
     }
 }

@@ -14,6 +14,7 @@ public class ConstructionDetailsScript : MonoBehaviour
     public Button plusButton;
 
     public Button editGardenButton;
+    public Button editTavernButton;
     public Button manageInventoryButton;
 
     public GameManager gameManager;
@@ -45,6 +46,8 @@ public class ConstructionDetailsScript : MonoBehaviour
                 peasantNumText.enabled = true;
                 manageInventoryButton.gameObject.SetActive(false);
             }
+            editTavernButton.gameObject.SetActive(((BuildingScript)constructionScript).buildingType == BuildingScript.BuildingType.Tavern);
+            editGardenButton.gameObject.SetActive(false);
         }
         else
         {
@@ -52,6 +55,7 @@ public class ConstructionDetailsScript : MonoBehaviour
             peasantNumText.enabled = true;
             editGardenButton.gameObject.SetActive(constructionScript.constructionType == ConstructionScript.ConstructionType.Enclosure
                 && ((EnclosureScript)constructionScript).enclosureType == EnclosureScript.EnclosureType.Garden);
+            editTavernButton.gameObject.SetActive(false);
             manageInventoryButton.gameObject.SetActive(constructionScript.constructionType == ConstructionScript.ConstructionType.Ship);
             UpdatePeasantNum();
         }

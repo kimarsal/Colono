@@ -23,14 +23,16 @@ public class GameManager : MonoBehaviour
     public Animator enclosureButtonsAnimator;
     public Animator constructionDetailsAnimator;
     public Animator peasantDetailsAnimator;
-    public Animator manageInventoryAnimator;
     public Animator gardenEditorAnimator;
+    public Animator tavernEditorAnimator;
+    public Animator manageInventoryAnimator;
 
     private ConstructionScript constructionScript;
     public ConstructionDetailsScript constructionDetailsScript;
     public PeasantDetailsScript peasantDetailsScript;
-    public ManageInventoryScript manageInventoryScript;
     public GardenEditor gardenEditorScript;
+    public TavernEditor tavernEditorScript;
+    public ManageInventoryScript manageInventoryScript;
 
     public Button boardIslandButton;
     public Button cancelClearingButton;
@@ -39,6 +41,8 @@ public class GameManager : MonoBehaviour
     
     public IslandScript islandScript;
     private CameraScript cameraScript;
+
+    public bool hasSelectedPeasant;
 
     private void Start()
     {
@@ -88,6 +92,12 @@ public class GameManager : MonoBehaviour
 
     public void ShowButtons()
     {
+        switch (buttonState)
+        {
+            case ButtonState.ConstructionDetails: constructionDetailsAnimator.Play("HideDetails"); break;
+            case ButtonState.PeasantDetails: peasantDetailsAnimator.Play("HideDetails"); break;
+        }
+
         canvasAnimator.Play("ShowLeaveIslandButton");
         buildingButtonsAnimator.Play("ShowBuildingButtons");
 
@@ -122,6 +132,7 @@ public class GameManager : MonoBehaviour
 
     public void SelectPeasant(PeasantScript peasantScript)
     {
+        hasSelectedPeasant = true;
         islandScript.islandCellScript.DestroyAllCells();
 
         SetPeasantDetails(peasantScript);
@@ -284,6 +295,26 @@ public class GameManager : MonoBehaviour
     public void HideGardenEditor()
     {
         gardenEditorAnimator.Play("HidePopUp");
+        constructionDetailsAnimator.Play("ShowDetails");
+
+        buttonState = ButtonState.ConstructionDetails;
+    }
+
+    public void ShowTavernEditor()
+    {
+        constructionDetailsAnimator.Play("HideDetails");
+
+        tavernEditorScript.gameObject.SetActive(true);
+        tavernEditorScript.tavernScript = (TavernScript)constructionScript;
+        tavernEditorScript.SetList();
+        tavernEditorAnimator.Play("ShowPopUp");
+
+        buttonState = ButtonState.PopUp;
+    }
+
+    public void HideTavernEditor()
+    {
+        tavernEditorAnimator.Play("HidePopUp");
         constructionDetailsAnimator.Play("ShowDetails");
 
         buttonState = ButtonState.ConstructionDetails;

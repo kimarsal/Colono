@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class GridRowScript : MonoBehaviour
+public class InventoryRowScript : MonoBehaviour
 {
     public ManageInventoryScript manageInventoryScript;
 
