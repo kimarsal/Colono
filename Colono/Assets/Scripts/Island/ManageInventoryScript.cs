@@ -18,13 +18,6 @@ public class ManageInventoryScript : MonoBehaviour
     public InventoryRowScript[] cropsGridRows;
     public GameObject gridRowPrefab;
 
-    private void Awake()
-    {
-        rows.GetComponent<RectTransform>().sizeDelta = new Vector2(rows.GetComponent<RectTransform>().sizeDelta.x,
-            (System.Enum.GetValues(typeof(ResourceScript.MaterialType)).Length + System.Enum.GetValues(typeof(ResourceScript.CropType)).Length)
-            * gridRowPrefab.GetComponent<RectTransform>().sizeDelta.y);
-    }
-
     public void SetGrid()
     {
         foreach (Transform row in rows)

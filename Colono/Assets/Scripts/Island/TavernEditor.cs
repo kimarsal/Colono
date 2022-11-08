@@ -61,10 +61,6 @@ public class TavernEditor : MonoBehaviour
 
         listTransform.GetChild(0).GetComponent<RecipeRowScript>().moveRecipeUpButton.enabled = false;
         listTransform.GetChild(tavernScript.recipes.Count - 1).GetComponent<RecipeRowScript>().moveRecipeDownButton.enabled = false;
-        if(tavernScript.recipes.Count == 1) listTransform.GetChild(0).GetComponent<RecipeRowScript>().removeRecipeButton.enabled = false;
-
-        listTransform.GetComponent<RectTransform>().sizeDelta = new Vector2(listTransform.GetComponent<RectTransform>().sizeDelta.x,
-            rowPrefab.GetComponent<RectTransform>().sizeDelta.y * tavernScript.recipes.Count + addRecipeItemTransform.GetComponent<RectTransform>().sizeDelta.y);
 
     }
 
@@ -84,9 +80,6 @@ public class TavernEditor : MonoBehaviour
 
         listTransform.GetChild(0).GetComponent<RecipeRowScript>().removeRecipeButton.enabled = true;
         listTransform.GetChild(tavernScript.recipes.Count - 2).GetComponent<RecipeRowScript>().moveRecipeDownButton.enabled = true;
-
-        listTransform.GetComponent<RectTransform>().sizeDelta = new Vector2(listTransform.GetComponent<RectTransform>().sizeDelta.x,
-            listTransform.GetComponent<RectTransform>().sizeDelta.y + rowPrefab.GetComponent<RectTransform>().sizeDelta.y);
     }
 
     public void MoveRecipe(RecipeRowScript row, bool moveUp)
@@ -119,9 +112,6 @@ public class TavernEditor : MonoBehaviour
         listTransform.GetChild(0).GetComponent<RecipeRowScript>().moveRecipeUpButton.enabled = false;
         listTransform.GetChild(tavernScript.recipes.Count - 1).GetComponent<RecipeRowScript>().moveRecipeDownButton.enabled = false;
         if (tavernScript.recipes.Count == 1) listTransform.GetChild(0).GetComponent<RecipeRowScript>().removeRecipeButton.enabled = false;
-
-        listTransform.GetComponent<RectTransform>().sizeDelta = new Vector2(listTransform.GetComponent<RectTransform>().sizeDelta.x,
-            listTransform.GetComponent<RectTransform>().sizeDelta.y - rowPrefab.GetComponent<RectTransform>().sizeDelta.y);
     }
 
     public class Recipe

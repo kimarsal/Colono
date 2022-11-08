@@ -15,6 +15,7 @@ public class ShipScript : ConstructionScript
     public int usage;
     public int[] materials = new int[Enum.GetValues(typeof(ResourceScript.MaterialType)).Length];
     public int[] crops = new int[Enum.GetValues(typeof(ResourceScript.CropType)).Length];
+    public int[] animals = new int[Enum.GetValues(typeof(ResourceScript.AnimalType)).Length];
 
     void Start()
     {

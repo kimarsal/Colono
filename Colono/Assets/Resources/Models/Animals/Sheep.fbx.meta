@@ -9,7 +9,12 @@ ModelImporter:
   - first:
       74: 1079665108409675491
     second: Armature|Jump
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Black
+    second: {fileID: 2100000, guid: 9d4a54041189e0446a6e7135d9e1d137, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

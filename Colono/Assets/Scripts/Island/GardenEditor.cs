@@ -33,7 +33,7 @@ public class GardenEditor : MonoBehaviour
         cropDropdown.value = 0;
         
         gridLayoutGroup.cellSize = new Vector2(cropButtonPrefab.GetComponent<RectTransform>().sizeDelta.x, cropButtonPrefab.GetComponent<RectTransform>().sizeDelta.y);
-        gridTransform.GetComponent<RectTransform>().sizeDelta = new Vector2((gardenScript.width - 2) * gridLayoutGroup.cellSize.x, (gardenScript.length - 2) * gridLayoutGroup.cellSize.y);
+        //gridTransform.GetComponent<RectTransform>().sizeDelta = new Vector2((gardenScript.width - 2) * gridLayoutGroup.cellSize.x, (gardenScript.length - 2) * gridLayoutGroup.cellSize.y);
 
         for(int i = 0; i < gardenScript.crops.Length; i++)
         {

@@ -37,8 +37,10 @@ public class IslandEditor : MonoBehaviour
     [Header("Resources")]
     public Sprite[] materialSprites;
     public Sprite[] cropSprites;
+    public Sprite[] animalSprites;
     public Sprite[] meatSprites;
 
+    [Header("Crops")]
     public GameObject[] onion;
     public GameObject[] carrot;
     public GameObject[] eggplant;

@@ -541,7 +541,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
         BoxCollider boxCollider = enclosure.AddComponent<BoxCollider>();
         boxCollider.center = (enclosureScript.minPos + enclosureScript.maxPos) / 2;
-        boxCollider.size = new Vector3(enclosureScript.maxPos.x - enclosureScript.minPos.x, 3, enclosureScript.minPos.z - enclosureScript.maxPos.z);
+        boxCollider.size = new Vector3(enclosureScript.maxPos.x - enclosureScript.minPos.x, 1, enclosureScript.minPos.z - enclosureScript.maxPos.z);
         boxCollider.isTrigger = true;
 
         enclosureScript.maxPeasants = (enclosureScript.width - 2) * (enclosureScript.length - 2);
