@@ -8,7 +8,6 @@ public class GardenScript : EnclosureScript
     public GameObject patches;
     public Dictionary<Vector2, PatchScript> patchesDictionary = new Dictionary<Vector2, PatchScript>();
     private int lastWorkedOnPatch = -1;
-    //private int lastCropGathered = -1;
     public ResourceScript.CropType[] crops;
 
     private void Start()
@@ -52,7 +51,7 @@ public class GardenScript : EnclosureScript
                 }
             }
         }
-        else //Sinó hi ha llavors disponibles
+        else //Si no hi ha llavors disponibles
         {
             int index = 0;
             foreach (Vector2 cell in cells)
@@ -88,8 +87,6 @@ public class GardenScript : EnclosureScript
         patchScript.index = index;
         patchScript.cropType = cropType;
         patchScript.center = islandScript.transform.position + MeshGenerator.GetCellCenter(cell, islandScript.islandCellScript.meshData);
-
-        //patchScript.PlantCrop(PatchScript.CropType.Potato);
 
         patchesDictionary.Add(cell, patchScript);
     }

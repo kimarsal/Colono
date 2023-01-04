@@ -9,7 +9,6 @@ public class ShipScript : ConstructionScript
     public GameObject npcs;
     private IslandEditor islandEditor;
     private GameManager gameManager;
-    public Outline outline;
 
     public int capacity;
     public int usage;
@@ -22,7 +21,7 @@ public class ShipScript : ConstructionScript
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         islandEditor = GameObject.Find("GameManager").GetComponent<IslandEditor>();
 
-        for (int i = 0; i < gameManager.numPeasants; i++)
+        for (int i = 0; i < 10; i++)
         {
             GameObject prefab = islandEditor.malePeasantPrefab;
             switch (i % 3)
@@ -43,7 +42,7 @@ public class ShipScript : ConstructionScript
 
     void Update()
     {
-        if (gameManager.isInIsland && gameManager.buttonState != GameManager.ButtonState.PopUp && constructionDetailsScript == null)
+        if (gameManager.CanSelect() && constructionDetailsScript == null)
         {
             RaycastHit raycastHit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -68,8 +67,10 @@ public class ShipScript : ConstructionScript
     public void SetClosestPoint(Vector3 colliderClosestPoint)
     {
         NavMeshHit hit;
-        NavMesh.SamplePosition(colliderClosestPoint, out hit, 10, NavMesh.AllAreas);
-        entry.position = hit.position;
+        if(NavMesh.SamplePosition(colliderClosestPoint, out hit, 15, NavMesh.AllAreas))
+        {
+            entry.position = hit.position;
+        }
     }
 
     public override TaskScript GetNextPendingTask()

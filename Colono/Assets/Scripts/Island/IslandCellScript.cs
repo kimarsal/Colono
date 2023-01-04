@@ -1,17 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerMoveHandler
 {
     private enum SelectMode { None, Selecting, Building};
-    public GameManager gameManagerScript;
-    public IslandGenerator islandGeneratorScript;
+    public GameManager gameManager;
+    public IslandGenerator islandGenerator;
     public IslandEditor islandEditorScript;
     public IslandScript islandScript;
-    private Collider _collider;
 
     public MeshData meshData;
     public int[,] regionMap;
@@ -27,21 +27,19 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     private BuildingScript selectedBuilding;
     private int buildingOrientation = 0;
-    private EnclosureScript selectedEnclosure;
     private List<ItemScript> selectedItems;
 
     private void Start()
     {
-        gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
-        islandGeneratorScript = GameObject.Find("GameManager").GetComponent<IslandGenerator>();
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        islandGenerator = GameObject.Find("GameManager").GetComponent<IslandGenerator>();
         islandEditorScript = GameObject.Find("GameManager").GetComponent<IslandEditor>();
-        _collider = GetComponent<Collider>();
         cells = new GameObject[IslandGenerator.mapChunkSize, IslandGenerator.mapChunkSize];
     }
 
     private void Update()
     {
-        if (gameManagerScript.buttonState != GameManager.ButtonState.PopUp && (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0))
+        if (gameManager.CanSelect() && (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0))
         {
             OnPointerMove(null);
         }
@@ -67,7 +65,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 Destroy(selectedBuilding.gameObject); //Eliminar l'edifici
                 buildingOrientation = 0; //Resetejar l'orientació
                 DestroyAllCells();
-                gameManagerScript.ShowButtons();
+                gameManager.canvasScript.ShowButtons();
             }
         }
         else if(selectMode == SelectMode.Selecting)
@@ -77,7 +75,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 selectMode = SelectMode.None;
                 DestroyAllCells();
                 wasOtherCellHovered = false;
-                gameManagerScript.ShowButtons();
+                gameManager.canvasScript.ShowButtons();
             }
         }
     }
@@ -87,6 +85,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         if(eventData == null)
         {
             x = y = -1;
+            Debug.Log("Fuck off");
             return false;
         };
         Vector3 islandPoint = eventData.pointerCurrentRaycast.worldPosition - transform.position;
@@ -99,10 +98,10 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     public void OnPointerDown(PointerEventData eventData)
     {
         int x, y;
-        if (!gameManagerScript.isInIsland || !GetPointerCoordinates(eventData, out x, out y)) return;
-        if (gameManagerScript.hasSelectedPeasant)
+        if (!gameManager.isInIsland || !GetPointerCoordinates(eventData, out x, out y)) return;
+        if (gameManager.hasSelectedPeasant)
         {
-            gameManagerScript.hasSelectedPeasant = false;
+            gameManager.hasSelectedPeasant = false;
             return;
         }
 
@@ -111,8 +110,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             if (!isSelectionValid) //Si la posició no és vàlida
             {
                 Destroy(selectedBuilding.gameObject); //Eliminar l'edifici
-                DestroyAllCells();
-                gameManagerScript.ShowButtons();
+                gameManager.canvasScript.ShowButtons();
             }
             else
             {
@@ -120,17 +118,14 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 selectedBuilding.islandScript = islandScript;
                 selectedBuilding.cells = selectedCells;
                 selectedBuilding.orientation = buildingOrientation;
-                islandScript.AddBuilding(selectedBuilding); //Col·locar edifici
+                selectedBuilding.outline = selectedBuilding.AddComponent<Outline>();
+                islandScript.AddConstruction(selectedBuilding); //Col·locar edifici
 
-                InvertRegions(selectedCells, false);
-                foreach (Vector2 cell in selectedCells)
-                {
-                    cells[(int)cell.x, (int)cell.y].GetComponent<MeshRenderer>().material = islandEditorScript.selectedMaterial;
-                }
-                cells[x, y].GetComponent<MeshRenderer>().material = islandEditorScript.selectedHoverMaterial;
+                InvertRegions(selectedCells);
 
-                gameManagerScript.SelectBuilding(selectedBuilding);
+                gameManager.SelectConstruction(selectedBuilding);
             }
+            DestroyAllCells();
             buildingOrientation = 0; //Resetejar l'orientació
         }
 
@@ -142,31 +137,18 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 DestroyAllCells();
 
                 ConstructionScript constructionScript = islandScript.GetConstructionByCell(hoveredCell);
-                selectedCells = hoveredCells;
-                foreach (Vector2 cell in selectedCells)
-                {
-                    cells[(int)cell.x, (int)cell.y].GetComponent<MeshRenderer>().material = islandEditorScript.selectedMaterial;
-                }
-                cells[x, y].GetComponent<MeshRenderer>().material = islandEditorScript.selectedHoverMaterial;
                 hoveredCells = new Vector2[0];
-                if (constructionScript.constructionType == ConstructionScript.ConstructionType.Building)
-                {
-                    SelectBuilding((BuildingScript)constructionScript);
-                }
-                else
-                {
-                    SelectEnclosure((EnclosureScript)constructionScript);
-                }
+                gameManager.SelectConstruction(constructionScript);
             }
             else
             {
                 DestroyAllCells();
 
                 if (regionMap[x, y] >= 0 && (regionMap[x, y] > 10 //Si és terreny disponible
-                    || islandGeneratorScript.regions[regionMap[x, y]].name.Contains("Grass"))) //Si la cel·la és gespa
+                    || islandGenerator.regions[regionMap[x, y]].name.Contains("Grass"))) //Si la cel·la és gespa
                 {
                     selectMode = SelectMode.Selecting;
-                    gameManagerScript.HideButtons();
+                    gameManager.canvasScript.HideButtons();
 
                     isSelectionValid = true;
                     selectedCell = new Vector2(x, y);
@@ -185,7 +167,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     public void OnPointerUp(PointerEventData eventData)
     {
         int x, y;
-        if (!gameManagerScript.isInIsland || !GetPointerCoordinates(eventData, out x, out y)) return;
+        if (!gameManager.isInIsland || !GetPointerCoordinates(eventData, out x, out y)) return;
 
         if (selectMode == SelectMode.Selecting)
         {
@@ -196,7 +178,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                     cells[x, y].GetComponent<MeshRenderer>().material = islandEditorScript.selectedHoverMaterial;
                     SingleSelection();
                 }
-                else
+                else if (selectedCells.Length > 1)
                 {
                     for (int i = 0; i < selectedCells.Length; i++)
                     {
@@ -212,7 +194,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 DestroyAllCells();
                 selectMode = SelectMode.None;
                 //OnPointerMove(null);
-                gameManagerScript.ShowButtons();
+                gameManager.canvasScript.ShowButtons();
             }
         }
 
@@ -222,7 +204,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     public void OnPointerMove(PointerEventData eventData)
     {
         int x, y;
-        if (!gameManagerScript.isInIsland || !GetPointerCoordinates(eventData, out x, out y)) return;
+        if (!gameManager.isInIsland || !GetPointerCoordinates(eventData, out x, out y)) return;
 
         if (!wasOtherCellHovered //No hi havia cap cel·la hovered
             || !(hoveredCell.x == x && hoveredCell.y == y)) //La cel·la és diferent a la hovered
@@ -269,7 +251,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                     for (int row = y; row < endY; row++)
                     {
                         selectedCells[index] = new Vector2(col, row);
-                        if (regionMap[col, row] < 0 || !islandGeneratorScript.regions[regionMap[col, row]].name.Contains("Grass") || islandScript.isCellTaken(selectedCells[index]))
+                        if (regionMap[col, row] < 0 || !islandGenerator.regions[regionMap[col, row]].name.Contains("Grass") || islandScript.isCellTaken(selectedCells[index]))
                         {
                             isSelectionValid = false;
                         }
@@ -309,7 +291,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                     for (int j = j_init; j <= j_fi; j++)
                     {
                         selectedCells[index] = new Vector2(i, j);
-                        if (regionMap[i, j] < 0 || (regionMap[i, j] < 10 && !islandGeneratorScript.regions[regionMap[i, j]].name.Contains("Grass")))
+                        if (regionMap[i, j] < 0 || (regionMap[i, j] < 10 && !islandGenerator.regions[regionMap[i, j]].name.Contains("Grass")))
                         {
                             isSelectionValid = false;
                         }
@@ -377,7 +359,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 else
                 {
                     hoveredCells = new Vector2[0];
-                    if (regionMap[x, y] > 10 || islandGeneratorScript.regions[regionMap[x, y]].name.Contains("Grass")) //Si la cel·la és gespa
+                    if (regionMap[x, y] > 10 || islandGenerator.regions[regionMap[x, y]].name.Contains("Grass")) //Si la cel·la és gespa
                     {
                         if (selectedCells.Contains(hoveredCell)) //La nova cel·la hovered està seleccionada
                         {
@@ -410,7 +392,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         Mesh mesh = cellMeshData.CreateMesh();
         meshFilter.mesh = mesh;
 
-        newCell.transform.parent = gameManagerScript.cellsTransform;
+        newCell.transform.parent = gameManager.cellsTransform;
         newCell.transform.position = transform.position;
 
         cells[(int)position.x, (int)position.y] = newCell;
@@ -423,6 +405,12 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             Destroy(cells[(int)selectedCells[i].x, (int)selectedCells[i].y].gameObject);
         }
         selectedCells = new Vector2[0];
+
+        for (int i = 0; i < hoveredCells.Length; i++)
+        {
+            Destroy(cells[(int)hoveredCells[i].x, (int)hoveredCells[i].y].gameObject);
+        }
+        hoveredCells = new Vector2[0];
 
         if (wasOtherCellHovered)
         {
@@ -439,11 +427,11 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         {
             ItemScript item = islandScript.GetItemByCell(selectedCell);
             selectedItems = new List<ItemScript>() { item };
-            gameManagerScript.SelectItems(item.isScheduledForClearing);
+            gameManager.canvasScript.SelectItems(item.isScheduledForClearing);
         }
         else
         {
-            gameManagerScript.ShowButtons();
+            gameManager.canvasScript.ShowButtons();
         }
     }
 
@@ -464,13 +452,13 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         }
         if (areaContainsItems)
         {
-            gameManagerScript.SelectItems(areScheduledForClearing);
+            gameManager.canvasScript.SelectItems(areScheduledForClearing);
         }
         else
         {
             bool isValidArea = selectedCells[selectedCells.Length - 1].x - selectedCells[0].x >= 2 && selectedCells[selectedCells.Length - 1].y - selectedCells[0].y >= 2;
-            if (isValidArea) gameManagerScript.SelectArea();
-            else gameManagerScript.ShowButtons();
+            if (isValidArea) gameManager.canvasScript.SelectArea();
+            else gameManager.canvasScript.ShowButtons();
         }
     }
 
@@ -547,62 +535,36 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         enclosureScript.maxPeasants = (enclosureScript.width - 2) * (enclosureScript.length - 2);
         enclosureScript.minPos += islandScript.transform.position;
         enclosureScript.maxPos += islandScript.transform.position;
+        enclosureScript.outline = enclosureScript.AddComponent<Outline>();
 
-        islandScript.AddEnclosure(enclosureScript);
+        islandScript.AddConstruction(enclosureScript);
 
-        InvertRegions(selectedCells, enclosureType == EnclosureScript.EnclosureType.Garden);
+        InvertRegions(selectedCells);
+        DestroyAllCells();
 
-        selectedEnclosure = enclosureScript;
-        gameManagerScript.SelectEnclosure(enclosureScript);
+        gameManager.SelectConstruction(enclosureScript);
     }
 
-    public void SelectEnclosure(EnclosureScript enclosure)
+    public void RemoveConstruction(ConstructionScript constructionScript)
     {
-        selectedEnclosure = enclosure;
-        gameManagerScript.SelectEnclosure(enclosure);
-    }
-
-    public void RemoveEnclosure()
-    {
-        Vector2[] enclosureCells = selectedEnclosure.GetComponent<EnclosureScript>().cells;
-        InvertRegions(enclosureCells, selectedEnclosure.GetComponent<EnclosureScript>().enclosureType == EnclosureScript.EnclosureType.Garden, true);
-        islandScript.RemoveEnclosure(selectedEnclosure);
+        InvertRegions(constructionScript.cells);
+        islandScript.RemoveConstruction(constructionScript);
 
         DestroyAllCells();
     }
 
-    private void InvertRegions(Vector2[] cells, bool isGarden, bool deleting = false)
+    private void InvertRegions(Vector2[] cells)
     {
         int minX = (int)cells[0].x, maxX = (int)cells[cells.Length - 1].x;
         int minY = (int)cells[0].y, maxY = (int)cells[cells.Length - 1].y;
 
-        /*if (isGarden)
+        for (int i = minX; i <= maxX; i++)
         {
-            for (int i = minX + 1; i < maxX; i++)
-            {
-                regionMap[i, minY] = -regionMap[i, minY];
-                regionMap[i, maxY] = -regionMap[i, maxY];
-                for (int j = minY + 1; j < maxY; j++)
-                {
-                    regionMap[i, j] = regionMap[i, j] + (deleting?-10:10);
-                }
-            }
             for (int j = minY; j <= maxY; j++)
             {
-                regionMap[minX, j] = -regionMap[minX, j];
-                regionMap[maxX, j] = -regionMap[maxX, j];
+                regionMap[i, j] = -regionMap[i, j];
             }
         }
-        else
-        {*/
-        for (int i = minX; i <= maxX; i++)
-            {
-                for (int j = minY; j <= maxY; j++)
-                {
-                    regionMap[i, j] = -regionMap[i, j];
-                }
-            }
-        //}
     }
 
     // -------------------------------- BUILDINGS ------------------------------------
@@ -634,18 +596,4 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         }
     }
 
-    public void SelectBuilding(BuildingScript building)
-    {
-        selectedBuilding = building;
-        gameManagerScript.SelectBuilding(building);
-    }
-
-    public void RemoveBuilding()
-    {
-        Vector2[] buildingCells = selectedBuilding.cells;
-        islandScript.RemoveBuilding(selectedBuilding);
-
-        InvertRegions(buildingCells, false, true);
-        DestroyAllCells();
-    }
 }

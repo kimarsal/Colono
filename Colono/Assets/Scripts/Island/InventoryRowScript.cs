@@ -6,7 +6,7 @@ using TMPro;
 
 public class InventoryRowScript : MonoBehaviour
 {
-    public ManageInventoryScript manageInventoryScript;
+    public InventoryEditor inventoryEditor;
 
     public ResourceScript.ResourceType resourceType;
     public ResourceScript.MaterialType materialType;
@@ -42,11 +42,11 @@ public class InventoryRowScript : MonoBehaviour
 
         if (resourceType == ResourceScript.ResourceType.Material)
         {
-            canMoveResource = manageInventoryScript.MoveMaterial(materialType, difference);
+            canMoveResource = inventoryEditor.MoveMaterial(materialType, difference);
         }
         else
         {
-            canMoveResource = manageInventoryScript.MoveCrop(cropType, difference);
+            canMoveResource = inventoryEditor.MoveCrop(cropType, difference);
         }
 
         if (canMoveResource)
@@ -84,11 +84,11 @@ public class InventoryRowScript : MonoBehaviour
 
         if(resourceType == ResourceScript.ResourceType.Material)
         {
-            manageInventoryScript.DiscardMaterial(materialType, fromIsland);
+            inventoryEditor.DiscardMaterial(materialType, fromIsland);
         }
         else
         {
-            manageInventoryScript.DiscardCrop(cropType, fromIsland);
+            inventoryEditor.DiscardCrop(cropType, fromIsland);
         }
     }
 

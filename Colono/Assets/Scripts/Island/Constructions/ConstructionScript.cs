@@ -14,6 +14,7 @@ public abstract class ConstructionScript : MonoBehaviour
     public int length;
     public int width;
     public Transform entry;
+    public Outline outline;
 
     public int maxPeasants;
     public List<PeasantScript> peasantList = new List<PeasantScript>();

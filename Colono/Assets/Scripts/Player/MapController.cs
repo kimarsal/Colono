@@ -4,27 +4,24 @@ using UnityEngine;
 
 public class MapController : MonoBehaviour
 {
-    private IslandManager islandManager;
-    public GameObject nextIsland;
+    private GameManager gameManager;
     public GameObject ship;
-    public RectTransform arrow;
-
+    public IslandScript closestIsland;
     public float distanceToBoardIsland = 2f;
-    /*private bool isWithinIslandRadius = false;
-    private bool enteredIslandRadius = false;
-    private bool exitedIslandRadius = false;*/
+
+    public RectTransform arrow;
+    private Vector3 destination;
 
     void Start()
     {
-        //S'obté el IslandGenerator
-        islandManager = GameObject.Find("GameManager").GetComponent<IslandManager>();
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
     }
 
     void Update()
     {
         //Es rota l'agulla de la brúixula
-        float xDiff = nextIsland.transform.position.x - transform.position.x;
-        float zDiff = nextIsland.transform.position.z - transform.position.z;
+        float xDiff = destination.x - transform.position.x;
+        float zDiff = destination.z - transform.position.z;
         float angle = Mathf.Atan2(zDiff, xDiff) * Mathf.Rad2Deg - 90;
         arrow.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
         ship.transform.rotation = Quaternion.Euler(new Vector3(90, 0, -transform.rotation.z));
@@ -48,9 +45,9 @@ public class MapController : MonoBehaviour
         bool closeToIsland = false;
         Vector3 colliderClosestPoint = new Vector3();
         float minDistance = 10;
-        foreach(MeshCollider meshCollider in nextIsland.transform.GetChild(0).GetComponentsInChildren<MeshCollider>())
+        foreach(MeshCollider meshCollider in closestIsland.convexColliders.GetComponentsInChildren<MeshCollider>())
         {
-            colliderClosestPoint = Physics.ClosestPoint(transform.position, meshCollider, nextIsland.transform.position, nextIsland.transform.rotation);
+            colliderClosestPoint = Physics.ClosestPoint(transform.position, meshCollider, closestIsland.transform.position, closestIsland.transform.rotation);
             float distanceToClosestPoint = Vector3.Distance(transform.position, colliderClosestPoint);
             if (distanceToClosestPoint < minDistance)
             {
@@ -63,46 +60,21 @@ public class MapController : MonoBehaviour
             }
             
         }
-        //Debug.Log(minDistance);
+
         if (closeToIsland)
         {
             GetComponent<ShipScript>().SetClosestPoint(colliderClosestPoint);
-            nextIsland.GetComponent<IslandScript>().PlayerIsNear();
+            gameManager.PlayerIsNearIsland(closestIsland);
         }
         else
         {
-            nextIsland.GetComponent<IslandScript>().PlayerIsFar();
+            gameManager.PlayerIsFarFromIsland();
         }
     }
 
-    public void FollowIsland(GameObject island)
+    public void SetDestination(Vector3 newDestination)
     {
-        nextIsland = island;
+        destination = newDestination;
     }
 
-
-    /*private void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.tag == "Island")
-        {
-            enteredIslandRadius = true;
-        }
-    }
-
-    private void OnTriggerStay(Collider other)
-    {
-        if (other.gameObject.tag == "Island")
-        {
-            isWithinIslandRadius = true;
-        }
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.gameObject.tag == "Island")
-        {
-            isWithinIslandRadius = false;
-            exitedIslandRadius = true;
-        }
-    }*/
 }

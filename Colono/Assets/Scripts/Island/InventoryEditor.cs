@@ -4,7 +4,7 @@ using UnityEngine;
 using TMPro;
 using static ResourceScript;
 
-public class ManageInventoryScript : MonoBehaviour
+public class InventoryEditor : MonoBehaviour
 {
     public IslandEditor islandEditor;
     public ShipScript shipScript;
@@ -25,16 +25,16 @@ public class ManageInventoryScript : MonoBehaviour
             Destroy(row.gameObject);
         }
 
-        materialsGridRows = new InventoryRowScript[System.Enum.GetValues(typeof(ResourceScript.MaterialType)).Length];
-        cropsGridRows = new InventoryRowScript[System.Enum.GetValues(typeof(ResourceScript.CropType)).Length];
+        materialsGridRows = new InventoryRowScript[System.Enum.GetValues(typeof(MaterialType)).Length];
+        cropsGridRows = new InventoryRowScript[System.Enum.GetValues(typeof(CropType)).Length];
 
         for (int i = 0; i < materialsGridRows.Length; i++)
         {
             GameObject gridRow = Instantiate(gridRowPrefab, rows);
             InventoryRowScript gridRowScript = gridRow.GetComponent<InventoryRowScript>();
-            gridRowScript.manageInventoryScript = this;
-            gridRowScript.resourceType = ResourceScript.ResourceType.Material;
-            gridRowScript.materialType = (ResourceScript.MaterialType)i;
+            gridRowScript.inventoryEditor = this;
+            gridRowScript.resourceType = ResourceType.Material;
+            gridRowScript.materialType = (MaterialType)i;
             gridRowScript.resourceImage.sprite = islandEditor.materialSprites[i];
             gridRowScript.resourcesInIsland = islandScript.materials[i];
             gridRowScript.resourcesInShip = shipScript.materials[i];
@@ -46,9 +46,9 @@ public class ManageInventoryScript : MonoBehaviour
         {
             GameObject gridRow = Instantiate(gridRowPrefab, rows);
             InventoryRowScript gridRowScript = gridRow.GetComponent<InventoryRowScript>();
-            gridRowScript.manageInventoryScript = this;
-            gridRowScript.resourceType = ResourceScript.ResourceType.Crop;
-            gridRowScript.cropType = (ResourceScript.CropType)i;
+            gridRowScript.inventoryEditor = this;
+            gridRowScript.resourceType = ResourceType.Crop;
+            gridRowScript.cropType = (CropType)i;
             gridRowScript.resourceImage.sprite = islandEditor.cropSprites[i];
             gridRowScript.resourcesInIsland = islandScript.crops[i];
             gridRowScript.resourcesInShip = shipScript.crops[i];
@@ -59,7 +59,7 @@ public class ManageInventoryScript : MonoBehaviour
         UpdateInventoryText();
     }
 
-    public void UpdateMaterial(ResourceScript.MaterialType materialType)
+    public void UpdateMaterial(MaterialType materialType)
     {
         if(materialsGridRows != null && materialsGridRows[0] != null)
         {
@@ -70,7 +70,7 @@ public class ManageInventoryScript : MonoBehaviour
         }
     }
 
-    public void UpdateCrop(ResourceScript.CropType cropType)
+    public void UpdateCrop(CropType cropType)
     {
         if(cropsGridRows != null && cropsGridRows[0] != null)
         {
@@ -87,7 +87,7 @@ public class ManageInventoryScript : MonoBehaviour
         shipInventoryText.text = shipScript.usage + "/" + shipScript.capacity;
     }
 
-    public bool MoveMaterial(ResourceScript.MaterialType materialType, int difference)
+    public bool MoveMaterial(MaterialType materialType, int difference)
     {
         if (difference < 0 && islandScript.usage < islandScript.capacity || difference > 0 && shipScript.usage < shipScript.capacity)
         {
@@ -104,7 +104,7 @@ public class ManageInventoryScript : MonoBehaviour
         return false;
     }
 
-    public bool MoveCrop(ResourceScript.CropType cropType, int difference)
+    public bool MoveCrop(CropType cropType, int difference)
     {
         if(difference < 0 && islandScript.usage < islandScript.capacity || difference > 0 && shipScript.usage < shipScript.capacity)
         {
@@ -121,7 +121,7 @@ public class ManageInventoryScript : MonoBehaviour
         return false;
     }
 
-    public void DiscardMaterial(ResourceScript.MaterialType materialType, bool fromIsland)
+    public void DiscardMaterial(MaterialType materialType, bool fromIsland)
     {
         if (fromIsland)
         {
@@ -136,7 +136,7 @@ public class ManageInventoryScript : MonoBehaviour
         UpdateInventoryText();
     }
 
-    public void DiscardCrop(ResourceScript.CropType cropType, bool fromIsland)
+    public void DiscardCrop(CropType cropType, bool fromIsland)
     {
         if (fromIsland)
         {

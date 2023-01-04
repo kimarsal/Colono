@@ -11,16 +11,15 @@ public class IslandScript : MonoBehaviour
     public bool hasBeenDiscovered = false;
     public string islandName;
 
-    public GameManager gameManagerScript;
+    public GameManager gameManager;
     public IslandCellScript islandCellScript;
     public NPCManager npcManager;
 
-    private GameObject convexColliders;
+    public GameObject convexColliders;
     public GameObject items;
     public GameObject constructions;
 
-    private List<EnclosureScript> enclosuresList = new List<EnclosureScript>();
-    private List<BuildingScript> buildingsList = new List<BuildingScript>();
+    private List<ConstructionScript> constructionList = new List<ConstructionScript>();
 
     private Dictionary<Vector2, GameObject> itemsList = new Dictionary<Vector2, GameObject>();
 
@@ -31,32 +30,12 @@ public class IslandScript : MonoBehaviour
 
     private void Start()
     {
-        gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         convexColliders = transform.GetChild(0).gameObject;
 
         constructions = new GameObject("Constructions");
         constructions.transform.parent = gameObject.transform;
         constructions.transform.localPosition = Vector3.zero;
-    }
-
-    public void PlayerIsNear()
-    {
-        gameManagerScript.PlayerIsNearIsland(this);
-    }
-
-    public void PlayerEntered()
-    {
-        convexColliders.SetActive(false);
-    }
-
-    public void PLayerLeft()
-    {
-        convexColliders.SetActive(true);
-    }
-
-    public void PlayerIsFar()
-    {
-        gameManagerScript.PlayerIsFarFromIsland();
     }
 
     public bool isCellTaken(Vector2 cell)
@@ -74,53 +53,29 @@ public class IslandScript : MonoBehaviour
         itemsList.Add(cell, item);
     }
 
-    /*public void ClearArea(Vector2[] cells)
-    {
-        foreach(Vector2 cell in cells)
-        {
-            if (isCellTaken(cell))
-            {
-                RemoveItemAtCell(cell);
-            }
-        }
-    }*/
-
     public void RemoveItemAtCell(Vector2 cell)
     {
         itemsList.Remove(cell);
     }
 
-    public void AddBuilding(BuildingScript building)
+    public void AddConstruction(ConstructionScript constructionScript)
     {
-        if(building.buildingType == BuildingScript.BuildingType.Warehouse)
+        if(constructionScript.constructionType == ConstructionScript.ConstructionType.Building && ((BuildingScript)constructionScript).buildingType == BuildingScript.BuildingType.Warehouse)
         {
             capacity += 30;
         }
-        buildingsList.Add(building);
+        constructionList.Add(constructionScript);
         RebakeNavMesh();
     }
 
-    public void RemoveBuilding(BuildingScript building)
+    public void RemoveConstruction(ConstructionScript constructionScript)
     {
-        if (building.buildingType == BuildingScript.BuildingType.Warehouse)
+        if (constructionScript.constructionType == ConstructionScript.ConstructionType.Building && ((BuildingScript)constructionScript).buildingType == BuildingScript.BuildingType.Warehouse)
         {
             capacity -= 30;
         }
-        buildingsList.Remove(building);
-        Destroy(building.gameObject);
-        StartCoroutine(RebakeNavMeshDelayed());
-    }
-
-    public void AddEnclosure(EnclosureScript enclosure)
-    {
-        enclosuresList.Add(enclosure);
-        RebakeNavMesh();
-    }
-
-    public void RemoveEnclosure(EnclosureScript enclosure)
-    {
-        enclosuresList.Remove(enclosure);
-        Destroy(enclosure.gameObject);
+        constructionList.Remove(constructionScript);
+        Destroy(constructionScript.gameObject);
         StartCoroutine(RebakeNavMeshDelayed());
     }
 
@@ -136,38 +91,15 @@ public class IslandScript : MonoBehaviour
 
     }
 
-    public EnclosureScript GetEnclosureByCell(Vector2 cell)
-    {
-        foreach(EnclosureScript enclosure in enclosuresList)
-        {
-            Vector2[] cells = enclosure.cells;
-            if(cell.x >= cells[0].x && cell.x <= cells[cells.Length - 1].x
-                && cell.y >= cells[0].y && cell.y <= cells[cells.Length - 1].y)
-            {
-                return enclosure;
-            }
-        }
-        return null;
-    }
-
     public ConstructionScript GetConstructionByCell(Vector2 cell)
     {
-        foreach (EnclosureScript enclosure in enclosuresList)
+        foreach (ConstructionScript constructionScript in constructionList)
         {
-            Vector2[] cells = enclosure.cells;
+            Vector2[] cells = constructionScript.cells;
             if (cell.x >= cells[0].x && cell.x <= cells[cells.Length - 1].x
                 && cell.y >= cells[0].y && cell.y <= cells[cells.Length - 1].y)
             {
-                return enclosure;
-            }
-        }
-        foreach (BuildingScript building in buildingsList)
-        {
-            Vector2[] cells = building.cells;
-            if (cell.x >= cells[0].x && cell.x <= cells[cells.Length - 1].x
-                && cell.y >= cells[0].y && cell.y <= cells[cells.Length - 1].y)
-            {
-                return building;
+                return constructionScript;
             }
         }
         return null;
@@ -175,7 +107,7 @@ public class IslandScript : MonoBehaviour
 
     public BuildingScript GetAvailableBuilding(BuildingScript.BuildingType buildingType)
     {
-        foreach (BuildingScript building in buildingsList)
+        foreach (BuildingScript building in constructionList)
         {
             if (building.buildingType == buildingType && building.peasantList.Count < building.maxPeasants)
             {
@@ -192,11 +124,11 @@ public class IslandScript : MonoBehaviour
             materials[(int)materialType]++;
             usage++;
         }
-        else if (gameManagerScript.isInIsland && gameManagerScript.islandScript == this)
+        else if (gameManager.isInIsland && gameManager.islandScript == this)
         {
-            gameManagerScript.shipScript.AddMaterial(materialType);
+            gameManager.shipScript.AddMaterial(materialType);
         }
-        gameManagerScript.UpdateMaterial(materialType);
+        gameManager.canvasScript.UpdateMaterial(materialType);
     }
 
     public void AddCrops(ResourceScript.CropType cropType, int cropAmount)
@@ -210,17 +142,17 @@ public class IslandScript : MonoBehaviour
         crops[(int)cropType] += cropAmount;
         usage += cropAmount;
 
-        if(cropAmount < originalAmount && gameManagerScript.isInIsland && gameManagerScript.islandScript == this)
+        if(cropAmount < originalAmount && gameManager.isInIsland && gameManager.islandScript == this)
         {
-            gameManagerScript.shipScript.AddCrops(cropType, originalAmount - cropAmount);
+            gameManager.shipScript.AddCrops(cropType, originalAmount - cropAmount);
         }
-        gameManagerScript.UpdateCrop(cropType);
+        gameManager.canvasScript.UpdateCrop(cropType);
     }
 
     public int GetCropAmount(ResourceScript.CropType cropType)
     {
         int seedAmount = crops[(int)cropType];
-        if (gameManagerScript.isInIsland) seedAmount += gameManagerScript.shipScript.crops[(int)cropType];
+        if (gameManager.isInIsland) seedAmount += gameManager.shipScript.crops[(int)cropType];
         return seedAmount;
     }
 
@@ -232,10 +164,10 @@ public class IslandScript : MonoBehaviour
             usage--;
             return true;
         }
-        else if (gameManagerScript.isInIsland && gameManagerScript.shipScript.crops[(int)cropType] > 0)
+        else if (gameManager.isInIsland && gameManager.shipScript.crops[(int)cropType] > 0)
         {
-            gameManagerScript.shipScript.crops[(int)cropType]--;
-            gameManagerScript.shipScript.usage--;
+            gameManager.shipScript.crops[(int)cropType]--;
+            gameManager.shipScript.usage--;
             return true;
         }
         return false;

@@ -20,7 +20,7 @@ public class IslandManager : MonoBehaviour
     {
         mapController = player.GetComponent<MapController>();
         islandGenerator = GetComponent<IslandGenerator>();
-        islandEditor = GameObject.Find("GameManager").GetComponent<IslandEditor>();
+        islandEditor = GetComponent<IslandEditor>();
 
         GenerateIsland(player.transform);
     }
@@ -76,7 +76,7 @@ public class IslandManager : MonoBehaviour
             islandScript.npcManager.islandEditor = islandEditor;
             islandScript.npcManager.islandScript = islandScript;
 
-            mapController.FollowIsland(newIsland.island);
+            mapController.closestIsland = newIsland.island.GetComponent<IslandScript>();
             islands.Add(newIsland.island);
 
             islandScript.items = new GameObject("Items");

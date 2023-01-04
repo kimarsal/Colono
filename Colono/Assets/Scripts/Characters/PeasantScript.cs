@@ -130,7 +130,7 @@ public abstract class PeasantScript : MonoBehaviour
             if(cabin != null) UpdateTask();
         }
 
-        if (gameManager.isInIsland && gameManager.buttonState != GameManager.ButtonState.PopUp && peasantDetailsScript == null)
+        if (gameManager.CanSelect() && peasantDetailsScript == null)
         {
             RaycastHit raycastHit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -159,7 +159,7 @@ public abstract class PeasantScript : MonoBehaviour
         if (!navMeshAgent.isStopped)
         {
             float d = Vector3.Distance(transform.position, navMeshAgent.destination);
-            if (d < 0.3f) //Ha arribat al destí
+            if (d < 0.5f) //Ha arribat al destí
             {
                 StopCharacter();
                 ArrivedAtDestination();

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using static UnityEditor.Progress;
 
 public class NPCManager : MonoBehaviour
 {
@@ -34,9 +35,9 @@ public class NPCManager : MonoBehaviour
             new Color(44, 22, 8)
         };
 
-    void Start()
+    /*void Start()
     {
-        /*for (int i = 0; i < numPeasants; i++)
+        for (int i = 0; i < numPeasants; i++)
         {
             GameObject prefab = malePeasantPrefab;
             switch (i % 3)
@@ -54,10 +55,10 @@ public class NPCManager : MonoBehaviour
             GameObject prefab = maleWarriorPrefab;
             if (Random.Range(0, 2) == 0) prefab = femaleWarriorPrefab;
             Instantiate(prefab, new Vector3(Random.Range(minX, maxX), 0f, Random.Range(minZ, maxZ)), prefab.transform.rotation);
-        }*/
+        }
 
 
-    }
+    }*/
 
     public void SpawnPeasants()
     {
@@ -73,41 +74,6 @@ public class NPCManager : MonoBehaviour
             }
             GameObject npc = Instantiate(prefab, GetRandomPoint(transform.position), prefab.transform.rotation, npcs.transform);
             peasantList.Add(npc.GetComponent<PeasantScript>());
-        }
-    }
-
-    public void SendPeasantToIsland(ShipScript shipScript, bool adding)
-    {
-        if (adding) // Enviar al vaixell
-        {
-            PeasantScript peasantScript = null;
-            for (int i = 0; i < peasantList.Count; i++)
-            {
-                peasantScript = peasantList[i];
-                if (peasantScript.constructionScript == null) break;
-            }
-            peasantScript.constructionScript = shipScript;
-            shipScript.peasantList.Add(peasantScript);
-            peasantList.Remove(peasantScript);
-            shipScript.peasantsOnTheirWay++;
-            peasantScript.UpdateTask();
-        }
-        else // Enviar a l'illa
-        {
-            PeasantScript peasantScript = shipScript.peasantList[0];
-            peasantScript.npcManager = this;
-            peasantScript.transform.parent = npcs.transform;
-            peasantScript.transform.localScale = Vector3.one * 0.4f;
-            peasantScript.transform.position = shipScript.entry.position;
-            peasantList.Add(peasantScript);
-            shipScript.peasantList.Remove(peasantScript);
-            peasantScript.gameObject.SetActive(true);
-
-            if (peasantScript.peasantType == PeasantScript.PeasantType.Adult)
-            {
-                AsignItemToPeasant((PeasantAdultScript)peasantScript);
-            }
-            else peasantScript.UpdateTask();
         }
     }
 
@@ -134,16 +100,29 @@ public class NPCManager : MonoBehaviour
     public void AddItemToClear(ItemScript item)
     {
         itemsToClear.Add(item);
+        PeasantAdultScript peasantScript = null;
+        float minDistance = 0f;
         for (int i = 0; i < peasantList.Count; i++)
         {
-            PeasantAdultScript peasantScript = peasantList[i].GetComponent<PeasantAdultScript>();
-            if (peasantScript != null && peasantScript.constructionScript == null && peasantScript.task == null) //Si és adult i no té tasques
+            if(peasantList[i].peasantType == PeasantScript.PeasantType.Adult) //Si és adult
             {
-                peasantScript.task = item;
-                item.peasantScript = peasantScript;
-                peasantScript.UpdateTask();
-                break;
+                PeasantAdultScript peasantAdultScript = (PeasantAdultScript)peasantList[i];
+                float distance = Vector3.Distance(peasantAdultScript.transform.position, item.transform.position);
+                if (peasantAdultScript.constructionScript == null && peasantAdultScript.task == null) //Si no té tasques
+                {
+                    if(peasantScript == null || distance < minDistance)
+                    {
+                        peasantScript = peasantAdultScript;
+                        minDistance = distance;
+                    }
+                }
             }
+        }
+        if(peasantScript != null)
+        {
+            peasantScript.task = item;
+            item.peasantScript = peasantScript;
+            peasantScript.UpdateTask();
         }
     }
 
@@ -162,34 +141,51 @@ public class NPCManager : MonoBehaviour
     {
         if (adding) // Enviar a la construcció
         {
+            PeasantScript peasantScript = null;
+            float minDistance = 0f;
             for (int i = 0; i < peasantList.Count; i++)
             {
-                PeasantScript peasantScript = peasantList[i];
+                PeasantScript p = peasantList[i];
                 if(constructionScript.constructionType == ConstructionScript.ConstructionType.Ship
-                    || peasantScript.peasantType == PeasantScript.PeasantType.Adult) //Si la construcció és el vaixell o és adult
+                    || p.peasantType == PeasantScript.PeasantType.Adult) //Si la construcció és el vaixell o el personatge és adult
                 {
-                    peasantScript.constructionScript = constructionScript;
-                    constructionScript.peasantList.Add(peasantScript);
-                    peasantList.Remove(peasantScript);
-                    constructionScript.peasantsOnTheirWay++;
-
-                    if (peasantScript.peasantType == PeasantScript.PeasantType.Adult)
+                    float distance = Vector3.Distance(p.transform.position, constructionScript.entry.position);
+                    if(peasantScript == null || distance < minDistance)
                     {
-                        TaskScript task = constructionScript.GetNextPendingTask();
-                        if(task != null)
-                        {
-                            task.peasantScript = (PeasantAdultScript)peasantScript;
-                            ((PeasantAdultScript)peasantScript).task = task;
-                        }
+                        peasantScript = p;
+                        minDistance = distance;
                     }
-                    peasantScript.UpdateTask();
-                    break;
                 }
+            }
+            if(peasantScript != null)
+            {
+                peasantScript.constructionScript = constructionScript;
+                constructionScript.peasantList.Add(peasantScript);
+                peasantList.Remove(peasantScript);
+                constructionScript.peasantsOnTheirWay++;
+
+                if (peasantScript.peasantType == PeasantScript.PeasantType.Adult)
+                {
+                    TaskScript task = constructionScript.GetNextPendingTask();
+                    if (task != null)
+                    {
+                        task.peasantScript = (PeasantAdultScript)peasantScript;
+                        ((PeasantAdultScript)peasantScript).task = task;
+                    }
+                }
+                peasantScript.UpdateTask();
             }
         }
         else // Desvincular de la construcció
         {
             PeasantScript peasantScript = constructionScript.peasantList[0];
+            if (constructionScript.constructionType == ConstructionScript.ConstructionType.Ship)
+            {
+                peasantScript.npcManager = this;
+                peasantScript.transform.parent = npcs.transform;
+                peasantScript.transform.localScale = Vector3.one * 0.4f;
+                peasantScript.transform.position = constructionScript.entry.position;
+            }
             peasantScript.constructionScript = null;
             peasantList.Add(peasantScript);
             constructionScript.peasantList.Remove(peasantScript);
@@ -197,7 +193,7 @@ public class NPCManager : MonoBehaviour
             if (!peasantScript.gameObject.activeInHierarchy) peasantScript.gameObject.SetActive(true);
             else constructionScript.peasantsOnTheirWay--;
 
-            if(peasantScript.peasantType == PeasantScript.PeasantType.Adult)
+            if (peasantScript.peasantType == PeasantScript.PeasantType.Adult)
             {
                 AsignItemToPeasant((PeasantAdultScript)peasantScript);
             }

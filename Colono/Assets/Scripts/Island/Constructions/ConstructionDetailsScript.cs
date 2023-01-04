@@ -15,7 +15,7 @@ public class ConstructionDetailsScript : MonoBehaviour
 
     public Button editGardenButton;
     public Button editTavernButton;
-    public Button manageInventoryButton;
+    public Button editInventoryButton;
 
     public GameManager gameManager;
     public ConstructionScript constructionScript;
@@ -39,12 +39,12 @@ public class ConstructionDetailsScript : MonoBehaviour
             if (((BuildingScript)constructionScript).buildingType == BuildingScript.BuildingType.Warehouse)
             {
                 peasantNumText.enabled = false;
-                manageInventoryButton.gameObject.SetActive(true);
+                editInventoryButton.gameObject.SetActive(true);
             }
             else
             {
                 peasantNumText.enabled = true;
-                manageInventoryButton.gameObject.SetActive(false);
+                editInventoryButton.gameObject.SetActive(false);
             }
             editTavernButton.gameObject.SetActive(((BuildingScript)constructionScript).buildingType == BuildingScript.BuildingType.Tavern);
             editGardenButton.gameObject.SetActive(false);
@@ -56,15 +56,14 @@ public class ConstructionDetailsScript : MonoBehaviour
             editGardenButton.gameObject.SetActive(constructionScript.constructionType == ConstructionScript.ConstructionType.Enclosure
                 && ((EnclosureScript)constructionScript).enclosureType == EnclosureScript.EnclosureType.Garden);
             editTavernButton.gameObject.SetActive(false);
-            manageInventoryButton.gameObject.SetActive(constructionScript.constructionType == ConstructionScript.ConstructionType.Ship);
+            editInventoryButton.gameObject.SetActive(constructionScript.constructionType == ConstructionScript.ConstructionType.Ship);
             UpdatePeasantNum();
         }
     }
 
     public void ManagePawns(bool adding)
     {
-        if (constructionScript.constructionType == ConstructionScript.ConstructionType.Ship) gameManager.islandScript.npcManager.SendPeasantToIsland((ShipScript)constructionScript, adding);
-        else gameManager.islandScript.npcManager.SendPeasantToArea(constructionScript, adding);
+        gameManager.islandScript.npcManager.SendPeasantToArea(constructionScript, adding);
         UpdatePeasantNum();
     }
 
