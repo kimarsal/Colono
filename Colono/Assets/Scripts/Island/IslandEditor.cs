@@ -67,4 +67,16 @@ public class IslandEditor : MonoBehaviour
 
     [Header("Others")]
     public GameObject coastObstacle;
+
+    public Sprite GetResourceSprite(ResourceScript.ResourceType resourceType, int resourceIndex)
+    {
+        switch (resourceType)
+        {
+            case ResourceScript.ResourceType.Material: return materialSprites[resourceIndex];
+            case ResourceScript.ResourceType.Crop: return cropSprites[resourceIndex];
+            case ResourceScript.ResourceType.Meat: return meatSprites[resourceIndex];
+            case ResourceScript.ResourceType.Animal: return animalSprites[resourceIndex];
+        }
+        return null;
+    }
 }

@@ -12,14 +12,25 @@ public class ShipScript : ConstructionScript
 
     public int capacity;
     public int usage;
-    public int[] materials = new int[Enum.GetValues(typeof(ResourceScript.MaterialType)).Length];
-    public int[] crops = new int[Enum.GetValues(typeof(ResourceScript.CropType)).Length];
-    public int[] animals = new int[Enum.GetValues(typeof(ResourceScript.AnimalType)).Length];
+    public int[][] resources;
 
     void Start()
     {
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         islandEditor = GameObject.Find("GameManager").GetComponent<IslandEditor>();
+
+        resources = new int[Enum.GetValues(typeof(ResourceScript.ResourceType)).Length][];
+        resources[0] = new int[Enum.GetValues(typeof(ResourceScript.MaterialType)).Length];
+        resources[1] = new int[Enum.GetValues(typeof(ResourceScript.CropType)).Length];
+        resources[2] = new int[Enum.GetValues(typeof(ResourceScript.MeatType)).Length];
+        resources[3] = new int[Enum.GetValues(typeof(ResourceScript.AnimalType)).Length];
+
+        resources[(int)ResourceScript.ResourceType.Crop][(int)ResourceScript.CropType.Onion] = 2;
+        resources[(int)ResourceScript.ResourceType.Crop][(int)ResourceScript.CropType.Carrot] = 2;
+        resources[(int)ResourceScript.ResourceType.Crop][(int)ResourceScript.CropType.Eggplant] = 2;
+        resources[(int)ResourceScript.ResourceType.Animal][(int)ResourceScript.AnimalType.Cow] = 2;
+        resources[(int)ResourceScript.ResourceType.Animal][(int)ResourceScript.AnimalType.Pig] = 2;
+        usage = 10;
 
         for (int i = 0; i < 10; i++)
         {
@@ -78,23 +89,14 @@ public class ShipScript : ConstructionScript
         return null;
     }
 
-    public void AddMaterial(ResourceScript.MaterialType materialType)
+    public void AddResource(ResourceScript.ResourceType resourceType, int resourceIndex, int amount)
     {
-        if (usage < capacity)
+        if (capacity - usage < amount)
         {
-            materials[(int)materialType]++;
-            usage++;
-        }
-    }
-
-    public void AddCrops(ResourceScript.CropType cropType, int cropAmount)
-    {
-        if (capacity - usage < cropAmount)
-        {
-            cropAmount = capacity - usage;
+            amount = capacity - usage;
         }
 
-        crops[(int)cropType] += cropAmount;
-        usage += cropAmount;
+        resources[(int)resourceType][resourceIndex] += amount;
+        usage += amount;
     }
 }

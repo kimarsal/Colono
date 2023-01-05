@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using static UnityEditor.Progress;
+using static UnityEngine.GraphicsBuffer;
 
 public class NPCManager : MonoBehaviour
 {
@@ -106,13 +107,13 @@ public class NPCManager : MonoBehaviour
         {
             if(peasantList[i].peasantType == PeasantScript.PeasantType.Adult) //Si és adult
             {
-                PeasantAdultScript peasantAdultScript = (PeasantAdultScript)peasantList[i];
-                float distance = Vector3.Distance(peasantAdultScript.transform.position, item.transform.position);
-                if (peasantAdultScript.constructionScript == null && peasantAdultScript.task == null) //Si no té tasques
+                PeasantAdultScript newPeasantScript = (PeasantAdultScript)peasantList[i];
+                if (newPeasantScript.constructionScript == null && newPeasantScript.task == null) //Si no té tasques
                 {
-                    if(peasantScript == null || distance < minDistance)
+                    float distance;
+                    if(CheckIfClosestPeasant(peasantScript, minDistance, item.transform.position, newPeasantScript, out distance))
                     {
-                        peasantScript = peasantAdultScript;
+                        peasantScript = newPeasantScript;
                         minDistance = distance;
                     }
                 }
@@ -137,26 +138,40 @@ public class NPCManager : MonoBehaviour
         }
     }
 
+    public bool CheckIfClosestPeasant(PeasantScript previousPeasantScript, float minDistance, Vector3 destination, PeasantScript newPeasantScript, out float distance)
+    {
+        distance = 0;
+        NavMeshPath path = new NavMeshPath();
+        if (newPeasantScript.GetComponent<NavMeshAgent>().CalculatePath(destination, path)) //Si el camí és possible
+        {
+            distance = Vector3.Distance(newPeasantScript.transform.position, destination);
+            if (previousPeasantScript == null || distance < minDistance) //Si és el més proper
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void SendPeasantToArea(ConstructionScript constructionScript, bool adding)
     {
         if (adding) // Enviar a la construcció
         {
-            PeasantScript peasantScript = null;
             float minDistance = 0f;
+            PeasantScript peasantScript = null;
             for (int i = 0; i < peasantList.Count; i++)
             {
-                PeasantScript p = peasantList[i];
-                if(constructionScript.constructionType == ConstructionScript.ConstructionType.Ship
-                    || p.peasantType == PeasantScript.PeasantType.Adult) //Si la construcció és el vaixell o el personatge és adult
+                if (constructionScript.constructionType == ConstructionScript.ConstructionType.Ship || peasantList[i].peasantType == PeasantScript.PeasantType.Adult)
                 {
-                    float distance = Vector3.Distance(p.transform.position, constructionScript.entry.position);
-                    if(peasantScript == null || distance < minDistance)
+                    float distance;
+                    if (CheckIfClosestPeasant(peasantScript, minDistance, constructionScript.entry.position, peasantList[i], out distance))
                     {
-                        peasantScript = p;
                         minDistance = distance;
+                        peasantScript = peasantList[i];
                     }
                 }
             }
+
             if(peasantScript != null)
             {
                 peasantScript.constructionScript = constructionScript;

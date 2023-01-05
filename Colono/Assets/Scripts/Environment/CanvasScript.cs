@@ -24,14 +24,13 @@ public class CanvasScript : MonoBehaviour
     public ConstructionDetailsScript constructionDetailsScript;
     public PeasantDetailsScript peasantDetailsScript;
     public GardenEditor gardenEditor;
-    //public PenEditor penEditor;
+    public InventoryEditor penEditor;
     public TavernEditor tavernEditor;
     public InventoryEditor inventoryEditor;
 
     [Header("Buttons")]
     public Button boardIslandButton;
     public Button cancelClearingButton;
-    public Button removeConstructionButton;
 
     private void Start()
     {
@@ -135,8 +134,6 @@ public class CanvasScript : MonoBehaviour
 
     public void ShowConstructionDetails(ConstructionScript constructionScript)
     {
-        removeConstructionButton.gameObject.SetActive(constructionScript.constructionType != ConstructionScript.ConstructionType.Ship);
-
         constructionDetailsScript.SetConstructionDetails(constructionScript);
 
         canvasAnimator.Play("HideLeaveIslandButton");
@@ -168,6 +165,7 @@ public class CanvasScript : MonoBehaviour
 
         inventoryEditor.gameObject.SetActive(true);
         inventoryEditor.islandScript = constructionDetailsScript.constructionScript.islandScript;
+        inventoryEditor.penScript = null;
         inventoryEditor.SetGrid();
         inventoryEditorAnimator.Play("ShowPopUp");
 
@@ -200,13 +198,14 @@ public class CanvasScript : MonoBehaviour
         buttonState = ButtonState.ConstructionDetails;
     }
 
-    public void ShowPenEditor()
+    public void ShowPenEditor(PenScript penScript)
     {
         constructionDetailsAnimator.Play("HideDetails");
 
-        /*penEditor.gameObject.SetActive(true);
-        penEditor.penScript = (PenScript)constructionDetailsScript.constructionScript;
-        penEditor.SetGrid();*/
+        penEditor.gameObject.SetActive(true);
+        penEditor.islandScript = constructionDetailsScript.constructionScript.islandScript;
+        penEditor.penScript = penScript;
+        penEditor.SetGrid();
         penEditorAnimator.Play("ShowPopUp");
 
         buttonState = ButtonState.PopUp;
@@ -269,14 +268,9 @@ public class CanvasScript : MonoBehaviour
         buttonState = ButtonState.Idle;
     }
 
-    public void UpdateMaterial(ResourceScript.MaterialType materialType)
+    public void UpdateInventoryRow(ResourceScript.ResourceType resourceType, int resourceIndex)
     {
-        inventoryEditor.UpdateMaterial(materialType);
-    }
-
-    public void UpdateCrop(ResourceScript.CropType cropType)
-    {
-        inventoryEditor.UpdateCrop(cropType);
+        inventoryEditor.UpdateInventoryRow(ResourceScript.ResourceType.Material, resourceIndex);
     }
 
     public void LeaveIsland()

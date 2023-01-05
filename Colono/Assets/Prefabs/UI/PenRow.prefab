@@ -959,7 +959,7 @@ GameObject:
   - component: {fileID: 6322384558000515134}
   - component: {fileID: 5725220440150650323}
   m_Layer: 5
-  m_Name: GridRow
+  m_Name: PenRow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

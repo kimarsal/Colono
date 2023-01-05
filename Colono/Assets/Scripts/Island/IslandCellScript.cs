@@ -483,7 +483,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         switch (enclosureType)
         {
             case EnclosureScript.EnclosureType.Garden: enclosureScript = enclosure.AddComponent<GardenScript>(); break;
-            case EnclosureScript.EnclosureType.Barn: enclosureScript = enclosure.AddComponent<BarnScript>(); break;
+            case EnclosureScript.EnclosureType.Pen: enclosureScript = enclosure.AddComponent<PenScript>(); break;
             case EnclosureScript.EnclosureType.Training: enclosureScript = enclosure.AddComponent<TrainingScript>(); break;
         }
         enclosureScript.constructionType = ConstructionScript.ConstructionType.Enclosure;
@@ -506,15 +506,11 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             else if (i == positions.Length - 2) enclosureScript.maxPos = fence.transform.localPosition - new Vector3(0, 0, 1);
         }
 
-        if (enclosureType == EnclosureScript.EnclosureType.Barn)
+        if (enclosureType == EnclosureScript.EnclosureType.Pen)
         {
-            ((BarnScript)enclosureScript).openGate = Instantiate(islandEditorScript.gateOpen, transform.position + positions[positions.Length - 1], rotations[rotations.Length - 1], fences.transform);
-            ((BarnScript)enclosureScript).openGate.SetActive(false);
-            ((BarnScript)enclosureScript).closedGate = Instantiate(islandEditorScript.gateClosed, transform.position + positions[positions.Length - 1], rotations[rotations.Length - 1], fences.transform);
-
-            ((BarnScript)enclosureScript).animals = new GameObject("Animals");
-            ((BarnScript)enclosureScript).animals.transform.parent = enclosure.transform;
-            ((BarnScript)enclosureScript).animals.transform.localPosition = Vector3.zero;
+            ((PenScript)enclosureScript).openGate = Instantiate(islandEditorScript.gateOpen, transform.position + positions[positions.Length - 1], rotations[rotations.Length - 1], fences.transform);
+            ((PenScript)enclosureScript).openGate.SetActive(false);
+            ((PenScript)enclosureScript).closedGate = Instantiate(islandEditorScript.gateClosed, transform.position + positions[positions.Length - 1], rotations[rotations.Length - 1], fences.transform);
         }
         else
         {

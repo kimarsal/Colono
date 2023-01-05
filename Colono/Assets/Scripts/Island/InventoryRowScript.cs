@@ -9,8 +9,7 @@ public class InventoryRowScript : MonoBehaviour
     public InventoryEditor inventoryEditor;
 
     public ResourceScript.ResourceType resourceType;
-    public ResourceScript.MaterialType materialType;
-    public ResourceScript.CropType cropType;
+    public int resourceIndex;
 
     public GameObject blocker;
     public Image resourceImage;
@@ -38,16 +37,7 @@ public class InventoryRowScript : MonoBehaviour
     public void OnSliderValueChange()
     {
         int difference = (int)resourceSlider.value - resourcesInShip;
-        bool canMoveResource;
-
-        if (resourceType == ResourceScript.ResourceType.Material)
-        {
-            canMoveResource = inventoryEditor.MoveMaterial(materialType, difference);
-        }
-        else
-        {
-            canMoveResource = inventoryEditor.MoveCrop(cropType, difference);
-        }
+        bool canMoveResource = inventoryEditor.MoveResource(resourceType, resourceIndex, difference);
 
         if (canMoveResource)
         {
@@ -82,14 +72,7 @@ public class InventoryRowScript : MonoBehaviour
         }
         UpdateValues();
 
-        if(resourceType == ResourceScript.ResourceType.Material)
-        {
-            inventoryEditor.DiscardMaterial(materialType, fromIsland);
-        }
-        else
-        {
-            inventoryEditor.DiscardCrop(cropType, fromIsland);
-        }
+        inventoryEditor.DiscardResource(resourceType, resourceIndex, fromIsland);
     }
 
 }

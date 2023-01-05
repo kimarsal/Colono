@@ -22,7 +22,7 @@ public class PatchScript : TaskScript
     {
         //cropType = (ResourceScript.CropType)Random.Range(0, System.Enum.GetNames(typeof(ResourceScript.CropType)).Length);
         
-        if (gardenScript.islandScript.UseCrop(cropType))
+        if (gardenScript.islandScript.UseResource(ResourceScript.ResourceType.Crop, (int)cropType))
         {
             orientation = Quaternion.Euler(0f, Random.Range(0, 359), 0f);
             cropState = CropState.Planted;
@@ -58,7 +58,7 @@ public class PatchScript : TaskScript
             }
             else //if (cropState == CropState.Blossomed)
             {
-                gardenScript.islandScript.AddCrops(cropType, 3);
+                gardenScript.islandScript.AddResource(ResourceScript.ResourceType.Crop, (int)cropType, 3);
                 cropState = CropState.Grown;
             }
             Destroy(crop);

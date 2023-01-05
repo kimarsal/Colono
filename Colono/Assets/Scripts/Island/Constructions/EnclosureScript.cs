@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 
 public abstract class EnclosureScript : ConstructionScript
 {
-    public enum EnclosureType { Garden, Barn, Training };
+    public enum EnclosureType { Garden, Pen, Training };
     public EnclosureType enclosureType;
 
     public Vector3 minPos;

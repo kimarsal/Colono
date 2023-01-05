@@ -45,7 +45,7 @@ public class ItemScript : TaskScript
     public override void TaskProgress()
     {
         materialAmount--;
-        islandScript.AddMaterial(materialType);
+        islandScript.AddResource(ResourceScript.ResourceType.Material, (int)materialType);
         if (materialAmount == 0)
         {
             islandScript.npcManager.RemoveItemToClear(this);

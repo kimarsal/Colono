@@ -1,21 +1,23 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BarnScript : EnclosureScript
+public class PenScript : EnclosureScript
 {
-    public GameObject animals;
+    public int[] animals = new int[Enum.GetValues(typeof(ResourceScript.AnimalType)).Length];
+    public List<AnimalScript> animalList = new List<AnimalScript>();
+
     public GameObject openGate;
     public GameObject closedGate;
-
     public bool npcIsInside = false;
     public bool npcHasEntered = false;
     public bool npcHasExited = false;
 
     private void Start()
     {
-        openGate.GetComponent<BarnDoorScript>().barnScript = this;
-        closedGate.GetComponent<BarnDoorScript>().barnScript = this;
+        openGate.GetComponent<PenDoorScript>().penScript = this;
+        closedGate.GetComponent<PenDoorScript>().penScript = this;
     }
 
     void Update()

@@ -13,9 +13,7 @@ public class ConstructionDetailsScript : MonoBehaviour
     public Button minusButton;
     public Button plusButton;
 
-    public Button editGardenButton;
-    public Button editTavernButton;
-    public Button editInventoryButton;
+    public Button removeConstructionButton;
 
     public GameManager gameManager;
     public ConstructionScript constructionScript;
@@ -32,32 +30,43 @@ public class ConstructionDetailsScript : MonoBehaviour
             case ConstructionScript.ConstructionType.Enclosure: title.text = ((EnclosureScript)constructionScript).enclosureType.ToString(); break;
             case ConstructionScript.ConstructionType.Ship: title.text = constructionScript.constructionType.ToString(); break;
         }
-        
-        if (constructionScript.constructionType == ConstructionScript.ConstructionType.Building && ((BuildingScript)constructionScript).buildingType != BuildingScript.BuildingType.Mine)
+
+        if (constructionScript.constructionType == ConstructionScript.ConstructionType.Building
+            && ((BuildingScript)constructionScript).buildingType != BuildingScript.BuildingType.Mine)
         {
             peasantButtons.SetActive(false);
-            if (((BuildingScript)constructionScript).buildingType == BuildingScript.BuildingType.Warehouse)
-            {
-                peasantNumText.enabled = false;
-                editInventoryButton.gameObject.SetActive(true);
-            }
-            else
-            {
-                peasantNumText.enabled = true;
-                editInventoryButton.gameObject.SetActive(false);
-            }
-            editTavernButton.gameObject.SetActive(((BuildingScript)constructionScript).buildingType == BuildingScript.BuildingType.Tavern);
-            editGardenButton.gameObject.SetActive(false);
+            peasantNumText.enabled = ((BuildingScript)constructionScript).buildingType != BuildingScript.BuildingType.Warehouse;
         }
         else
         {
             peasantButtons.SetActive(true);
             peasantNumText.enabled = true;
-            editGardenButton.gameObject.SetActive(constructionScript.constructionType == ConstructionScript.ConstructionType.Enclosure
-                && ((EnclosureScript)constructionScript).enclosureType == EnclosureScript.EnclosureType.Garden);
-            editTavernButton.gameObject.SetActive(false);
-            editInventoryButton.gameObject.SetActive(constructionScript.constructionType == ConstructionScript.ConstructionType.Ship);
             UpdatePeasantNum();
+        }
+        removeConstructionButton.gameObject.SetActive(constructionScript.constructionType != ConstructionScript.ConstructionType.Ship);
+    }
+
+    public void EditConstruction()
+    {
+        if(constructionScript.constructionType == ConstructionScript.ConstructionType.Ship)
+        {
+            gameManager.canvasScript.ShowInventoryEditor();
+        }
+        else if(constructionScript.constructionType == ConstructionScript.ConstructionType.Enclosure)
+        {
+            switch (((EnclosureScript)constructionScript).enclosureType)
+            {
+                case EnclosureScript.EnclosureType.Garden: gameManager.canvasScript.ShowGardenEditor(); break;
+                case EnclosureScript.EnclosureType.Pen: gameManager.canvasScript.ShowPenEditor((PenScript)constructionScript); break;
+            }
+        }
+        else
+        {
+            switch (((BuildingScript)constructionScript).buildingType)
+            {
+                case BuildingScript.BuildingType.Warehouse: gameManager.canvasScript.ShowInventoryEditor(); break;
+                case BuildingScript.BuildingType.Tavern: gameManager.canvasScript.ShowTavernEditor(); break;
+            }
         }
     }
 

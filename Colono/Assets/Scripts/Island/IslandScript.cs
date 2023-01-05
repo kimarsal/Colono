@@ -25,8 +25,7 @@ public class IslandScript : MonoBehaviour
 
     public int capacity;
     public int usage;
-    public int[] materials = new int[Enum.GetValues(typeof(ResourceScript.MaterialType)).Length];
-    public int[] crops = new int[Enum.GetValues(typeof(ResourceScript.CropType)).Length];
+    public int[][] resources;
 
     private void Start()
     {
@@ -36,6 +35,12 @@ public class IslandScript : MonoBehaviour
         constructions = new GameObject("Constructions");
         constructions.transform.parent = gameObject.transform;
         constructions.transform.localPosition = Vector3.zero;
+
+        resources = new int[Enum.GetValues(typeof(ResourceScript.ResourceType)).Length][];
+        resources[0] = new int[Enum.GetValues(typeof(ResourceScript.MaterialType)).Length];
+        resources[1] = new int[Enum.GetValues(typeof(ResourceScript.CropType)).Length];
+        resources[2] = new int[Enum.GetValues(typeof(ResourceScript.MeatType)).Length];
+        resources[3] = new int[Enum.GetValues(typeof(ResourceScript.AnimalType)).Length];
     }
 
     public bool isCellTaken(Vector2 cell)
@@ -117,56 +122,42 @@ public class IslandScript : MonoBehaviour
         return null;
     }
 
-    public void AddMaterial(ResourceScript.MaterialType materialType)
+    public void AddResource(ResourceScript.ResourceType resourceType, int resourceIndex, int amount = 1)
     {
-        if (usage < capacity)
-        {
-            materials[(int)materialType]++;
-            usage++;
-        }
-        else if (gameManager.isInIsland && gameManager.islandScript == this)
-        {
-            gameManager.shipScript.AddMaterial(materialType);
-        }
-        gameManager.canvasScript.UpdateMaterial(materialType);
-    }
-
-    public void AddCrops(ResourceScript.CropType cropType, int cropAmount)
-    {
-        int originalAmount = cropAmount;
+        int originalAmount = amount;
         if(capacity - usage < originalAmount)
         {
-            cropAmount = capacity - usage;
+            amount = capacity - usage;
         }
 
-        crops[(int)cropType] += cropAmount;
-        usage += cropAmount;
+        resources[(int)resourceType][resourceIndex] += amount;
+        usage += amount;
 
-        if(cropAmount < originalAmount && gameManager.isInIsland && gameManager.islandScript == this)
+        if(amount < originalAmount && gameManager.isInIsland && gameManager.islandScript == this)
         {
-            gameManager.shipScript.AddCrops(cropType, originalAmount - cropAmount);
+            gameManager.shipScript.AddResource(resourceType, resourceIndex, originalAmount - amount);
         }
-        gameManager.canvasScript.UpdateCrop(cropType);
+        gameManager.canvasScript.UpdateInventoryRow(resourceType, resourceIndex);
     }
 
     public int GetCropAmount(ResourceScript.CropType cropType)
     {
-        int seedAmount = crops[(int)cropType];
-        if (gameManager.isInIsland) seedAmount += gameManager.shipScript.crops[(int)cropType];
+        int seedAmount = resources[(int)ResourceScript.ResourceType.Crop][(int)cropType];
+        if (gameManager.isInIsland) seedAmount += gameManager.shipScript.resources[(int)ResourceScript.ResourceType.Crop][(int)cropType];
         return seedAmount;
     }
 
-    public bool UseCrop(ResourceScript.CropType cropType)
+    public bool UseResource(ResourceScript.ResourceType resourceType, int resourceIndex)
     {
-        if (crops[(int)cropType] > 0)
+        if (resources[(int)resourceType][resourceIndex] > 0)
         {
-            crops[(int)cropType]--;
+            resources[(int)resourceType][resourceIndex]--;
             usage--;
             return true;
         }
-        else if (gameManager.isInIsland && gameManager.shipScript.crops[(int)cropType] > 0)
+        else if (gameManager.isInIsland && gameManager.shipScript.resources[(int)resourceType][resourceIndex] > 0)
         {
-            gameManager.shipScript.crops[(int)cropType]--;
+            gameManager.shipScript.resources[(int)resourceType][resourceIndex]--;
             gameManager.shipScript.usage--;
             return true;
         }

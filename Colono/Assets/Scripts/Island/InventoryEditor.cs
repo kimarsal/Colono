@@ -14,9 +14,24 @@ public class InventoryEditor : MonoBehaviour
     public TextMeshProUGUI shipInventoryText;
 
     public Transform rows;
-    public InventoryRowScript[] materialsGridRows;
-    public InventoryRowScript[] cropsGridRows;
-    public GameObject gridRowPrefab;
+    public InventoryRowScript[][] inventoryRows;
+    public GameObject inventoryRowPrefab;
+
+    public PenScript penScript;
+
+    private void SetRow(ResourceType resourceType, int resourceIndex)
+    {
+        GameObject gridRow = Instantiate(inventoryRowPrefab, rows);
+        InventoryRowScript gridRowScript = gridRow.GetComponent<InventoryRowScript>();
+        gridRowScript.inventoryEditor = this;
+        gridRowScript.resourceType = resourceType;
+        gridRowScript.resourceIndex = resourceIndex;
+        gridRowScript.resourceImage.sprite = islandEditor.GetResourceSprite(resourceType, resourceIndex);
+        gridRowScript.resourcesInIsland = islandScript.resources[(int)resourceType][resourceIndex];
+        gridRowScript.resourcesInShip = shipScript.resources[(int)resourceType][resourceIndex];
+        gridRowScript.UpdateValues();
+        inventoryRows[(int)resourceType][resourceIndex] = gridRowScript;
+    }
 
     public void SetGrid()
     {
@@ -25,58 +40,49 @@ public class InventoryEditor : MonoBehaviour
             Destroy(row.gameObject);
         }
 
-        materialsGridRows = new InventoryRowScript[System.Enum.GetValues(typeof(MaterialType)).Length];
-        cropsGridRows = new InventoryRowScript[System.Enum.GetValues(typeof(CropType)).Length];
+        inventoryRows = new InventoryRowScript[System.Enum.GetValues(typeof(ResourceType)).Length][];
 
-        for (int i = 0; i < materialsGridRows.Length; i++)
+        if (penScript == null)
         {
-            GameObject gridRow = Instantiate(gridRowPrefab, rows);
-            InventoryRowScript gridRowScript = gridRow.GetComponent<InventoryRowScript>();
-            gridRowScript.inventoryEditor = this;
-            gridRowScript.resourceType = ResourceType.Material;
-            gridRowScript.materialType = (MaterialType)i;
-            gridRowScript.resourceImage.sprite = islandEditor.materialSprites[i];
-            gridRowScript.resourcesInIsland = islandScript.materials[i];
-            gridRowScript.resourcesInShip = shipScript.materials[i];
-            gridRowScript.UpdateValues();
-            materialsGridRows[i] = gridRowScript;
-        }
+            inventoryRows[(int)ResourceType.Material] = new InventoryRowScript[System.Enum.GetValues(typeof(MaterialType)).Length];
+            for (int i = 0; i < inventoryRows[(int)ResourceType.Material].Length; i++)
+            {
+                SetRow(ResourceType.Material, i);
+            }
 
-        for (int i = 0; i < cropsGridRows.Length; i++)
-        {
-            GameObject gridRow = Instantiate(gridRowPrefab, rows);
-            InventoryRowScript gridRowScript = gridRow.GetComponent<InventoryRowScript>();
-            gridRowScript.inventoryEditor = this;
-            gridRowScript.resourceType = ResourceType.Crop;
-            gridRowScript.cropType = (CropType)i;
-            gridRowScript.resourceImage.sprite = islandEditor.cropSprites[i];
-            gridRowScript.resourcesInIsland = islandScript.crops[i];
-            gridRowScript.resourcesInShip = shipScript.crops[i];
-            gridRowScript.UpdateValues();
-            cropsGridRows[i] = gridRowScript;
-        }
+            inventoryRows[(int)ResourceType.Crop] = new InventoryRowScript[System.Enum.GetValues(typeof(CropType)).Length];
+            for (int i = 0; i < inventoryRows[(int)ResourceType.Crop].Length; i++)
+            {
+                // TODO: Si ha estat descobert
+                SetRow(ResourceType.Crop, i);
+            }
 
-        UpdateInventoryText();
-    }
+            inventoryRows[(int)ResourceType.Meat] = new InventoryRowScript[System.Enum.GetValues(typeof(MeatType)).Length];
+            for (int i = 0; i < inventoryRows[(int)ResourceType.Meat].Length; i++)
+            {
+                SetRow(ResourceType.Meat, i);
+            }
 
-    public void UpdateMaterial(MaterialType materialType)
-    {
-        if(materialsGridRows != null && materialsGridRows[0] != null)
-        {
-            materialsGridRows[(int)materialType].resourcesInIsland = islandScript.materials[(int)materialType];
-            materialsGridRows[(int)materialType].resourcesInShip = shipScript.materials[(int)materialType];
-            materialsGridRows[(int)materialType].UpdateValues();
             UpdateInventoryText();
         }
+        else
+        {
+            inventoryRows[(int)ResourceType.Animal] = new InventoryRowScript[System.Enum.GetValues(typeof(AnimalType)).Length];
+            for (int i = 0; i < inventoryRows[(int)ResourceType.Animal].Length; i++)
+            {
+                SetRow(ResourceType.Animal, i);
+            }
+        }
     }
 
-    public void UpdateCrop(CropType cropType)
+    public void UpdateInventoryRow(ResourceType resourceType, int resourceIndex)
     {
-        if(cropsGridRows != null && cropsGridRows[0] != null)
+        if (inventoryRows[(int)resourceType] != null && inventoryRows[(int)resourceType][resourceIndex] != null)
         {
-            cropsGridRows[(int)cropType].resourcesInIsland = islandScript.crops[(int)cropType];
-            cropsGridRows[(int)cropType].resourcesInShip = shipScript.crops[(int)cropType];
-            cropsGridRows[(int)cropType].UpdateValues();
+            InventoryRowScript inventoryRowScript = inventoryRows[(int)resourceType][resourceIndex];
+            inventoryRowScript.resourcesInIsland = islandScript.resources[(int)resourceType][resourceIndex];
+            inventoryRowScript.resourcesInShip = shipScript.resources[(int)resourceType][resourceIndex];
+            inventoryRowScript.UpdateValues();
             UpdateInventoryText();
         }
     }
@@ -87,14 +93,14 @@ public class InventoryEditor : MonoBehaviour
         shipInventoryText.text = shipScript.usage + "/" + shipScript.capacity;
     }
 
-    public bool MoveMaterial(MaterialType materialType, int difference)
+    public bool MoveResource(ResourceType resourceType, int resourceIndex, int difference)
     {
         if (difference < 0 && islandScript.usage < islandScript.capacity || difference > 0 && shipScript.usage < shipScript.capacity)
         {
-            islandScript.materials[(int)materialType] -= difference;
+            islandScript.resources[(int)resourceType][resourceIndex] -= difference;
             islandScript.usage -= difference;
 
-            shipScript.materials[(int)materialType] += difference;
+            shipScript.resources[(int)resourceType][resourceIndex] += difference;
             shipScript.usage += difference;
 
             UpdateInventoryText();
@@ -104,50 +110,20 @@ public class InventoryEditor : MonoBehaviour
         return false;
     }
 
-    public bool MoveCrop(CropType cropType, int difference)
-    {
-        if(difference < 0 && islandScript.usage < islandScript.capacity || difference > 0 && shipScript.usage < shipScript.capacity)
-        {
-            islandScript.crops[(int)cropType] -= difference;
-            islandScript.usage -= difference;
 
-            shipScript.crops[(int)cropType] += difference;
-            shipScript.usage += difference;
-
-            UpdateInventoryText();
-
-            return true;
-        }
-        return false;
-    }
-
-    public void DiscardMaterial(MaterialType materialType, bool fromIsland)
+    public void DiscardResource(ResourceType resourceType, int resourceIndex, bool fromIsland)
     {
         if (fromIsland)
         {
-            islandScript.materials[(int)materialType]--;
+            islandScript.resources[(int)resourceType][resourceIndex]--;
             islandScript.usage--;
         }
         else
         {
-            shipScript.materials[(int)materialType]--;
+            shipScript.resources[(int)resourceType][resourceIndex]--;
             shipScript.usage--;
         }
         UpdateInventoryText();
     }
 
-    public void DiscardCrop(CropType cropType, bool fromIsland)
-    {
-        if (fromIsland)
-        {
-            islandScript.crops[(int)cropType]--;
-            islandScript.usage--;
-        }
-        else
-        {
-            shipScript.crops[(int)cropType]--;
-            shipScript.usage--;
-        }
-        UpdateInventoryText();
-    }
 }
