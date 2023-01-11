@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using static UnityEditor.PlayerSettings;
 using static UnityEditor.Progress;
 using static UnityEngine.GraphicsBuffer;
 
@@ -11,8 +12,8 @@ public class NPCManager : MonoBehaviour
     public GameObject npcs;
     public List<PeasantScript> peasantList = new List<PeasantScript>();
     private List<ItemScript> itemsToClear = new List<ItemScript>();
+    //public int availableAdultPeasants = 0;
 
-    public int numWarriors = 0;
     public static float minX = -20;
     public static float maxX = 20;
     public static float minZ = -20;
@@ -80,6 +81,8 @@ public class NPCManager : MonoBehaviour
 
     public void AsignItemToPeasant(PeasantAdultScript peasantScript)
     {
+        peasantScript.CancelTask();
+
         bool otherItemNeedsClearing = false;
         foreach (ItemScript itemScript in itemsToClear)
         {
@@ -153,7 +156,7 @@ public class NPCManager : MonoBehaviour
         return false;
     }
 
-    public void SendPeasantToArea(ConstructionScript constructionScript, bool adding)
+    public bool SendPeasantToArea(ConstructionScript constructionScript, bool adding)
     {
         if (adding) // Enviar a la construcció
         {
@@ -189,7 +192,9 @@ public class NPCManager : MonoBehaviour
                     }
                 }
                 peasantScript.UpdateTask();
+                return true;
             }
+            return false;
         }
         else // Desvincular de la construcció
         {
@@ -213,6 +218,7 @@ public class NPCManager : MonoBehaviour
                 AsignItemToPeasant((PeasantAdultScript)peasantScript);
             }
             else peasantScript.UpdateTask();
+            return true;
         }
     }
 
@@ -224,7 +230,6 @@ public class NPCManager : MonoBehaviour
             peasantScript.constructionScript = null;
             peasantList.Add(peasantScript);
             AsignItemToPeasant((PeasantAdultScript)peasantScript);
-            ((PeasantAdultScript)peasantScript).UpdateTask();
         }
     }
 
@@ -259,9 +264,14 @@ public class NPCManager : MonoBehaviour
 
     public static Vector3 GetRandomPointWithinRange(Vector3 minPos, Vector3 maxPos)
     {
-        NavMeshHit hit;
         Vector3 randomPos = new Vector3(Random.Range(minPos.x, maxPos.x), Random.Range(minPos.y, maxPos.y), Random.Range(minPos.z, maxPos.z));
-        NavMesh.SamplePosition(randomPos, out hit, 5, NavMesh.AllAreas);
+        return GetClosestPointInNavMesh(randomPos);
+    }
+
+    public static Vector3 GetClosestPointInNavMesh(Vector3 pos)
+    {
+        NavMeshHit hit;
+        NavMesh.SamplePosition(pos, out hit, 5, NavMesh.AllAreas);
         return hit.position;
     }
 

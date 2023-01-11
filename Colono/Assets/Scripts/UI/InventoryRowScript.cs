@@ -20,14 +20,14 @@ public class InventoryRowScript : MonoBehaviour
     public Button discardResourceFromShipButton;
 
     private int totalResources;
-    public int resourcesInIsland;
-    public int resourcesInShip;
+    public int islandResources;
+    public int shipResources;
 
     public void UpdateValues()
     {
-        totalResources = resourcesInIsland + resourcesInShip;
+        totalResources = islandResources + shipResources;
         resourceSlider.maxValue = totalResources;
-        resourceSlider.value = resourcesInShip;
+        resourceSlider.value = shipResources;
         resourceSlider.enabled = totalResources > 0;
         blocker.SetActive(totalResources == 0);
 
@@ -36,39 +36,39 @@ public class InventoryRowScript : MonoBehaviour
 
     public void OnSliderValueChange()
     {
-        int difference = (int)resourceSlider.value - resourcesInShip;
+        int difference = (int)resourceSlider.value - shipResources;
         bool canMoveResource = inventoryEditor.MoveResource(resourceType, resourceIndex, difference);
 
         if (canMoveResource)
         {
-            resourcesInIsland -= difference;
-            resourcesInShip += difference;
+            islandResources -= difference;
+            shipResources += difference;
 
             UpdateText();
         }
         else
         {
-            resourceSlider.value = resourcesInShip;
+            resourceSlider.value = shipResources;
         }
     }
 
     public void UpdateText()
     {
-        resourcesInIslandText.text = resourcesInIsland.ToString();
-        resourcesInShipText.text = resourcesInShip.ToString();
-        discardResourceFromIslandButton.enabled = resourcesInIsland > 0;
-        discardResourceFromShipButton.enabled = resourcesInShip > 0;
+        resourcesInIslandText.text = islandResources.ToString();
+        resourcesInShipText.text = shipResources.ToString();
+        discardResourceFromIslandButton.enabled = islandResources > 0;
+        discardResourceFromShipButton.enabled = shipResources > 0;
     }
 
     public void DiscardResource(bool fromIsland)
     {
         if (fromIsland)
         {
-            resourcesInIsland--;
+            islandResources--;
         }
         else
         {
-            resourcesInShip--;
+            shipResources--;
         }
         UpdateValues();
 

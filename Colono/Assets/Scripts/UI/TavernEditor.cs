@@ -31,21 +31,21 @@ public class TavernEditor : MonoBehaviour
         introducedCropDropdownOptions.Add(new Dropdown.OptionData());
         for (int i = 0; i < introducedCropTypes; i++)
         {
-            introducedCropDropdownOptions.Add(new Dropdown.OptionData(tavernScript.islandScript.islandCellScript.islandEditorScript.cropSprites[i]));
+            introducedCropDropdownOptions.Add(new Dropdown.OptionData(tavernScript.islandEditor.cropSprites[i]));
         }
 
         nativeCropDropdownOptions = new List<Dropdown.OptionData>(nativeCropTypes+1);
         nativeCropDropdownOptions.Add(new Dropdown.OptionData());
         for (int i = 0; i < nativeCropTypes; i++)
         {
-            nativeCropDropdownOptions.Add(new Dropdown.OptionData(tavernScript.islandScript.islandCellScript.islandEditorScript.cropSprites[introducedCropTypes + i]));
+            nativeCropDropdownOptions.Add(new Dropdown.OptionData(tavernScript.islandEditor.cropSprites[introducedCropTypes + i]));
         }
 
         meatDropdownOptions = new List<Dropdown.OptionData>(meatTypes+1);
         meatDropdownOptions.Add(new Dropdown.OptionData());
         for (int i = 0; i < meatTypes; i++)
         {
-            meatDropdownOptions.Add(new Dropdown.OptionData(tavernScript.islandScript.islandCellScript.islandEditorScript.meatSprites[i]));
+            meatDropdownOptions.Add(new Dropdown.OptionData(tavernScript.islandEditor.meatSprites[i]));
         }
 
         foreach (Recipe recipe in tavernScript.recipes)
@@ -125,6 +125,16 @@ public class TavernEditor : MonoBehaviour
             introducedCrop = (int)ResourceScript.CropType.Onion;
             nativeCrop = -1;
             meat = -1;
+        }
+
+        public int hungerPoints { get
+            {
+                int ingredients = 0;
+                if (introducedCrop != -1) ingredients++;
+                if (nativeCrop != -1) ingredients++;
+                if (meat != -1) ingredients++;
+                return ingredients * 3;
+            }
         }
     }
 

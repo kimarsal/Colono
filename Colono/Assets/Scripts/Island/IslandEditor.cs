@@ -55,6 +55,9 @@ public class IslandEditor : MonoBehaviour
 
     public GameObject[] grass;
 
+    [Header("Animals")]
+    public GameObject[] animals;
+
     [Header("Recipes")]
     public Sprite[] cookedVegetableSprites;
     public Sprite[] cookedMeatSprites;
@@ -67,6 +70,7 @@ public class IslandEditor : MonoBehaviour
 
     [Header("Others")]
     public GameObject coastObstacle;
+    public GameObject enclosureCenter;
 
     public Sprite GetResourceSprite(ResourceScript.ResourceType resourceType, int resourceIndex)
     {

@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     public ShipScript shipScript;
     public CameraScript cameraScript;
     public CanvasScript canvasScript;
+    public InventoryEditor inventoryEditor;
     private ConstructionScript constructionScript;
 
     private bool isPlayerNearIsland = false;
@@ -17,8 +18,15 @@ public class GameManager : MonoBehaviour
 
     public Transform cellsTransform;
     public IslandScript islandScript;
+    private IslandCellScript islandCellScript;
 
     public bool hasSelectedPeasant;
+
+    private void Start()
+    {
+        islandCellScript = GetComponent<IslandCellScript>();
+        islandCellScript.enabled = false;
+    }
 
     public void PlayerIsNearIsland(IslandScript islandScript)
     {
@@ -34,22 +42,26 @@ public class GameManager : MonoBehaviour
     {
         islandScript.convexColliders.SetActive(false);
         cameraScript.SetIslandCamera(islandScript.transform.position);
+        inventoryEditor.islandInventoryScript = islandScript.inventoryScript;
         canvasScript.BoardIsland();
 
         shipScript.islandScript = islandScript;
+
+        islandCellScript.enabled = true;
+        islandCellScript.islandScript = islandScript;
     }
 
     public void ChangeSelectedItemsState(bool toClear)
     {
-        islandScript.islandCellScript.ChangeSelectedItemsState(toClear);
-        islandScript.islandCellScript.DestroyAllCells();
+        islandCellScript.ChangeSelectedItemsState(toClear);
+        islandCellScript.DestroyAllCells();
 
         canvasScript.UnselectArea();
     }
 
     public void SelectShip()
     {
-        islandScript.islandCellScript.DestroyAllCells();
+        islandCellScript.DestroyAllCells();
 
         SelectConstruction(shipScript);
     }
@@ -57,27 +69,28 @@ public class GameManager : MonoBehaviour
     public void SelectPeasant(PeasantScript peasantScript)
     {
         hasSelectedPeasant = true;
-        islandScript.islandCellScript.DestroyAllCells();
+        islandCellScript.DestroyAllCells();
 
         canvasScript.ShowPeasantDetails(peasantScript);
     }
 
     public void ChooseBuilding(int type)
     {
-        islandScript.islandCellScript.ChooseBuilding((BuildingScript.BuildingType)type);
+        islandCellScript.ChooseBuilding((BuildingScript.BuildingType)type);
         canvasScript.ChooseBuilding();
     }
 
     public void RemoveConstruction()
     {
+        constructionScript.FinishUpBusiness();
         islandScript.npcManager.SendAllPeasantsBack(constructionScript);
-        islandScript.islandCellScript.RemoveConstruction(constructionScript);
+        islandCellScript.RemoveConstruction(constructionScript);
         canvasScript.HideConstructionDetails();
     }
 
     public void CreateEnclosure(int enclosureType)
     {
-        islandScript.islandCellScript.CreateEnclosure((EnclosureScript.EnclosureType) enclosureType);
+        islandCellScript.CreateEnclosure((EnclosureScript.EnclosureType) enclosureType);
     }
 
     public void SelectConstruction(ConstructionScript newConstructionScript)
@@ -96,19 +109,19 @@ public class GameManager : MonoBehaviour
         constructionScript.constructionDetailsScript = null;
         constructionScript.outline.enabled = false;
         constructionScript = null;
-        islandScript.islandCellScript.DestroyAllCells();
+        islandCellScript.DestroyAllCells();
         canvasScript.HideConstructionDetails();
     }
 
     public void LeaveIsland()
     {
-        isInIsland = false;
         cameraScript.ResetPlayerCamera();
         canvasScript.LeaveIsland();
 
         islandScript.npcManager.CancelAllTripsToShip(shipScript);
         islandScript.convexColliders.SetActive(true);
-        islandScript.islandCellScript.DestroyAllCells();
+        islandCellScript.DestroyAllCells();
+        islandCellScript.enabled = false;
     }
 
     public void PlayerIsFarFromIsland()

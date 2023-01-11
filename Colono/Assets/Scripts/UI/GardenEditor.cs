@@ -25,7 +25,7 @@ public class GardenEditor : MonoBehaviour
         cropDropdown.ClearOptions();
         for(int i = 0; i < cropTypes; i++)
         {
-            cropDropdown.options.Add(new Dropdown.OptionData(gardenScript.islandScript.islandCellScript.islandEditorScript.cropSprites[i]));
+            cropDropdown.options.Add(new Dropdown.OptionData(gardenScript.islandEditor.cropSprites[i]));
         }
         cropDropdown.template.GetComponent<RectTransform>().sizeDelta = new Vector2(cropDropdown.template.GetComponent<RectTransform>().sizeDelta.x, cropTypes * 100 / 2);
         //cropDropdown.value = 0;
@@ -38,7 +38,7 @@ public class GardenEditor : MonoBehaviour
             GameObject cropButton = Instantiate(cropButtonPrefab, gridTransform);
             CropButtonScript cropButtonScript = cropButton.GetComponent<CropButtonScript>();
             cropButtonScript.gardenEditor = this;
-            cropButtonScript.cropImage.sprite = gardenScript.islandScript.islandCellScript.islandEditorScript.cropSprites[(int)gardenScript.crops[i]];
+            cropButtonScript.cropImage.sprite = gardenScript.islandEditor.cropSprites[(int)gardenScript.crops[i]];
             cropButtonScript.index = i;
         }
     }
@@ -51,6 +51,6 @@ public class GardenEditor : MonoBehaviour
     public void ChangeCrop(CropButtonScript cropButtonScript)
     {
         gardenScript.crops[cropButtonScript.index] = selectedCropType;
-        cropButtonScript.cropImage.sprite = gardenScript.islandScript.islandCellScript.islandEditorScript.cropSprites[(int)selectedCropType];
+        cropButtonScript.cropImage.sprite = gardenScript.islandEditor.cropSprites[(int)selectedCropType];
     }
 }

@@ -11,4 +11,6 @@ public abstract class TaskScript : MonoBehaviour
     public PeasantAdultScript peasantScript;
 
     public abstract void TaskProgress();
+
+    public abstract void CancelTask();
 }

@@ -7,6 +7,7 @@ using UnityEngine;
 public class PeasantAdultScript : PeasantScript
 {
     public TaskScript task;
+    private bool hasTaskChanged;
 
     [Header("Tools")]
     public GameObject axe;
@@ -70,7 +71,10 @@ public class PeasantAdultScript : PeasantScript
                 SetDestination(constructionScript.entry.position);
             }
         }
-        else SetDestination(NPCManager.GetRandomPoint(transform.position));
+        else
+        {
+            SetDestination(NPCManager.GetRandomPoint(transform.position));
+        }
     }
 
     public override void ArrivedAtDestination()
@@ -97,7 +101,7 @@ public class PeasantAdultScript : PeasantScript
             {
                 if (constructionScript.constructionType == ConstructionScript.ConstructionType.Ship)
                 {
-                    transform.parent = ((ShipScript)constructionScript).npcs.transform;
+                    transform.parent = ((ShipScript)constructionScript).npcsTransform.transform;
                 }
 
                 constructionScript.peasantsOnTheirWay--;
@@ -113,7 +117,7 @@ public class PeasantAdultScript : PeasantScript
 
     public void DoTask()
     {
-        transform.LookAt(task.center);
+        hasTaskChanged = false;
         if (task.taskType == TaskScript.TaskType.Item)
         {
             switch (((ItemScript)task).itemType)
@@ -141,6 +145,7 @@ public class PeasantAdultScript : PeasantScript
                 }
             }
         }
+        transform.LookAt(task.center);
         //StartCoroutine(PointTowardsTaskCenter());
     }
 
@@ -156,9 +161,21 @@ public class PeasantAdultScript : PeasantScript
         while (Vector3.Angle(transform.forward, task.center - transform.position) > 10);
     }*/
 
+    public void CancelTask()
+    {
+        if (task != null)
+        {
+            task.CancelTask();
+            hasTaskChanged = true;
+        }
+    }
+
     private void TaskProgress()
     {
-        task.TaskProgress();
+        if (!hasTaskChanged)
+        {
+            task.TaskProgress();
+        }
         hunger += 0.05f;
         exhaustion += 0.05f;
     }

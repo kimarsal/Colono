@@ -2,11 +2,16 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static ResourceScript;
 
 public class PenScript : EnclosureScript
 {
-    public int[] animals = new int[Enum.GetValues(typeof(ResourceScript.AnimalType)).Length];
+    private CanvasScript canvasScript;
+    private IslandEditor islandEditor;
+    public int[] animals = new int[Enum.GetValues(typeof(AnimalType)).Length];
+    public int[] desiredAmounts = new int[Enum.GetValues(typeof(AnimalType)).Length];
     public List<AnimalScript> animalList = new List<AnimalScript>();
+    public int animalAmount;
 
     public GameObject openGate;
     public GameObject closedGate;
@@ -18,6 +23,9 @@ public class PenScript : EnclosureScript
     {
         openGate.GetComponent<PenDoorScript>().penScript = this;
         closedGate.GetComponent<PenDoorScript>().penScript = this;
+        GameObject gm = GameObject.FindGameObjectWithTag("GameController");
+        canvasScript = gm.GetComponent<GameManager>().canvasScript;
+        islandEditor = gm.GetComponent<IslandEditor>();
     }
 
     void Update()
@@ -37,6 +45,38 @@ public class PenScript : EnclosureScript
                 npcHasExited = false;
             }
         }
+    }
+
+    public void AgeUpAnimal(AnimalScript animalScript)
+    {
+        AnimalType animalType = animalScript.animalType;
+        GameObject agedUpAnimal = islandEditor.animals[(int)animalType + 1];
+        AnimalScript agedUpAnimalScript = Instantiate(agedUpAnimal, animalScript.transform.position, animalScript.transform.rotation, transform).GetComponent<AnimalScript>();
+        animalList.Add(agedUpAnimalScript);
+        animalList.Remove(animalScript);
+        Destroy(animalScript.gameObject);
+
+        animals[(int)animalType]--;
+        animals[(int)animalType + 1]++;
+
+        canvasScript.UpdatePenRow(animalType);
+        canvasScript.UpdatePenRow(animalType + 1);
+
+        if (animalScript.animalType == AnimalType.Chicken)
+        {
+            agedUpAnimal.transform.localScale = Vector3.one * 0.1f;
+        }
+        else
+        {
+            agedUpAnimal.transform.localScale = Vector3.one;
+        }
+        agedUpAnimalScript.penScript = this;
+        agedUpAnimalScript.SetNewPen(false);
+    }
+
+    public void ChangeDesiredAmount(AnimalType animalType, int difference)
+    {
+        desiredAmounts[(int)animalType] += difference;
     }
 
     public override TaskScript GetNextPendingTask()

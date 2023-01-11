@@ -102,6 +102,7 @@ public class CameraScript : MonoBehaviour
         }
         else
         {
+            gameManagerScript.isInIsland = false;
             float previousSpeed = speed;
             targetPosition = player.transform.position + navigationOffset;
             float distance = Vector3.Distance(transform.position, targetPosition);

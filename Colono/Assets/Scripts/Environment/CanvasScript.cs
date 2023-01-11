@@ -24,7 +24,7 @@ public class CanvasScript : MonoBehaviour
     public ConstructionDetailsScript constructionDetailsScript;
     public PeasantDetailsScript peasantDetailsScript;
     public GardenEditor gardenEditor;
-    public InventoryEditor penEditor;
+    public PenEditor penEditor;
     public TavernEditor tavernEditor;
     public InventoryEditor inventoryEditor;
 
@@ -164,8 +164,6 @@ public class CanvasScript : MonoBehaviour
         constructionDetailsAnimator.Play("HideDetails");
 
         inventoryEditor.gameObject.SetActive(true);
-        inventoryEditor.islandScript = constructionDetailsScript.constructionScript.islandScript;
-        inventoryEditor.penScript = null;
         inventoryEditor.SetGrid();
         inventoryEditorAnimator.Play("ShowPopUp");
 
@@ -175,7 +173,10 @@ public class CanvasScript : MonoBehaviour
     public void HideInventoryEditor()
     {
         inventoryEditorAnimator.Play("HidePopUp");
-        ShowButtons();
+        constructionDetailsAnimator.Play("ShowDetails");
+
+        buttonState = ButtonState.ConstructionDetails;
+        //ShowButtons();
     }
 
     public void ShowGardenEditor()
@@ -203,8 +204,7 @@ public class CanvasScript : MonoBehaviour
         constructionDetailsAnimator.Play("HideDetails");
 
         penEditor.gameObject.SetActive(true);
-        penEditor.islandScript = constructionDetailsScript.constructionScript.islandScript;
-        penEditor.penScript = penScript;
+        penEditor.penScript = (PenScript)constructionDetailsScript.constructionScript;
         penEditor.SetGrid();
         penEditorAnimator.Play("ShowPopUp");
 
@@ -270,7 +270,12 @@ public class CanvasScript : MonoBehaviour
 
     public void UpdateInventoryRow(ResourceScript.ResourceType resourceType, int resourceIndex)
     {
-        inventoryEditor.UpdateInventoryRow(ResourceScript.ResourceType.Material, resourceIndex);
+        inventoryEditor.UpdateInventoryRow(resourceType, resourceIndex);
+    }
+
+    public void UpdatePenRow(ResourceScript.AnimalType animalType)
+    {
+        penEditor.UpdatePenRow(animalType);
     }
 
     public void LeaveIsland()

@@ -6,31 +6,28 @@ using UnityEngine.AI;
 
 public class ShipScript : ConstructionScript
 {
-    public GameObject npcs;
+    public Transform npcsTransform;
+    public Transform animalsTransform;
     private IslandEditor islandEditor;
     private GameManager gameManager;
 
-    public int capacity;
-    public int usage;
-    public int[][] resources;
+    public InventoryScript inventoryScript;
+
+    public int[] animals;
+    public List<AnimalScript> animalList = new List<AnimalScript>();
+    public int animalAmount;
 
     void Start()
     {
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         islandEditor = GameObject.Find("GameManager").GetComponent<IslandEditor>();
+        inventoryScript = GetComponent<InventoryScript>();
 
-        resources = new int[Enum.GetValues(typeof(ResourceScript.ResourceType)).Length][];
-        resources[0] = new int[Enum.GetValues(typeof(ResourceScript.MaterialType)).Length];
-        resources[1] = new int[Enum.GetValues(typeof(ResourceScript.CropType)).Length];
-        resources[2] = new int[Enum.GetValues(typeof(ResourceScript.MeatType)).Length];
-        resources[3] = new int[Enum.GetValues(typeof(ResourceScript.AnimalType)).Length];
+        inventoryScript.AddResource(ResourceScript.ResourceType.Crop, (int)ResourceScript.CropType.Onion, 2);
+        inventoryScript.AddResource(ResourceScript.ResourceType.Crop, (int)ResourceScript.CropType.Carrot, 2);
+        inventoryScript.AddResource(ResourceScript.ResourceType.Crop, (int)ResourceScript.CropType.Cucumber, 2);
 
-        resources[(int)ResourceScript.ResourceType.Crop][(int)ResourceScript.CropType.Onion] = 2;
-        resources[(int)ResourceScript.ResourceType.Crop][(int)ResourceScript.CropType.Carrot] = 2;
-        resources[(int)ResourceScript.ResourceType.Crop][(int)ResourceScript.CropType.Eggplant] = 2;
-        resources[(int)ResourceScript.ResourceType.Animal][(int)ResourceScript.AnimalType.Cow] = 2;
-        resources[(int)ResourceScript.ResourceType.Animal][(int)ResourceScript.AnimalType.Pig] = 2;
-        usage = 10;
+        inventoryScript.AddResource(ResourceScript.ResourceType.Animal, (int)ResourceScript.AnimalType.Cow, 2);
 
         for (int i = 0; i < 10; i++)
         {
@@ -42,13 +39,33 @@ public class ShipScript : ConstructionScript
                 case 2:
                     prefab = islandEditor.childPeasantPrefab; break;
             }
-            GameObject peasant = Instantiate(prefab, entry.position, prefab.transform.rotation, npcs.transform);
+            GameObject peasant = Instantiate(prefab, transform.position, prefab.transform.rotation, npcsTransform);
             PeasantScript peasantScript = peasant.GetComponent<PeasantScript>();
             peasantScript.gameManager = gameManager;
             peasantScript.InitializePeasant();
             peasant.SetActive(false);
             peasantList.Add(peasantScript);
         }
+
+        animals = new int[Enum.GetValues(typeof(ResourceScript.AnimalType)).Length];
+        AddAnimal(ResourceScript.AnimalType.Cow);
+        AddAnimal(ResourceScript.AnimalType.Calf);
+        AddAnimal(ResourceScript.AnimalType.Pig);
+        AddAnimal(ResourceScript.AnimalType.Piglet);
+        AddAnimal(ResourceScript.AnimalType.Sheep);
+        AddAnimal(ResourceScript.AnimalType.Lamb);
+        AddAnimal(ResourceScript.AnimalType.Chicken);
+        AddAnimal(ResourceScript.AnimalType.Chick);
+    }
+
+    private void AddAnimal(ResourceScript.AnimalType animalType)
+    {
+        GameObject prefab = islandEditor.animals[(int)animalType];
+        AnimalScript animalScript = Instantiate(prefab, transform.position, prefab.transform.rotation, animalsTransform).GetComponent<AnimalScript>();
+        animalScript.gameObject.SetActive(false);
+        animalList.Add(animalScript);
+        animals[(int)animalType]++;
+        animalAmount++;
     }
 
     void Update()
@@ -89,14 +106,32 @@ public class ShipScript : ConstructionScript
         return null;
     }
 
-    public void AddResource(ResourceScript.ResourceType resourceType, int resourceIndex, int amount)
-    {
-        if (capacity - usage < amount)
-        {
-            amount = capacity - usage;
-        }
 
-        resources[(int)resourceType][resourceIndex] += amount;
-        usage += amount;
+
+    public void AddAnimal(AnimalScript animalScript)
+    {
+        animalList.Add(animalScript);
+        animals[(int)animalScript.animalType]++;
+        animalAmount++;
+
+        animalScript.gameObject.SetActive(false);
+        animalScript.transform.parent = animalsTransform;
     }
+
+    public AnimalScript RemoveAnimal(ResourceScript.AnimalType animalType)
+    {
+        for (int i = 0; i < animalList.Count; i++)
+        {
+            AnimalScript animalScript = animalList[i];
+            if (animalScript.animalType == animalType)
+            {
+                animalList.RemoveAt(i);
+                animals[(int)animalType]--;
+                animalAmount--;
+                return animalScript;
+            }
+        }
+        return null;
+    }
+
 }

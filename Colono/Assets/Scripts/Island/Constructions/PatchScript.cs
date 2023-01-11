@@ -20,21 +20,9 @@ public class PatchScript : TaskScript
 
     public void PlantCrop()
     {
-        //cropType = (ResourceScript.CropType)Random.Range(0, System.Enum.GetNames(typeof(ResourceScript.CropType)).Length);
-        
-        if (gardenScript.islandScript.UseResource(ResourceScript.ResourceType.Crop, (int)cropType))
-        {
-            orientation = Quaternion.Euler(0f, Random.Range(0, 359), 0f);
-            cropState = CropState.Planted;
-            crop = Instantiate(GetCropPrefab(), center, orientation, transform);
-        }
-        else
-        {
-            peasantScript.task = ((GardenScript)peasantScript.constructionScript).GetNextPendingTask();
-            peasantScript.task.peasantScript = peasantScript;
-            peasantScript.UpdateTask();
-            peasantScript = null;
-        }
+        orientation = Quaternion.Euler(0f, Random.Range(0, 359), 0f);
+        cropState = CropState.Planted;
+        crop = Instantiate(GetCropPrefab(), center, orientation, transform);
     }
 
     public override void TaskProgress()
@@ -65,24 +53,20 @@ public class PatchScript : TaskScript
             crop = Instantiate(GetCropPrefab(), center, orientation, transform);
         }
 
-        PeasantAdultScript p = peasantScript;
-        peasantScript = null;
-        if (p == null)
+        if (peasantScript != null) //Si el granjer encara no ha marxat
         {
-            Debug.Log("Fuck bitches");
-        }
-        else if (p.constructionScript != null && p.constructionScript == gardenScript) //Si el granjer encara no ha marxat
-        {
-            if (p.hunger < 1 && p.exhaustion < 1) //Si el granjer no té gana i no està cansat
+            if (peasantScript.hunger < 1 && peasantScript.exhaustion < 1) //Si el granjer no té gana i no està cansat
             {
-                p.task = ((GardenScript)p.constructionScript).GetNextPendingTask();
-                p.task.peasantScript = p;
+                PatchScript nextPatch = (PatchScript)gardenScript.GetNextPendingTask();
+                peasantScript.task = nextPatch;
+                nextPatch.peasantScript = peasantScript;
             }
             else
             {
-                p.task = null;
+                peasantScript.task = null;
             }
-            p.UpdateTask();
+            peasantScript.UpdateTask();
+            peasantScript = null;
         }
     }
 
@@ -107,4 +91,11 @@ public class PatchScript : TaskScript
         return prefab;
     }
 
+    public override void CancelTask()
+    {
+        if (cropState == CropState.Barren)
+        {
+            gardenScript.islandScript.AddResource(ResourceScript.ResourceType.Crop, (int)cropType);
+        }
+    }
 }

@@ -39,7 +39,7 @@ public class PeasantChildScript : PeasantScript
         }
         else if (constructionScript != null) //Si té el vaixell com a destí
         {
-            transform.parent = ((ShipScript)constructionScript).npcs.transform;
+            transform.parent = ((ShipScript)constructionScript).npcsTransform.transform;
             constructionScript.peasantsOnTheirWay--;
             constructionScript.UpdateConstructionDetails();
             gameObject.SetActive(false);

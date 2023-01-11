@@ -18,7 +18,7 @@ public class GardenScript : EnclosureScript
 
         for(int i = 0; i < cropAmount.Length; i++)
         {
-            cropAmount[i] = islandScript.GetCropAmount((ResourceScript.CropType)i);
+            cropAmount[i] = islandScript.GetResourceAmount(ResourceScript.ResourceType.Crop, i);
             totalCropAmount += cropAmount[i];
         }
 
@@ -72,9 +72,9 @@ public class GardenScript : EnclosureScript
         MeshRenderer meshRenderer = patch.AddComponent<MeshRenderer>();
         MeshFilter meshFilter = patch.AddComponent<MeshFilter>();
 
-        meshRenderer.material = islandScript.islandCellScript.islandEditorScript.patchMaterial;
+        meshRenderer.material = islandEditor.patchMaterial;
 
-        MeshData cellMeshData = MeshGenerator.GenerateCell(cell, 0.01f, islandScript.islandCellScript.meshData);
+        MeshData cellMeshData = MeshGenerator.GenerateCell(cell, 0.01f, islandScript.meshData);
         Mesh mesh = cellMeshData.CreateMesh();
         meshFilter.mesh = mesh;
 
@@ -83,10 +83,10 @@ public class GardenScript : EnclosureScript
 
         PatchScript patchScript = patch.AddComponent<PatchScript>();
         patchScript.gardenScript = this;
-        patchScript.islandEditor = islandScript.islandCellScript.islandEditorScript;
+        patchScript.islandEditor = islandEditor;
         patchScript.index = index;
         patchScript.cropType = cropType;
-        patchScript.center = islandScript.transform.position + MeshGenerator.GetCellCenter(cell, islandScript.islandCellScript.meshData);
+        patchScript.center = islandScript.transform.position + MeshGenerator.GetCellCenter(cell, islandScript.meshData);
 
         patchesDictionary.Add(cell, patchScript);
     }
@@ -102,7 +102,7 @@ public class GardenScript : EnclosureScript
             if (index < lastWorkedOnPatch)
             {
                 if(patch == null && pair.Value.peasantScript == null
-                    && !(pair.Value.cropState == PatchScript.CropState.Barren && islandScript.GetCropAmount(pair.Value.cropType) == 0))
+                    && !(pair.Value.cropState == PatchScript.CropState.Barren && islandScript.GetResourceAmount(ResourceScript.ResourceType.Crop, (int)pair.Value.cropType) == 0))
                 {
                     //lastWorkedOnPatch = index;
                     patch = pair.Value;
@@ -111,14 +111,30 @@ public class GardenScript : EnclosureScript
             else
             {
                 if (pair.Value.peasantScript == null
-                    && !(pair.Value.cropState == PatchScript.CropState.Barren && islandScript.GetCropAmount(pair.Value.cropType) == 0))
+                    && !(pair.Value.cropState == PatchScript.CropState.Barren && islandScript.GetResourceAmount(ResourceScript.ResourceType.Crop, (int)pair.Value.cropType) == 0))
                 {
                     //lastWorkedOnPatch = index;
+                    islandScript.UseResource(ResourceScript.ResourceType.Crop, (int)pair.Value.cropType);
                     return pair.Value;
                 }
             }
             index++;
         }
+
+        islandScript.UseResource(ResourceScript.ResourceType.Crop, (int)patch.cropType);
         return patch;
     }
+
+    public override void FinishUpBusiness()
+    {
+        base.FinishUpBusiness();
+        foreach (KeyValuePair<Vector2, PatchScript> pair in patchesDictionary)
+        {
+            if(pair.Value.cropState != PatchScript.CropState.Barren)
+            {
+                islandScript.AddResource(ResourceScript.ResourceType.Crop, (int)pair.Value.cropType);
+            }
+        }
+    }
+
 }

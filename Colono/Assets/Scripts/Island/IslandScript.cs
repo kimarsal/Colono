@@ -1,19 +1,22 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.EventSystems;
+using static UnityEditor.Experimental.GraphView.Port;
 
 public class IslandScript : MonoBehaviour
 {
-    public enum ItemType { Tree, Bush, Rock, Flower, Miscellaneous};
     public bool hasBeenDiscovered = false;
     public string islandName;
+    public MeshData meshData;
+    public int[,] regionMap;
 
     public GameManager gameManager;
-    public IslandCellScript islandCellScript;
     public NPCManager npcManager;
+    public InventoryScript inventoryScript;
 
     public GameObject convexColliders;
     public GameObject items;
@@ -21,26 +24,12 @@ public class IslandScript : MonoBehaviour
 
     private List<ConstructionScript> constructionList = new List<ConstructionScript>();
 
-    private Dictionary<Vector2, GameObject> itemsList = new Dictionary<Vector2, GameObject>();
-
-    public int capacity;
-    public int usage;
-    public int[][] resources;
+    private Dictionary<Vector2, ItemScript> itemsList = new Dictionary<Vector2, ItemScript>();
 
     private void Start()
     {
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         convexColliders = transform.GetChild(0).gameObject;
-
-        constructions = new GameObject("Constructions");
-        constructions.transform.parent = gameObject.transform;
-        constructions.transform.localPosition = Vector3.zero;
-
-        resources = new int[Enum.GetValues(typeof(ResourceScript.ResourceType)).Length][];
-        resources[0] = new int[Enum.GetValues(typeof(ResourceScript.MaterialType)).Length];
-        resources[1] = new int[Enum.GetValues(typeof(ResourceScript.CropType)).Length];
-        resources[2] = new int[Enum.GetValues(typeof(ResourceScript.MeatType)).Length];
-        resources[3] = new int[Enum.GetValues(typeof(ResourceScript.AnimalType)).Length];
     }
 
     public bool isCellTaken(Vector2 cell)
@@ -50,10 +39,10 @@ public class IslandScript : MonoBehaviour
 
     public ItemScript GetItemByCell(Vector2 cell)
     {
-        return itemsList[cell].GetComponent<ItemScript>();
+        return itemsList[cell];
     }
 
-    public void AddItem(GameObject item, Vector2 cell)
+    public void AddItem(ItemScript item, Vector2 cell)
     {
         itemsList.Add(cell, item);
     }
@@ -67,7 +56,7 @@ public class IslandScript : MonoBehaviour
     {
         if(constructionScript.constructionType == ConstructionScript.ConstructionType.Building && ((BuildingScript)constructionScript).buildingType == BuildingScript.BuildingType.Warehouse)
         {
-            capacity += 30;
+            inventoryScript.capacity += 30;
         }
         constructionList.Add(constructionScript);
         RebakeNavMesh();
@@ -77,7 +66,7 @@ public class IslandScript : MonoBehaviour
     {
         if (constructionScript.constructionType == ConstructionScript.ConstructionType.Building && ((BuildingScript)constructionScript).buildingType == BuildingScript.BuildingType.Warehouse)
         {
-            capacity -= 30;
+            inventoryScript.capacity -= 30;
         }
         constructionList.Remove(constructionScript);
         Destroy(constructionScript.gameObject);
@@ -112,55 +101,57 @@ public class IslandScript : MonoBehaviour
 
     public BuildingScript GetAvailableBuilding(BuildingScript.BuildingType buildingType)
     {
-        foreach (BuildingScript building in constructionList)
+        foreach (ConstructionScript construction in constructionList)
         {
-            if (building.buildingType == buildingType && building.peasantList.Count < building.maxPeasants)
+            if(construction.constructionType == ConstructionScript.ConstructionType.Building)
             {
-                return building;
+                BuildingScript building = (BuildingScript)construction;
+                if (building.buildingType == buildingType && building.peasantList.Count < building.maxPeasants)
+                {
+                    return building;
+                }
             }
         }
         return null;
     }
 
-    public void AddResource(ResourceScript.ResourceType resourceType, int resourceIndex, int amount = 1)
+    public bool AddResource(ResourceScript.ResourceType resourceType, int resourceIndex, int amount = 1)
     {
-        int originalAmount = amount;
-        if(capacity - usage < originalAmount)
+        int remainingAmount = inventoryScript.AddResource(resourceType, resourceIndex, amount);
+        if (remainingAmount > 0 && gameManager.isInIsland)
         {
-            amount = capacity - usage;
-        }
-
-        resources[(int)resourceType][resourceIndex] += amount;
-        usage += amount;
-
-        if(amount < originalAmount && gameManager.isInIsland && gameManager.islandScript == this)
-        {
-            gameManager.shipScript.AddResource(resourceType, resourceIndex, originalAmount - amount);
+            remainingAmount = gameManager.shipScript.inventoryScript.AddResource(resourceType, resourceIndex, remainingAmount);
         }
         gameManager.canvasScript.UpdateInventoryRow(resourceType, resourceIndex);
+
+        return remainingAmount == 0;
     }
 
-    public int GetCropAmount(ResourceScript.CropType cropType)
+    public int GetResourceAmount(ResourceScript.ResourceType resourceType, int resourceIndex)
     {
-        int seedAmount = resources[(int)ResourceScript.ResourceType.Crop][(int)cropType];
-        if (gameManager.isInIsland) seedAmount += gameManager.shipScript.resources[(int)ResourceScript.ResourceType.Crop][(int)cropType];
-        return seedAmount;
+        int amount = inventoryScript.GetResourceAmount(resourceType, resourceIndex);
+        if (gameManager.isInIsland) amount += gameManager.shipScript.inventoryScript.GetResourceAmount(resourceType, resourceIndex);
+        return amount;
     }
 
-    public bool UseResource(ResourceScript.ResourceType resourceType, int resourceIndex)
+    public bool UseResource(ResourceScript.ResourceType resourceType, int resourceIndex, int amount = 1)
     {
-        if (resources[(int)resourceType][resourceIndex] > 0)
+        if (GetResourceAmount(resourceType, resourceIndex) < amount) return false;
+
+        int remainingAmount = inventoryScript.RemoveResource(resourceType, resourceIndex, amount);
+        if(remainingAmount > 0)
         {
-            resources[(int)resourceType][resourceIndex]--;
-            usage--;
-            return true;
+            gameManager.shipScript.inventoryScript.RemoveResource(resourceType, resourceIndex, remainingAmount);
         }
-        else if (gameManager.isInIsland && gameManager.shipScript.resources[(int)resourceType][resourceIndex] > 0)
-        {
-            gameManager.shipScript.resources[(int)resourceType][resourceIndex]--;
-            gameManager.shipScript.usage--;
-            return true;
-        }
-        return false;
+        return true;
     }
+
+}
+
+[System.Serializable]
+public class IslandInfo
+{
+    public Vector2 position;
+    public List<ItemInfo> items;
+    public List<ConstructionInfo> constructions;
 }

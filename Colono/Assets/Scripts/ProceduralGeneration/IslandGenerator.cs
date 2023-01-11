@@ -4,54 +4,148 @@ using System;
 using System.Threading;
 using System.Collections.Generic;
 using UnityEngine.AI;
+using System.Runtime.CompilerServices;
+using Random = UnityEngine.Random;
+using Unity.VisualScripting;
 
 public class IslandGenerator : MonoBehaviour
 {
     public static int mapChunkSize = 241;
-    public float noiseScale;
-
-    public int octaves;
-    [Range(0, 1)]
-    public float persistance;
-    public float lacunarity;
 
     public int seed;
     public Vector2 offset;
-
-    public float meshHeightMultiplier;
+    public Material islandMaterial;
     public AnimationCurve meshHeightCurve;
-
     public TerrainType[] regions;
-    public TerrainType zoneType;
-    
-    public Material mapMaterial;
 
-    float[,] falloffMap;
+    private float noiseScale = 100;
+    private int octaves = 10;
+    private float persistance = 0.5f;
+    private float lacunarity = 2;
+    private float meshHeightMultiplier = 50f;
+    private float[,] falloffMap;
 
     private void Start()
     {
-        falloffMap = FalloffGenerator.GenerateFalloffMap(mapChunkSize);
-        zoneType.name = "Zone";
-        zoneType.colour = Color.white;
-        zoneType.height = 0;
+        //falloffMap = FalloffGenerator.GenerateFalloffMap(mapChunkSize);
     }
 
-    public Island GenerateIsland(Vector2 position, IslandEditor islandEditor)
+    public IslandScript GenerateIsland(Vector2 position, IslandEditor islandEditor, IslandInfo islandInfo = null)
     {
-        return new Island(position, transform, mapMaterial, this, islandEditor);
-    }
+        // Part 1: Es genera el GameObject i els seus components
+        GameObject island = new GameObject("Island");
+        island.transform.position = new Vector3(position.x, 0, position.y);
+        island.transform.parent = transform;
+        island.transform.localScale = Vector3.one;
+        island.tag = "Island";
+        island.isStatic = true;
 
-    public MeshData GenerateTerrainMesh(MapData mapData)
-    {
-        return MeshGenerator.GenerateTerrainMesh(mapData.heightMap, meshHeightMultiplier, meshHeightCurve);
+        MeshRenderer meshRenderer = island.AddComponent<MeshRenderer>();
+        MeshFilter meshFilter = island.AddComponent<MeshFilter>();
+        MeshCollider meshCollider = island.AddComponent<MeshCollider>();
+        meshRenderer.material = islandMaterial;
+
+        // Part 2: Es pinta l'objecte amb el colourMap
+        MapData mapData = GenerateMapData(position);
+        Texture2D colorTexture = TextureGenerator.TextureFromColourMap(mapData.colourMap, mapChunkSize, mapChunkSize);
+        meshRenderer.material.mainTexture = colorTexture;
+
+        // Part 3: Es genera el mesh a partir del heightMap
+        MeshData meshData = MeshGenerator.GenerateTerrainMesh(mapData.heightMap, meshHeightMultiplier, meshHeightCurve);
+        Mesh mesh = meshData.CreateMesh();
+        meshFilter.mesh = mesh;
+        meshCollider.sharedMesh = mesh;
+
+        // Part 4: S'afegeixen els col·liders que serviran per calcular la distància entre el vaixell i la costa
+        CMR.ConvexDecomposition.Bake(island, CMR.VHACDSession.Create(), null, false, true, false);
+        foreach (MeshCollider triggerCollider in island.transform.GetChild(0).GetComponentsInChildren<MeshCollider>())
+        {
+            triggerCollider.isTrigger = true;
+        }
+
+        // Part 5: Es calcula la navegació
+        GameObject coastObstacle = Instantiate(islandEditor.coastObstacle, island.transform);
+        NavMeshSurface surface = island.AddComponent<NavMeshSurface>();
+        surface.collectObjects = CollectObjects.Children;
+        surface.BuildNavMesh();
+
+        // Part 6: S'afegeixen els scripts
+        IslandScript islandScript = island.AddComponent<IslandScript>();
+        islandScript.regionMap = mapData.regionMap;
+        islandScript.meshData = meshData;
+
+        islandScript.npcManager = island.AddComponent<NPCManager>();
+        islandScript.npcManager.islandEditor = islandEditor;
+        islandScript.npcManager.islandScript = islandScript;
+
+        islandScript.inventoryScript = transform.AddComponent<InventoryScript>();
+
+        // Part 7: S'afegeixen els fills
+        islandScript.items = new GameObject("Items");
+        islandScript.items.transform.parent = island.transform;
+        islandScript.items.transform.localPosition = Vector3.zero;
+
+        GameObject npcs = new GameObject("NPCs");
+        npcs.transform.parent = island.transform;
+        npcs.transform.localPosition = Vector3.zero;
+        islandScript.npcManager.npcs = npcs;
+        
+        islandScript.constructions = new GameObject("Constructions");
+        islandScript.constructions.transform.parent = gameObject.transform;
+        islandScript.constructions.transform.localPosition = Vector3.zero;
+
+        // Part 8: S'afegeixen els elements de joc
+        int row = 0, col = 0;
+        while (row < mapChunkSize - 1)
+        {
+            Vector2 itemCell = new Vector2(col, row);
+            Vector3 itemPos = Vector3.zero;
+
+            try
+            {
+                itemPos = island.transform.position + MeshGenerator.GetCellCenter(itemCell, islandScript.meshData);
+            }
+            catch (Exception ex)
+            {
+                Debug.Log(ex);
+                Debug.Log(itemCell);
+            }
+
+            GameObject prefab = null;
+
+            switch (regions[islandScript.regionMap[col, row]].name)
+            {
+                case "Grass": prefab = islandEditor.fieldItems[Random.Range(0, islandEditor.fieldItems.Length)]; break;
+                case "Grass 2": prefab = islandEditor.hillItems[Random.Range(0, islandEditor.hillItems.Length)]; break;
+            }
+
+            if (prefab != null)
+            {
+                int orientation = Random.Range(0, 360);
+                ItemScript itemScript = Instantiate(prefab, itemPos, Quaternion.Euler(0, orientation, 0), islandScript.items.transform).GetComponent<ItemScript>();
+                itemScript.islandScript = islandScript;
+                itemScript.itemCell = itemCell;
+                islandScript.AddItem(itemScript, itemCell);
+            }
+
+            col += Random.Range(1, 20);
+            if (col >= mapChunkSize)
+            {
+                row++;
+                col = col - mapChunkSize;
+            }
+        }
+
+        return islandScript;
     }
 
     public MapData GenerateMapData(Vector2 centre)
     {
         float[,] noiseMap = Noise.GenerateNoiseMap(mapChunkSize, mapChunkSize, seed, noiseScale, octaves, persistance, lacunarity, centre + offset);
-        float[,] detailMap = Noise.GenerateNoiseMap(mapChunkSize, mapChunkSize, seed, 0.1f, 1, persistance, lacunarity, centre + offset);
         Color[] colourMap = new Color[mapChunkSize * mapChunkSize];
         int[,] regionMap = new int[mapChunkSize, mapChunkSize];
+
+        if(falloffMap == null) falloffMap = FalloffGenerator.GenerateFalloffMap(mapChunkSize);
 
         for (int y = 0; y < mapChunkSize; y++)
         {
@@ -74,76 +168,8 @@ public class IslandGenerator : MonoBehaviour
             }
         }
 
-        return new MapData(noiseMap, colourMap, detailMap, regionMap);
+        return new MapData(noiseMap, colourMap, regionMap);
     }
-
-    void OnValidate()
-    {
-        if (lacunarity < 1)
-        {
-            lacunarity = 1;
-        }
-        if (octaves < 0)
-        {
-            octaves = 0;
-        }
-
-        falloffMap = FalloffGenerator.GenerateFalloffMap(mapChunkSize);
-    }
-}
-
-public class Island
-{
-    const float scale = 1f;
-
-    public GameObject island;
-    public MeshData meshData;
-    public int[,] regionMap;
-
-    public Island(Vector2 coord, Transform parent, Material material, IslandGenerator islandGenerator, IslandEditor islandEditor)
-    {
-        Vector2 position = coord;
-        Vector3 positionV3 = new Vector3(position.x, 0, position.y);
-
-        island = new GameObject("Island");
-        island.tag = "Island";
-        //island.layer = 6;
-        island.isStatic = true;
-
-        MeshRenderer meshRenderer = island.AddComponent<MeshRenderer>();
-        MeshFilter meshFilter = island.AddComponent<MeshFilter>();
-        MeshCollider meshCollider = island.AddComponent<MeshCollider>();
-        meshRenderer.material = material;
-
-        island.transform.position = positionV3 * scale;
-        island.transform.parent = parent;
-        island.transform.localScale = Vector3.one * scale;
-
-        MapData mapData = islandGenerator.GenerateMapData(position);
-        regionMap = mapData.regionMap;
-
-        Texture2D colorTexture = TextureGenerator.TextureFromColourMap(mapData.colourMap, IslandGenerator.mapChunkSize, IslandGenerator.mapChunkSize);
-        Texture2D detailTexture = TextureGenerator.TextureFromHeightMap(mapData.detailMap);
-        meshRenderer.material.mainTexture = colorTexture;
-
-        meshData = islandGenerator.GenerateTerrainMesh(mapData);
-        Mesh mesh = meshData.CreateMesh();
-        meshFilter.mesh = mesh;
-        meshCollider.sharedMesh = mesh;
-
-
-        CMR.ConvexDecomposition.Bake(island, CMR.VHACDSession.Create(), null, false, true, false);
-        foreach (MeshCollider triggerCollider in island.transform.GetChild(0).GetComponentsInChildren<MeshCollider>())
-        {
-            triggerCollider.isTrigger = true;
-        }
-
-        GameObject coastObstacle = GameObject.Instantiate(islandEditor.coastObstacle, island.transform);
-        NavMeshSurface surface = island.AddComponent<NavMeshSurface>();
-        surface.collectObjects = CollectObjects.Children;
-
-    }
-
 }
 
 [System.Serializable]
@@ -158,14 +184,12 @@ public struct MapData
 {
     public readonly float[,] heightMap;
     public readonly Color[] colourMap;
-    public readonly float[,] detailMap;
     public readonly int[,] regionMap;
 
-    public MapData(float[,] heightMap, Color[] colourMap, float[,] detailMap, int[,] regionMap)
+    public MapData(float[,] heightMap, Color[] colourMap, int[,] regionMap)
     {
         this.heightMap = heightMap;
         this.colourMap = colourMap;
-        this.detailMap = detailMap;
         this.regionMap = regionMap;
     }
 }

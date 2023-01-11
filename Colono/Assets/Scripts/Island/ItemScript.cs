@@ -53,4 +53,20 @@ public class ItemScript : TaskScript
             Destroy(gameObject);
         }
     }
+
+    public override void CancelTask()
+    {
+        return;
+    }
+}
+
+[System.Serializable]
+public class ItemInfo
+{
+    public int itemType;
+    public int materialType;
+    public int materialAmount;
+    public Vector2 cell;
+    public int orientation;
+    public bool isScheduledForClearing;
 }
