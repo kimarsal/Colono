@@ -49,15 +49,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   constructionType: 2
   islandScript: {fileID: 0}
+  islandEditor: {fileID: 0}
   cells: []
   length: 3
   width: 3
   entry: {fileID: 5666154522394969465}
+  outline: {fileID: 0}
   maxPeasants: 10
   peasantList: []
   peasantsOnTheirWay: 0
   constructionDetailsScript: {fileID: 0}
-  buildingType: 4
+  buildingType: 3
   orientation: 0
 --- !u!65 &6398704646448144681
 BoxCollider:

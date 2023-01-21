@@ -7,16 +7,16 @@ using UnityEngine.AI;
 using System.Runtime.CompilerServices;
 using Random = UnityEngine.Random;
 using Unity.VisualScripting;
+using static Terrain;
+using static BuildingScript;
 
 public class IslandGenerator : MonoBehaviour
 {
     public static int mapChunkSize = 241;
 
-    public int seed;
-    public Vector2 offset;
     public Material islandMaterial;
     public AnimationCurve meshHeightCurve;
-    public TerrainType[] regions;
+    public Terrain[] regions;
 
     private float noiseScale = 100;
     private int octaves = 10;
@@ -30,11 +30,20 @@ public class IslandGenerator : MonoBehaviour
         //falloffMap = FalloffGenerator.GenerateFalloffMap(mapChunkSize);
     }
 
-    public IslandScript GenerateIsland(Vector2 position, IslandEditor islandEditor, IslandInfo islandInfo = null)
+    public void LoadIslands(List<IslandInfo> islandList)
+    {
+        IslandManager islandManager = GetComponent<IslandManager>();
+        foreach(IslandInfo islandInfo in islandList)
+        {
+            islandManager.islandList.Add(GenerateIsland(islandManager.seed, islandInfo.offset.UnityVector, GetComponent<IslandEditor>(), islandInfo));
+        }
+    }
+
+    public IslandScript GenerateIsland(int seed, Vector2 offset, IslandEditor islandEditor, IslandInfo islandInfo = null)
     {
         // Part 1: Es genera el GameObject i els seus components
         GameObject island = new GameObject("Island");
-        island.transform.position = new Vector3(position.x, 0, position.y);
+        island.transform.position = new Vector3(offset.x, 0, offset.y);
         island.transform.parent = transform;
         island.transform.localScale = Vector3.one;
         island.tag = "Island";
@@ -45,8 +54,8 @@ public class IslandGenerator : MonoBehaviour
         MeshCollider meshCollider = island.AddComponent<MeshCollider>();
         meshRenderer.material = islandMaterial;
 
-        // Part 2: Es pinta l'objecte amb el colourMap
-        MapData mapData = GenerateMapData(position);
+        // Part 2: Es genera el soroll a partir del seed i l'offset
+        MapData mapData = GenerateMapData(seed, offset);
         Texture2D colorTexture = TextureGenerator.TextureFromColourMap(mapData.colourMap, mapChunkSize, mapChunkSize);
         meshRenderer.material.mainTexture = colorTexture;
 
@@ -71,6 +80,7 @@ public class IslandGenerator : MonoBehaviour
 
         // Part 6: S'afegeixen els scripts
         IslandScript islandScript = island.AddComponent<IslandScript>();
+        islandScript.offset = offset;
         islandScript.regionMap = mapData.regionMap;
         islandScript.meshData = meshData;
 
@@ -78,7 +88,7 @@ public class IslandGenerator : MonoBehaviour
         islandScript.npcManager.islandEditor = islandEditor;
         islandScript.npcManager.islandScript = islandScript;
 
-        islandScript.inventoryScript = transform.AddComponent<InventoryScript>();
+        islandScript.islandEditor = islandEditor;
 
         // Part 7: S'afegeixen els fills
         islandScript.items = new GameObject("Items");
@@ -91,57 +101,111 @@ public class IslandGenerator : MonoBehaviour
         islandScript.npcManager.npcs = npcs;
         
         islandScript.constructions = new GameObject("Constructions");
-        islandScript.constructions.transform.parent = gameObject.transform;
+        islandScript.constructions.transform.parent = island.transform;
         islandScript.constructions.transform.localPosition = Vector3.zero;
 
         // Part 8: S'afegeixen els elements de joc
-        int row = 0, col = 0;
-        while (row < mapChunkSize - 1)
+        if(islandInfo == null)
         {
-            Vector2 itemCell = new Vector2(col, row);
-            Vector3 itemPos = Vector3.zero;
-
-            try
+            int row = 0, col = 0;
+            while (row < mapChunkSize)
             {
-                itemPos = island.transform.position + MeshGenerator.GetCellCenter(itemCell, islandScript.meshData);
+                int itemIndex;
+                Vector2 itemCell = new Vector2(col, row);
+                TerrainType terrainType = regions[islandScript.regionMap[col, row]].type;
+                GameObject itemPrefab = islandEditor.GetRandomItemPrefab(terrainType, out itemIndex);
+
+                if (itemPrefab != null)
+                {
+                    Vector3 itemPos = island.transform.position + MeshGenerator.GetCellCenter(itemCell, islandScript.meshData);
+                    int orientation = Random.Range(0, 360);
+                    ItemScript itemScript = Instantiate(itemPrefab, itemPos, Quaternion.Euler(0, orientation, 0), islandScript.items.transform).GetComponent<ItemScript>();
+                    itemScript.islandScript = islandScript;
+                    itemScript.terrainType = terrainType;
+                    itemScript.itemIndex = itemIndex;
+                    itemScript.itemCell = itemCell;
+                    itemScript.orientation = orientation;
+                    islandScript.AddItem(itemScript, itemCell);
+                }
+
+                col += Random.Range(1, 20);
+                if (col >= mapChunkSize)
+                {
+                    row++;
+                    col = col - mapChunkSize;
+                }
             }
-            catch (Exception ex)
-            {
-                Debug.Log(ex);
-                Debug.Log(itemCell);
-            }
 
-            GameObject prefab = null;
-
-            switch (regions[islandScript.regionMap[col, row]].name)
+            islandScript.inventoryScript = new InventoryScript();
+            islandScript.inventoryScript.capacity = 30;
+        }
+        else
+        {
+            foreach(ItemInfo itemInfo in islandInfo.itemList)
             {
-                case "Grass": prefab = islandEditor.fieldItems[Random.Range(0, islandEditor.fieldItems.Length)]; break;
-                case "Grass 2": prefab = islandEditor.hillItems[Random.Range(0, islandEditor.hillItems.Length)]; break;
-            }
-
-            if (prefab != null)
-            {
-                int orientation = Random.Range(0, 360);
-                ItemScript itemScript = Instantiate(prefab, itemPos, Quaternion.Euler(0, orientation, 0), islandScript.items.transform).GetComponent<ItemScript>();
+                GameObject itemPrefab = islandEditor.GetItemPrefab(itemInfo.terrainType, itemInfo.itemIndex);
+                Vector3 itemPos = island.transform.position + MeshGenerator.GetCellCenter(itemInfo.cell.UnityVector, islandScript.meshData);
+                ItemScript itemScript = Instantiate(itemPrefab, itemPos, Quaternion.Euler(0, itemInfo.orientation, 0), islandScript.items.transform).GetComponent<ItemScript>();
                 itemScript.islandScript = islandScript;
-                itemScript.itemCell = itemCell;
-                islandScript.AddItem(itemScript, itemCell);
+                itemScript.terrainType = itemInfo.terrainType;
+                itemScript.itemIndex = itemInfo.itemIndex;
+                itemScript.itemCell = itemInfo.cell.UnityVector;
+                itemScript.orientation = itemInfo.orientation;
+                islandScript.AddItem(itemScript, itemInfo.cell.UnityVector);
             }
 
-            col += Random.Range(1, 20);
-            if (col >= mapChunkSize)
+            islandScript.inventoryScript = islandInfo.inventoryScript;
+
+            foreach (ConstructionInfo constructionInfo in islandInfo.constructionList)
             {
-                row++;
-                col = col - mapChunkSize;
+                if(constructionInfo.constructionType == ConstructionScript.ConstructionType.Enclosure)
+                {
+                    EnclosureInfo enclosureInfo = (EnclosureInfo)constructionInfo;
+                    EnclosureScript enclosureScript = islandScript.CreateEnclosure(enclosureInfo.enclosureType, SerializableVector2.GetSerializableArray(constructionInfo.cells));
+                    switch (enclosureScript.enclosureType)
+                    {
+                        case EnclosureScript.EnclosureType.Garden: ((GardenScript)enclosureScript).InitializeGarden((GardenInfo)enclosureInfo); break;
+                        case EnclosureScript.EnclosureType.Pen: ((PenScript)enclosureScript).InitializePen((PenInfo)enclosureInfo); break;
+                        case EnclosureScript.EnclosureType.Training: break;
+                    }
+                }
+                else
+                {
+                    BuildingInfo buildingInfo = (BuildingInfo)constructionInfo;
+                    BuildingScript buildingScript = Instantiate(islandEditor.GetBuilding(buildingInfo.buildingType),
+                        buildingInfo.position.UnityVector, Quaternion.Euler(0, 90 * buildingInfo.orientation, 0),
+                        islandScript.constructions.transform).GetComponent<BuildingScript>();
+                    buildingScript.cells = SerializableVector2.GetSerializableArray(buildingInfo.cells);
+                    buildingScript.orientation = buildingInfo.orientation;
+
+                    if(buildingScript.buildingType == BuildingType.Tavern)
+                    {
+                        ((TavernScript)buildingScript).recipeList = ((TavernInfo)buildingInfo).recipeList;
+                    }
+
+                    islandScript.AddConstruction(buildingScript);
+                }
+            }
+
+            foreach (PeasantInfo peasantInfo in islandInfo.peasantList)
+            {
+                GameObject peasantPrefab = islandEditor.GetNPCPrefab(peasantInfo.peasantType, peasantInfo.peasantGender);
+                PeasantScript peasantScript = Instantiate(peasantPrefab, peasantInfo.position.UnityVector,
+                    Quaternion.Euler(0, peasantInfo.orientation, 0), npcs.transform).GetComponent<PeasantScript>();
+                peasantScript.transform.localScale = Vector3.one * 0.4f;
+                peasantScript.InitializePeasant(peasantInfo);
+                peasantScript.npcManager = islandScript.npcManager;
+                islandScript.npcManager.peasantList.Add(peasantScript);
+                peasantScript.UpdateTask();
             }
         }
-
+        
         return islandScript;
     }
 
-    public MapData GenerateMapData(Vector2 centre)
+    public MapData GenerateMapData(int seed, Vector2 offset)
     {
-        float[,] noiseMap = Noise.GenerateNoiseMap(mapChunkSize, mapChunkSize, seed, noiseScale, octaves, persistance, lacunarity, centre + offset);
+        float[,] noiseMap = Noise.GenerateNoiseMap(mapChunkSize, mapChunkSize, seed, noiseScale, octaves, persistance, lacunarity, offset);
         Color[] colourMap = new Color[mapChunkSize * mapChunkSize];
         int[,] regionMap = new int[mapChunkSize, mapChunkSize];
 
@@ -173,9 +237,10 @@ public class IslandGenerator : MonoBehaviour
 }
 
 [System.Serializable]
-public struct TerrainType
+public struct Terrain
 {
-    public string name;
+    public enum TerrainType { WaterDeep, WaterShallow, Sand, Grass, Grass2, Rock, Rock2, Snow}
+    public TerrainType type;
     public float height;
     public Color colour;
 }

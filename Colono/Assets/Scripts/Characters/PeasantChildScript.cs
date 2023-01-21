@@ -6,6 +6,7 @@ public class PeasantChildScript : PeasantScript
 {
     public override void UpdateTask()
     {
+        StopCharacter();
         if (tavern != null) //Si ha d'anar a menjar
         {
             SetDestination(tavern.entry.position);
@@ -39,10 +40,10 @@ public class PeasantChildScript : PeasantScript
         }
         else if (constructionScript != null) //Si té el vaixell com a destí
         {
-            transform.parent = ((ShipScript)constructionScript).npcsTransform.transform;
+            ((ShipScript)constructionScript).AddPeasant(GetPeasantInfo());
             constructionScript.peasantsOnTheirWay--;
             constructionScript.UpdateConstructionDetails();
-            gameObject.SetActive(false);
+            Destroy(gameObject);
         }
         else
         {

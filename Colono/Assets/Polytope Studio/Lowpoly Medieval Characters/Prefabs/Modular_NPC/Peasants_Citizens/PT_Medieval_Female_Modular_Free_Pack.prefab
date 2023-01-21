@@ -2422,8 +2422,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   peasantType: 0
+  peasantGender: 1
   walkSpeed: 0.9
   runSpeed: 2
+  isNative: 0
   head1: {fileID: 7072988294438679710}
   head2: {fileID: 7277769846642262525}
   lowerNaked: {fileID: 2153526700735156509}
@@ -2431,11 +2433,9 @@ MonoBehaviour:
   lowerClothed: {fileID: 3965086837229382317}
   upperClothed: {fileID: 8231445908065054936}
   material: {fileID: 2100000, guid: c79855c6f54ed954293d041acc3120a8, type: 2}
-  isNative: 0
   age: 20
   hunger: 0
   exhaustion: 0
-  action: 0
   gameManager: {fileID: 0}
   npcManager: {fileID: 0}
   constructionScript: {fileID: 0}

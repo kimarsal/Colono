@@ -1,16 +1,12 @@
 using System;
 using UnityEngine;
 
-public class InventoryScript : MonoBehaviour
+[System.Serializable]
+public class InventoryScript
 {
     public int capacity;
     public int usage;
     public int[][] resources;
-
-    private void Start()
-    {
-        if (resources == null) InitializeResources();
-    }
 
     private void InitializeResources()
     {
@@ -29,13 +25,14 @@ public class InventoryScript : MonoBehaviour
 
     public int AddResource(ResourceScript.ResourceType resourceType, int resourceIndex, int amount = 1)
     {
+        if (resources == null) InitializeResources();
+
         int originalAmount = amount;
         if(capacity - usage < originalAmount)
         {
             amount = capacity - usage;
         }
         
-        if (resources == null) InitializeResources();
         resources[(int)resourceType][resourceIndex] += amount;
         usage += amount;
 

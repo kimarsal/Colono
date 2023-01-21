@@ -23,16 +23,12 @@ public class AnimalScript : MonoBehaviour
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
-        navMeshAgent.enabled = true;
+        SetDestination(NPCManager.GetRandomPointWithinRange(penScript.minPos, penScript.maxPos));
     }
 
-    public void SetNewPen(bool isAnimalNew = true)
+    public void InitializeAnimal(AnimalInfo animalInfo)
     {
-        navMeshAgent = GetComponent<NavMeshAgent>();
-        animator = GetComponent<Animator>();
-        if (isAnimalNew) transform.position = NPCManager.GetClosestPointInNavMesh(penScript.entry.position);
-        navMeshAgent.enabled = true;
-        SetDestination(NPCManager.GetRandomPointWithinRange(penScript.minPos, penScript.maxPos));
+        age = animalInfo.age;
     }
 
     void Update()
@@ -97,13 +93,23 @@ public class AnimalScript : MonoBehaviour
         yield return new WaitForSeconds(animator.GetCurrentAnimatorClipInfo(0)[0].clip.length);
         //Destroy(gameObject);
     }
+
+    public AnimalInfo GetAnimalInfo()
+    {
+        AnimalInfo animalInfo = new AnimalInfo();
+        animalInfo.animalType = animalType;
+        animalInfo.position = new SerializableVector3(transform.position);
+        animalInfo.orientation = Mathf.RoundToInt(transform.rotation.eulerAngles.y);
+        animalInfo.age = age;
+        return animalInfo;
+    }
 }
 
 [System.Serializable]
 public class AnimalInfo
 {
-    public int animalType;
-    public int age;
-    public int island;
-    public int construction;
+    public ResourceScript.AnimalType animalType;
+    public SerializableVector3 position;
+    public int orientation;
+    public float age;
 }

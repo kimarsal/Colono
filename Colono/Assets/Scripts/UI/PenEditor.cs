@@ -34,7 +34,7 @@ public class PenEditor : MonoBehaviour
             PenRowScript gridRowScript = gridRow.GetComponent<PenRowScript>();
             gridRowScript.penEditor = this;
             gridRowScript.animalType = animalType;
-            gridRowScript.animalImage.sprite = islandEditor.animalSprites[(int)animalType];
+            gridRowScript.animalImage.sprite = islandEditor.GetResourceSprite(ResourceType.Animal, (int)animalType);
             gridRowScript.penAnimals = penScript.animals[(int)animalType];
             gridRowScript.shipAnimals = shipScript.animals[(int)animalType];
             gridRowScript.desiredAmount = penScript.desiredAmounts[(int)animalType];
@@ -65,13 +65,13 @@ public class PenEditor : MonoBehaviour
     {
         if(toPen)
         {
-            AnimalScript animalScript = shipScript.RemoveAnimal(animalType);
+            AnimalScript animalScript = shipScript.RemoveAnimal(penScript, animalType);
             AddAnimal(animalScript);
         }
         else
         {
-            AnimalScript animalScript = RemoveAnimal(animalType);
-            shipScript.AddAnimal(animalScript);
+            AnimalInfo animalInfo = RemoveAnimal(animalType);
+            shipScript.AddAnimal(animalInfo);
         }
 
         UpdatePenText();
@@ -83,8 +83,6 @@ public class PenEditor : MonoBehaviour
         penScript.animals[(int)animalScript.animalType]++;
         penScript.animalAmount++;
 
-        animalScript.transform.parent = penScript.transform;
-        animalScript.gameObject.SetActive(true);
         if (animalScript.animalType == AnimalType.Chicken)
         {
             animalScript.transform.localScale = Vector3.one * 0.1f;
@@ -98,10 +96,11 @@ public class PenEditor : MonoBehaviour
             animalScript.transform.localScale = Vector3.one;
         }
         animalScript.penScript = penScript;
-        animalScript.SetNewPen();
+        
+
     }
 
-    public AnimalScript RemoveAnimal(AnimalType animalType)
+    public AnimalInfo RemoveAnimal(AnimalType animalType)
     {
         for(int i = 0; i < penScript.animalList.Count; i++)
         {
@@ -111,7 +110,9 @@ public class PenEditor : MonoBehaviour
                 penScript.animalList.RemoveAt(i);
                 penScript.animals[(int)animalType]--;
                 penScript.animalAmount--;
-                return animalScript;
+                AnimalInfo animalInfo = animalScript.GetAnimalInfo();
+                Destroy(animalScript.gameObject);
+                return animalInfo;
             }
         }
         return null;

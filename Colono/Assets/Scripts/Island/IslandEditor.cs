@@ -1,16 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using static PatchScript;
+using static ResourceScript;
 
 public class IslandEditor : MonoBehaviour
 {
     [Header("NPCs")]
-    public GameObject malePeasantPrefab;
-    public GameObject femalePeasantPrefab;
-    public GameObject childPeasantPrefab;
-    public GameObject maleWarriorPrefab;
-    public GameObject femaleWarriorPrefab;
+    [SerializeField] private GameObject malePeasantPrefab;
+    [SerializeField] private GameObject femalePeasantPrefab;
+    [SerializeField] private GameObject childPeasantPrefab;
+    [SerializeField] private GameObject maleWarriorPrefab;
+    [SerializeField] private GameObject femaleWarriorPrefab;
+
+    [SerializeField] private Color[] skinColorsCaucassian;
+    [SerializeField] private Color[] hairColors;
 
     [Header("Cell materials")]
     public Material hoverMaterial;
@@ -22,11 +24,7 @@ public class IslandEditor : MonoBehaviour
     public Material patchMaterial;
 
     [Header("Buildings")]
-    public GameObject warehouse;
-    public GameObject cabin;
-    public GameObject tavern;
-    public GameObject alchemist;
-    public GameObject mine;
+    [SerializeField] private GameObject[] buildings;
 
     [Header("Fences")]
     public GameObject[] fences;
@@ -35,10 +33,10 @@ public class IslandEditor : MonoBehaviour
     public GameObject gateOpen;
 
     [Header("Resources")]
-    public Sprite[] materialSprites;
-    public Sprite[] cropSprites;
-    public Sprite[] animalSprites;
-    public Sprite[] meatSprites;
+    [SerializeField] private Sprite[] materialSprites;
+    [SerializeField] private Sprite[] cropSprites;
+    [SerializeField] private Sprite[] animalSprites;
+    [SerializeField] private Sprite[] meatSprites;
 
     [Header("Crops")]
     public GameObject[] onion;
@@ -72,15 +70,110 @@ public class IslandEditor : MonoBehaviour
     public GameObject coastObstacle;
     public GameObject enclosureCenter;
 
-    public Sprite GetResourceSprite(ResourceScript.ResourceType resourceType, int resourceIndex)
+    public Sprite GetResourceSprite(ResourceType resourceType, int resourceIndex)
     {
         switch (resourceType)
         {
-            case ResourceScript.ResourceType.Material: return materialSprites[resourceIndex];
-            case ResourceScript.ResourceType.Crop: return cropSprites[resourceIndex];
-            case ResourceScript.ResourceType.Meat: return meatSprites[resourceIndex];
-            case ResourceScript.ResourceType.Animal: return animalSprites[resourceIndex];
+            case ResourceType.Material: return materialSprites[resourceIndex];
+            case ResourceType.Crop: return cropSprites[resourceIndex];
+            case ResourceType.Meat: return meatSprites[resourceIndex];
+            case ResourceType.Animal: return animalSprites[resourceIndex];
         }
         return null;
     }
+
+    public GameObject GetItemPrefab(Terrain.TerrainType terrainType, int itemIndex)
+    {
+        switch (terrainType)
+        {
+            case Terrain.TerrainType.Grass: return fieldItems[itemIndex];
+            case Terrain.TerrainType.Grass2: return hillItems[itemIndex];
+        }
+        return null;
+    }
+
+    public GameObject GetRandomItemPrefab(Terrain.TerrainType terrainType, out int itemIndex)
+    {
+        switch (terrainType)
+        {
+            case Terrain.TerrainType.Grass: itemIndex = Random.Range(0, fieldItems.Length); return fieldItems[itemIndex];
+            case Terrain.TerrainType.Grass2: itemIndex = Random.Range(0, hillItems.Length); return hillItems[itemIndex];
+        }
+        itemIndex = -1;
+        return null;
+    }
+    
+    public GameObject GetCropPrefab(CropType cropType, CropState cropState)
+    {
+        GameObject prefab = null;
+        switch (cropType)
+        {
+            case CropType.Onion: prefab = onion[(int)cropState]; break;
+            case CropType.Carrot: prefab = carrot[(int)cropState]; break;
+            case CropType.Eggplant: prefab = eggplant[(int)cropState]; break;
+            case CropType.Cucumber: prefab = cucumber[(int)cropState]; break;
+            case CropType.Cabbage: prefab = cabbage[(int)cropState]; break;
+
+            case CropType.Potato: prefab = potato[(int)cropState]; break;
+            case CropType.Tomato: prefab = tomato[(int)cropState]; break;
+            case CropType.Zucchini: prefab = zucchini[(int)cropState]; break;
+            case CropType.Pepper: prefab = pepper[(int)cropState]; break;
+            case CropType.Corn: prefab = corn[(int)cropState]; break;
+        }
+        if (prefab == null) prefab = grass[(int)cropState];
+        return prefab;
+    }
+
+    public GameObject GetAnimalPrefab(AnimalType animalType)
+    {
+        return animals[(int)animalType];
+    }
+
+    public GameObject GetNPCPrefab(PeasantScript.PeasantType peasantType, PeasantScript.PeasantGender peasantGender)
+    {
+        switch (peasantType)
+        {
+            case PeasantScript.PeasantType.Adult: return peasantGender == PeasantScript.PeasantGender.Male ? malePeasantPrefab : femalePeasantPrefab;
+            case PeasantScript.PeasantType.Child: return childPeasantPrefab;
+        }
+        return null;
+    }
+
+    public Color GetRandomSkinColor()
+    {
+        return skinColorsCaucassian[Random.Range(0, skinColorsCaucassian.Length)];
+    }
+
+    public Color GetRandomHairColor()
+    {
+        return hairColors[Random.Range(0, hairColors.Length)];
+    }
+
+    private static Color normalizeColor(Color color)
+    {
+        return new Color(color.r / 256, color.g / 256, color.b / 256, color.a);
+    }
+
+    public GameObject GetBuilding(BuildingScript.BuildingType buildingType)
+    {
+        return buildings[(int)buildingType];
+    }
+
+    /*private Color[] skinColorsCaucassian =
+        new Color[] {
+            new Color(255, 205, 148),
+            new Color(255, 224, 189),
+            new Color(234, 192, 134),
+            new Color(255, 227, 159),
+            new Color(255, 173, 96)
+        };
+    
+     private Color[] hairColors =
+        new Color[] {
+            new Color(35, 18, 11),
+            new Color(61, 35, 20),
+            new Color(90, 56, 37),
+            new Color(204, 153, 102),
+            new Color(44, 22, 8)
+        };*/
 }

@@ -1,18 +1,15 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
-using Random = UnityEngine.Random;
 
 public class IslandManager : MonoBehaviour
 {
-    private List<IslandScript> islands = new List<IslandScript>();
+    public List<IslandScript> islandList = new List<IslandScript>();
     private Transform player;
     private MapController mapController;
     private IslandGenerator islandGenerator;
     private IslandEditor islandEditor;
 
+    public int seed;
     public float spotDistance = 100f;
     public float islandDistance = 20f;
     public float playerDistance = 30f;
@@ -24,7 +21,7 @@ public class IslandManager : MonoBehaviour
         islandGenerator = GetComponent<IslandGenerator>();
         islandEditor = GetComponent<IslandEditor>();
 
-        TryToGenerateIsland();
+        //TryToGenerateIsland();
     }
 
     void Update()
@@ -49,7 +46,7 @@ public class IslandManager : MonoBehaviour
         float x = Mathf.Sin(angle);
         float z = Mathf.Cos(angle);
         Vector3 pos = player.position + new Vector3(x, 0, z) * spotDistance;
-        foreach (IslandScript island in islands)
+        foreach (IslandScript island in islandList)
         {
             if (Vector3.Distance(island.transform.position, pos) < islandDistance)
             {
@@ -57,9 +54,9 @@ public class IslandManager : MonoBehaviour
             }
         }
         
-        IslandScript islandScript = islandGenerator.GenerateIsland(new Vector2(0,80/*pos.x, pos.z*/), islandEditor);
+        IslandScript islandScript = islandGenerator.GenerateIsland(seed, new Vector2(0,80/*pos.x, pos.z*/), islandEditor);
         mapController.closestIsland = islandScript;
-        islands.Add(islandScript);
+        islandList.Add(islandScript);
         
     }
 }

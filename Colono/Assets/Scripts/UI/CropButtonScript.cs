@@ -7,7 +7,7 @@ public class CropButtonScript : MonoBehaviour
 {
     public GardenEditor gardenEditor;
     public Image cropImage;
-    public int index;
+    public Vector2 cell;
 
     public void SelectCrop()
     {

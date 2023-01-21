@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class RecipeRowScript : MonoBehaviour
 {
     public TavernEditor tavernEditor;
-    public TavernEditor.Recipe recipe;
+    public Recipe recipe;
 
     public Button moveRecipeUpButton;
     public Button moveRecipeDownButton;

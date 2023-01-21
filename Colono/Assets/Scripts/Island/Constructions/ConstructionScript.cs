@@ -1,8 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public abstract class ConstructionScript : MonoBehaviour
 {
@@ -25,26 +22,44 @@ public abstract class ConstructionScript : MonoBehaviour
 
     public abstract TaskScript GetNextPendingTask();
 
-    public virtual void FinishUpBusiness()
-    {
-        foreach (PeasantScript peasantScript in peasantList)
-        {
-            if(peasantScript.peasantType == PeasantScript.PeasantType.Adult)
-            {
-                ((PeasantAdultScript)peasantScript).CancelTask();
-            }
-        }
-    }
+    public abstract void FinishUpBusiness();
 
     public void UpdateConstructionDetails()
     {
         constructionDetailsScript?.UpdatePeasantNum();
+    }
+
+    public virtual ConstructionInfo GetConstructionInfo()
+    {
+        ConstructionInfo constructionInfo = null;
+        if(constructionType == ConstructionType.Enclosure)
+        {
+            constructionInfo = ((EnclosureScript)this).GetEnclosureInfo();
+        }
+        else
+        {
+            constructionInfo = ((BuildingScript)this).GetBuildingInfo();
+        }
+        constructionInfo.constructionType = constructionType;
+        foreach(PeasantScript peasantScript in peasantList)
+        {
+            constructionInfo.peasantList.Add(peasantScript.GetPeasantInfo());
+        }
+        constructionInfo.cells = SerializableVector2.GetSerializableArray(cells);
+        constructionInfo.length = length;
+        constructionInfo.width = width;
+        return constructionInfo;
     }
 }
 
 [System.Serializable]
 public class ConstructionInfo
 {
-    public int constructionType;
-    public int constructionIndex;
+    public ConstructionScript.ConstructionType constructionType;
+    public List<PeasantInfo> peasantList = new List<PeasantInfo>();
+
+    public SerializableVector2[] cells;
+    public int length;
+    public int width;
+
 }

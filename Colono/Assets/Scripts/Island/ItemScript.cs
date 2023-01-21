@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,9 +8,12 @@ public class ItemScript : TaskScript
     public enum ItemType { Chop, Dig, Pull, Pick }
     public ItemType itemType;
     public Vector2 itemCell;
+    public int orientation;
 
     public ResourceScript.MaterialType materialType;
     public int materialAmount;
+    public Terrain.TerrainType terrainType;
+    public int itemIndex;
 
     public IslandScript islandScript;
     public bool isScheduledForClearing;
@@ -58,15 +62,27 @@ public class ItemScript : TaskScript
     {
         return;
     }
+
+    public ItemInfo GetItemInfo()
+    {
+        ItemInfo itemInfo = new ItemInfo();
+        itemInfo.terrainType = terrainType;
+        itemInfo.itemIndex = itemIndex;
+        itemInfo.cell = new SerializableVector2(itemCell);
+        itemInfo.orientation = orientation;
+        itemInfo.materialAmount = materialAmount;
+        itemInfo.isScheduledForClearing = isScheduledForClearing;
+        return itemInfo;
+    }
 }
 
 [System.Serializable]
 public class ItemInfo
 {
-    public int itemType;
-    public int materialType;
-    public int materialAmount;
-    public Vector2 cell;
+    public Terrain.TerrainType terrainType;
+    public int itemIndex;
+    public SerializableVector2 cell;
     public int orientation;
+    public int materialAmount;
     public bool isScheduledForClearing;
 }

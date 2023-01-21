@@ -72,7 +72,7 @@ public class ConstructionDetailsScript : MonoBehaviour
 
     public void ManagePawns(bool adding)
     {
-        if (gameManager.islandScript.npcManager.SendPeasantToArea(constructionScript, adding))
+        if (gameManager.closestIsland.npcManager.SendPeasantToArea(constructionScript, adding))
         {
             UpdatePeasantNum();
         }
@@ -89,9 +89,20 @@ public class ConstructionDetailsScript : MonoBehaviour
         {
             peasantsOnTheirWayText.gameObject.SetActive(false);
         }
-        peasantNumText.text = (constructionScript.peasantList.Count - constructionScript.peasantsOnTheirWay).ToString() + "/" + constructionScript.maxPeasants;
-        minusButton.interactable = constructionScript.peasantList.Count > 0;
-        plusButton.interactable = constructionScript.peasantList.Count < constructionScript.maxPeasants/* && constructionScript.islandScript.npcManager.peasantList.Count > 0*/;
+
+        if(constructionScript.constructionType == ConstructionScript.ConstructionType.Ship)
+        {
+            ShipScript shipScript = (ShipScript)constructionScript;
+            peasantNumText.text = shipScript.peasantInfoList.Count.ToString() + "/" + constructionScript.maxPeasants;
+            minusButton.interactable = shipScript.peasantInfoList.Count > 0;
+            plusButton.interactable = shipScript.peasantInfoList.Count < shipScript.maxPeasants;
+        }
+        else
+        {
+            peasantNumText.text = (constructionScript.peasantList.Count - constructionScript.peasantsOnTheirWay).ToString() + "/" + constructionScript.maxPeasants;
+            minusButton.interactable = constructionScript.peasantList.Count > 0;
+            plusButton.interactable = constructionScript.peasantList.Count < constructionScript.maxPeasants;
+        }
     }
 
 }

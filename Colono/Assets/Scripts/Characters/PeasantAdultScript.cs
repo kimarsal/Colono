@@ -99,14 +99,18 @@ public class PeasantAdultScript : PeasantScript
             }
             else
             {
-                if (constructionScript.constructionType == ConstructionScript.ConstructionType.Ship)
-                {
-                    transform.parent = ((ShipScript)constructionScript).npcsTransform.transform;
-                }
-
                 constructionScript.peasantsOnTheirWay--;
                 constructionScript.UpdateConstructionDetails();
-                gameObject.SetActive(false);
+
+                if (constructionScript.constructionType == ConstructionScript.ConstructionType.Building)
+                {
+                    gameObject.SetActive(false);
+                }
+                else if (constructionScript.constructionType == ConstructionScript.ConstructionType.Ship)
+                {
+                    ((ShipScript)constructionScript).AddPeasant(GetPeasantInfo());
+                    Destroy(gameObject);
+                }
             }
         }
         else
@@ -131,7 +135,8 @@ public class PeasantAdultScript : PeasantScript
         else
         {
             PatchScript patchScript = (PatchScript)task;
-            if (patchScript.cropType != patchScript.gardenScript.crops[patchScript.index])
+            if (patchScript.cropState != PatchScript.CropState.Barren &&
+                patchScript.cropType != patchScript.gardenScript.cropDictionary[patchScript.cell]) //S'ha d'arrencar l'anterior planta
             {
                 animator.SetInteger("State", (int)PeasantAction.Pulling);
             }

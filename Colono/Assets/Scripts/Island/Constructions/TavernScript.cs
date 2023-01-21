@@ -1,15 +1,14 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class TavernScript : BuildingScript
 {
-    public List<TavernEditor.Recipe> recipes = new List<TavernEditor.Recipe>();
+    public List<Recipe> recipeList = new List<Recipe>();
 
     private void Start()
     {
-        recipes.Add(new TavernEditor.Recipe());
+        recipeList.Add(new Recipe());
     }
 
     public void FeedPeasant(PeasantScript peasantScript)
@@ -24,7 +23,7 @@ public class TavernScript : BuildingScript
         peasantScript.gameObject.SetActive(true);
 
         int hungerPoints = 0;
-        foreach(TavernEditor.Recipe recipe in recipes)
+        foreach(Recipe recipe in recipeList)
         {
             if ((recipe.introducedCrop == -1 || islandScript.GetResourceAmount(ResourceScript.ResourceType.Crop, recipe.introducedCrop) > 0)
                 && (recipe.nativeCrop == -1 || islandScript.GetResourceAmount(ResourceScript.ResourceType.Crop, recipe.nativeCrop) > 0)
@@ -51,4 +50,17 @@ public class TavernScript : BuildingScript
         }
         peasantScript.UpdateTask();
     }
+
+    public TavernInfo GetTavernInfo()
+    {
+        TavernInfo tavernInfo = new TavernInfo();
+        tavernInfo.recipeList = recipeList;
+        return tavernInfo;
+    }
+}
+
+[System.Serializable]
+public class TavernInfo : BuildingInfo
+{
+    public List<Recipe> recipeList;
 }

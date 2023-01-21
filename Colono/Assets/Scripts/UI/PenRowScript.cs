@@ -27,7 +27,7 @@ public class PenRowScript : MonoBehaviour
 
     private void Start()
     {
-        if((int)animalType % 2 != 0)
+        if((int)animalType % 2 == 0)
         {
             cropDropdown.gameObject.SetActive(false);
             UpdateDesiredAmount();

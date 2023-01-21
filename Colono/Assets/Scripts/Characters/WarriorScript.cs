@@ -45,14 +45,13 @@ public class WarriorScript : MonoBehaviour
 
     void Start()
     {
-        SetAppearence();
 
         state = PeasantState.Attack;
         animator = GetComponent<Animator>();
         animator.SetInteger("State", (int)state);
     }
 
-    public void SetAppearence()
+    /*public void SetAppearence()
     {
         if (Random.Range(0, 2) == 0)
         {
@@ -107,8 +106,8 @@ public class WarriorScript : MonoBehaviour
         }
 
         Material newMaterial = new Material(material);
-        newMaterial.SetColor("_SKINCOLOR", NPCManager.GetRandomSkinColor()); //Color pell
-        newMaterial.SetColor("_HAIRCOLOR", NPCManager.GetRandomHairColor()); //Color cabell
+        newMaterial.SetColor("_SKINCOLOR", islandEditor.GetRandomSkinColor()); //Color pell
+        newMaterial.SetColor("_HAIRCOLOR", islandEditor.GetRandomHairColor()); //Color cabell
         newMaterial.SetColor("_CLOTH1COLOR", Random.ColorHSV()); //Color roba 1
         newMaterial.SetColor("_CLOTH2COLOR", Random.ColorHSV()); //Color roba 2
         newMaterial.SetColor("_CLOTH3COLOR", Random.ColorHSV()); //Color roba 3
@@ -117,7 +116,7 @@ public class WarriorScript : MonoBehaviour
         hair.GetComponent<SkinnedMeshRenderer>().material = newMaterial;
         lower.GetComponent<SkinnedMeshRenderer>().material = newMaterial;
         upper.GetComponent<SkinnedMeshRenderer>().material = newMaterial;
-    }
+    }*/
 
     public void ToggleSword()
     {

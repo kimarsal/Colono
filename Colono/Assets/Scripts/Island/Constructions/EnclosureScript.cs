@@ -1,8 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public abstract class EnclosureScript : ConstructionScript
 {
@@ -29,4 +25,38 @@ public abstract class EnclosureScript : ConstructionScript
             UpdateConstructionDetails();
         }
     }
+
+    public override void FinishUpBusiness()
+    {
+        foreach (PeasantScript peasantScript in peasantList)
+        {
+            if (peasantScript.peasantType == PeasantScript.PeasantType.Adult)
+            {
+                ((PeasantAdultScript)peasantScript).CancelTask();
+            }
+        }
+    }
+
+    public EnclosureInfo GetEnclosureInfo()
+    {
+        EnclosureInfo enclosureInfo = null;
+        switch (enclosureType)
+        {
+            case EnclosureType.Garden: enclosureInfo = ((GardenScript)this).GetGardenInfo(); break;
+            case EnclosureType.Pen: enclosureInfo = ((PenScript)this).GetPenInfo(); break;
+            default: enclosureInfo = new EnclosureInfo(); break;
+        }
+        enclosureInfo.enclosureType = enclosureType;
+        enclosureInfo.minPos = new SerializableVector3(minPos);
+        enclosureInfo.maxPos = new SerializableVector3(maxPos);
+        return enclosureInfo;
+    }
+}
+
+[System.Serializable]
+public class EnclosureInfo : ConstructionInfo
+{
+    public EnclosureScript.EnclosureType enclosureType;
+    public SerializableVector3 minPos;
+    public SerializableVector3 maxPos;
 }

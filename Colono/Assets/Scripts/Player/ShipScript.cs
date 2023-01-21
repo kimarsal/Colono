@@ -1,53 +1,51 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using Random = UnityEngine.Random;
 
 public class ShipScript : ConstructionScript
 {
-    public Transform npcsTransform;
-    public Transform animalsTransform;
-    private IslandEditor islandEditor;
     private GameManager gameManager;
 
     public InventoryScript inventoryScript;
 
+    public List<PeasantInfo> peasantInfoList;
     public int[] animals;
-    public List<AnimalScript> animalList = new List<AnimalScript>();
+    public List<AnimalInfo> animalList;
     public int animalAmount;
 
     void Start()
     {
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-        islandEditor = GameObject.Find("GameManager").GetComponent<IslandEditor>();
-        inventoryScript = GetComponent<InventoryScript>();
+        //AddDefaultElements();
+    }
 
-        inventoryScript.AddResource(ResourceScript.ResourceType.Crop, (int)ResourceScript.CropType.Onion, 2);
-        inventoryScript.AddResource(ResourceScript.ResourceType.Crop, (int)ResourceScript.CropType.Carrot, 2);
-        inventoryScript.AddResource(ResourceScript.ResourceType.Crop, (int)ResourceScript.CropType.Cucumber, 2);
-
-        inventoryScript.AddResource(ResourceScript.ResourceType.Animal, (int)ResourceScript.AnimalType.Cow, 2);
-
+    public void AddDefaultElements()
+    {
+        peasantInfoList = new List<PeasantInfo>();
         for (int i = 0; i < 10; i++)
         {
-            GameObject prefab = islandEditor.malePeasantPrefab;
-            switch (i % 3)
-            {
-                case 1:
-                    prefab = islandEditor.femalePeasantPrefab; break;
-                case 2:
-                    prefab = islandEditor.childPeasantPrefab; break;
-            }
-            GameObject peasant = Instantiate(prefab, transform.position, prefab.transform.rotation, npcsTransform);
-            PeasantScript peasantScript = peasant.GetComponent<PeasantScript>();
-            peasantScript.gameManager = gameManager;
-            peasantScript.InitializePeasant();
-            peasant.SetActive(false);
-            peasantList.Add(peasantScript);
+            PeasantInfo peasantInfo = new PeasantInfo();
+            peasantInfo.peasantType = Random.Range(0, 2) == 0 ? PeasantScript.PeasantType.Adult : PeasantScript.PeasantType.Child;
+            peasantInfo.peasantGender = Random.Range(0, 2) == 0 ? PeasantScript.PeasantGender.Male : PeasantScript.PeasantGender.Female;
+            peasantInfo.isNative = false;
+
+            peasantInfo.headType = Random.Range(0, 2);
+            peasantInfo._SKINCOLOR = new SerializableColor(islandEditor.GetRandomSkinColor());
+            peasantInfo._HAIRCOLOR = new SerializableColor(islandEditor.GetRandomHairColor());
+            peasantInfo._CLOTH3COLOR = new SerializableColor(Random.ColorHSV());
+            peasantInfo._CLOTH4COLOR = new SerializableColor(Random.ColorHSV());
+            peasantInfo._OTHERCOLOR = new SerializableColor(Random.ColorHSV());
+
+            peasantInfo.position = new SerializableVector3(Vector3.zero);
+            peasantInfo.age = 10;
+            
+            AddPeasant(peasantInfo);
         }
 
         animals = new int[Enum.GetValues(typeof(ResourceScript.AnimalType)).Length];
+        animalList = new List<AnimalInfo>();
         AddAnimal(ResourceScript.AnimalType.Cow);
         AddAnimal(ResourceScript.AnimalType.Calf);
         AddAnimal(ResourceScript.AnimalType.Pig);
@@ -56,16 +54,10 @@ public class ShipScript : ConstructionScript
         AddAnimal(ResourceScript.AnimalType.Lamb);
         AddAnimal(ResourceScript.AnimalType.Chicken);
         AddAnimal(ResourceScript.AnimalType.Chick);
-    }
 
-    private void AddAnimal(ResourceScript.AnimalType animalType)
-    {
-        GameObject prefab = islandEditor.animals[(int)animalType];
-        AnimalScript animalScript = Instantiate(prefab, transform.position, prefab.transform.rotation, animalsTransform).GetComponent<AnimalScript>();
-        animalScript.gameObject.SetActive(false);
-        animalList.Add(animalScript);
-        animals[(int)animalType]++;
-        animalAmount++;
+        inventoryScript.AddResource(ResourceScript.ResourceType.Crop, (int)ResourceScript.CropType.Onion, 2);
+        inventoryScript.AddResource(ResourceScript.ResourceType.Crop, (int)ResourceScript.CropType.Carrot, 2);
+        inventoryScript.AddResource(ResourceScript.ResourceType.Crop, (int)ResourceScript.CropType.Cucumber, 2);
     }
 
     void Update()
@@ -101,37 +93,64 @@ public class ShipScript : ConstructionScript
         }
     }
 
-    public override TaskScript GetNextPendingTask()
+    public void AddPeasant(PeasantInfo peasantInfo)
     {
-        return null;
+        peasantInfoList.Add(peasantInfo);
     }
 
-
-
-    public void AddAnimal(AnimalScript animalScript)
+    public PeasantScript RemovePeasant(NPCManager npcManager)
     {
-        animalList.Add(animalScript);
-        animals[(int)animalScript.animalType]++;
+        PeasantInfo peasantInfo = peasantInfoList[0];
+        peasantInfoList.RemoveAt(0);
+        PeasantScript peasantScript = Instantiate(islandEditor.GetNPCPrefab(peasantInfo.peasantType, peasantInfo.peasantGender),
+            entry.position, Quaternion.identity, npcManager.npcs.transform).GetComponent<PeasantScript>();
+        peasantScript.transform.localScale = Vector3.one * 0.4f;
+        peasantScript.InitializePeasant(peasantInfo);
+        peasantScript.npcManager = npcManager;
+        return peasantScript;
+    }
+
+    private void AddAnimal(ResourceScript.AnimalType animalType)
+    {
+        AddAnimal(islandEditor.GetAnimalPrefab(animalType).GetComponent<AnimalScript>().GetAnimalInfo());
+    }
+
+    public void AddAnimal(AnimalInfo animalInfo)
+    {
+        animalList.Add(animalInfo);
+        animals[(int)animalInfo.animalType]++;
         animalAmount++;
-
-        animalScript.gameObject.SetActive(false);
-        animalScript.transform.parent = animalsTransform;
     }
 
-    public AnimalScript RemoveAnimal(ResourceScript.AnimalType animalType)
+    public AnimalScript RemoveAnimal(PenScript penScript, ResourceScript.AnimalType animalType)
     {
         for (int i = 0; i < animalList.Count; i++)
         {
-            AnimalScript animalScript = animalList[i];
-            if (animalScript.animalType == animalType)
+            AnimalInfo animalInfo = animalList[i];
+            if (animalInfo.animalType == animalType)
             {
                 animalList.RemoveAt(i);
                 animals[(int)animalType]--;
                 animalAmount--;
+                AnimalScript animalScript = Instantiate(islandEditor.GetAnimalPrefab(animalType),
+                    NPCManager.GetRandomPointWithinRange(penScript.minPos, penScript.maxPos),
+                    Quaternion.Euler(0, UnityEngine.Random.Range(0, 359), 0),
+                    penScript.transform).GetComponent<AnimalScript>();
+                animalScript.penScript = penScript;
+                animalScript.age = animalInfo.age;
                 return animalScript;
             }
         }
         return null;
     }
 
+    public override TaskScript GetNextPendingTask()
+    {
+        return null;
+    }
+
+    public override void FinishUpBusiness()
+    {
+        return;
+    }
 }

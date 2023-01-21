@@ -6,8 +6,8 @@ using static ResourceScript;
 
 public class PenScript : EnclosureScript
 {
+    private Transform animalTransform;
     private CanvasScript canvasScript;
-    private IslandEditor islandEditor;
     public int[] animals = new int[Enum.GetValues(typeof(AnimalType)).Length];
     public int[] desiredAmounts = new int[Enum.GetValues(typeof(AnimalType)).Length];
     public List<AnimalScript> animalList = new List<AnimalScript>();
@@ -23,9 +23,23 @@ public class PenScript : EnclosureScript
     {
         openGate.GetComponent<PenDoorScript>().penScript = this;
         closedGate.GetComponent<PenDoorScript>().penScript = this;
-        GameObject gm = GameObject.FindGameObjectWithTag("GameController");
-        canvasScript = gm.GetComponent<GameManager>().canvasScript;
-        islandEditor = gm.GetComponent<IslandEditor>();
+        canvasScript = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>().canvasScript;
+    }
+
+    public void InitializePen(PenInfo penInfo)
+    {
+        animalTransform = new GameObject("Animals").transform;
+        animalTransform.parent = transform;
+        animalTransform.localPosition = Vector3.zero;
+
+        foreach (AnimalInfo animalInfo in penInfo.animalList)
+        {
+            GameObject animalPrefab = islandEditor.GetAnimalPrefab(animalInfo.animalType);
+            AnimalScript animalScript = Instantiate(animalPrefab, animalInfo.position.UnityVector,
+                Quaternion.Euler(0, animalInfo.orientation, 0), animalTransform).GetComponent<AnimalScript>();
+            animalScript.InitializeAnimal(animalInfo);
+
+        }
     }
 
     void Update()
@@ -50,7 +64,7 @@ public class PenScript : EnclosureScript
     public void AgeUpAnimal(AnimalScript animalScript)
     {
         AnimalType animalType = animalScript.animalType;
-        GameObject agedUpAnimal = islandEditor.animals[(int)animalType + 1];
+        GameObject agedUpAnimal = islandEditor.GetAnimalPrefab(animalType + 1);
         AnimalScript agedUpAnimalScript = Instantiate(agedUpAnimal, animalScript.transform.position, animalScript.transform.rotation, transform).GetComponent<AnimalScript>();
         animalList.Add(agedUpAnimalScript);
         animalList.Remove(animalScript);
@@ -71,7 +85,6 @@ public class PenScript : EnclosureScript
             agedUpAnimal.transform.localScale = Vector3.one;
         }
         agedUpAnimalScript.penScript = this;
-        agedUpAnimalScript.SetNewPen(false);
     }
 
     public void ChangeDesiredAmount(AnimalType animalType, int difference)
@@ -84,4 +97,19 @@ public class PenScript : EnclosureScript
         return null;
     }
 
+    public PenInfo GetPenInfo()
+    {
+        PenInfo penInfo = new PenInfo();
+        foreach(AnimalScript animalScript in animalList)
+        {
+            penInfo.animalList.Add(animalScript.GetAnimalInfo());
+        }
+        return penInfo;
+    }
+}
+
+[System.Serializable]
+public class PenInfo : EnclosureInfo
+{
+    public List<AnimalInfo> animalList = new List<AnimalInfo>();
 }

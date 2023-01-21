@@ -1,28 +1,55 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class GardenScript : EnclosureScript
 {
-    public GameObject patches;
-    public Dictionary<Vector2, PatchScript> patchesDictionary = new Dictionary<Vector2, PatchScript>();
+    private Transform patchesTransform;
+    public List<PatchScript> patchList = new List<PatchScript>();
+    public Dictionary<Vector2, ResourceScript.CropType> cropDictionary = new Dictionary<Vector2, ResourceScript.CropType>();
     private int lastWorkedOnPatch = -1;
-    public ResourceScript.CropType[] crops;
 
     private void Start()
     {
-        crops = new ResourceScript.CropType[maxPeasants];
+        if (patchList.Count == 0) InitializeGarden();
+    }
+
+    public void InitializeGarden(GardenInfo gardenInfo = null)
+    {
+        patchesTransform = new GameObject("Patches").transform;
+        patchesTransform.parent = transform;
+        patchesTransform.localPosition = Vector3.zero;
+
+        if(gardenInfo == null)
+        {
+            CreateDefaultPatches();
+        }
+        else
+        {
+            foreach(PatchInfo patchInfo in gardenInfo.patchList)
+            {
+                CreatePatch(patchInfo.cell.UnityVector, patchInfo.cropType);
+            }
+            foreach(KeyValuePair<SerializableVector2, ResourceScript.CropType> pair in gardenInfo.cropDictionary)
+            {
+                cropDictionary[pair.Key.UnityVector] = pair.Value;
+            }
+            lastWorkedOnPatch = gardenInfo.lastWorkedOnPatch;
+        }
+        
+    }
+
+    private void CreateDefaultPatches()
+    {
         int[] cropAmount = new int[System.Enum.GetNames(typeof(ResourceScript.CropType)).Length];
         int totalCropAmount = 0;
 
-        for(int i = 0; i < cropAmount.Length; i++)
+        for (int i = 0; i < cropAmount.Length; i++)
         {
             cropAmount[i] = islandScript.GetResourceAmount(ResourceScript.ResourceType.Crop, i);
             totalCropAmount += cropAmount[i];
         }
 
-        if(totalCropAmount > 0) //Si hi ha llavors disponibles
+        if (totalCropAmount > 0) //Si hi ha llavors disponibles
         {
             int usedAmount = 0;
 
@@ -32,7 +59,7 @@ public class GardenScript : EnclosureScript
                 usedAmount += cropAmount[i];
             }
 
-            int index = 0, cropIndex = 0;
+            int cropIndex = 0;
             while (cropIndex < cropAmount.Length && cropAmount[cropIndex] == 0) cropIndex++;
             if (cropIndex == cropAmount.Length) cropIndex = 0;
             cropAmount[cropIndex] += (maxPeasants - usedAmount);
@@ -42,9 +69,7 @@ public class GardenScript : EnclosureScript
                 if (cell.x != cells[0].x && cell.x != cells[cells.Length - 1].x
                     && cell.y != cells[0].y && cell.y != cells[cells.Length - 1].y)
                 {
-                    CreatePatch(cell, (ResourceScript.CropType)cropIndex, index);
-                    crops[index] = (ResourceScript.CropType)cropIndex;
-                    index++;
+                    CreatePatch(cell, (ResourceScript.CropType)cropIndex);
 
                     cropAmount[cropIndex]--;
                     while (cropIndex < cropAmount.Length && cropAmount[cropIndex] == 0) cropIndex++;
@@ -53,20 +78,18 @@ public class GardenScript : EnclosureScript
         }
         else //Si no hi ha llavors disponibles
         {
-            int index = 0;
             foreach (Vector2 cell in cells)
             {
                 if (cell.x != cells[0].x && cell.x != cells[cells.Length - 1].x
                     && cell.y != cells[0].y && cell.y != cells[cells.Length - 1].y)
                 {
-                    CreatePatch(cell, 0, index);
-                    index++;
+                    CreatePatch(cell, 0);
                 }
             }
         }
     }
 
-    private void CreatePatch(Vector2 cell, ResourceScript.CropType cropType, int index)
+    private void CreatePatch(Vector2 cell, ResourceScript.CropType cropType)
     {
         GameObject patch = new GameObject("patch");
         MeshRenderer meshRenderer = patch.AddComponent<MeshRenderer>();
@@ -78,63 +101,85 @@ public class GardenScript : EnclosureScript
         Mesh mesh = cellMeshData.CreateMesh();
         meshFilter.mesh = mesh;
 
-        patch.transform.parent = patches.transform;
+        patch.transform.parent = patchesTransform;
         patch.transform.localPosition = Vector3.zero;
 
         PatchScript patchScript = patch.AddComponent<PatchScript>();
         patchScript.gardenScript = this;
-        patchScript.islandEditor = islandEditor;
-        patchScript.index = index;
+        patchScript.cell = cell;
         patchScript.cropType = cropType;
         patchScript.center = islandScript.transform.position + MeshGenerator.GetCellCenter(cell, islandScript.meshData);
 
-        patchesDictionary.Add(cell, patchScript);
+        patchList.Add(patchScript);
+        cropDictionary.Add(cell, cropType);
     }
 
     public override TaskScript GetNextPendingTask()
     {
-        PatchScript patch = null;
-        lastWorkedOnPatch = (lastWorkedOnPatch + 1) % patchesDictionary.Count;
+        PatchScript nextPatch = null;
+        lastWorkedOnPatch = (lastWorkedOnPatch + 1) % patchList.Count;
 
         int index = 0;
-        foreach (KeyValuePair<Vector2, PatchScript> pair in patchesDictionary)
+        foreach (PatchScript patchScript in patchList)
         {
             if (index < lastWorkedOnPatch)
             {
-                if(patch == null && pair.Value.peasantScript == null
-                    && !(pair.Value.cropState == PatchScript.CropState.Barren && islandScript.GetResourceAmount(ResourceScript.ResourceType.Crop, (int)pair.Value.cropType) == 0))
+                if(nextPatch == null && patchScript.peasantScript == null
+                    && !(patchScript.cropState == PatchScript.CropState.Barren && islandScript.GetResourceAmount(ResourceScript.ResourceType.Crop, (int)patchScript.cropType) == 0))
                 {
                     //lastWorkedOnPatch = index;
-                    patch = pair.Value;
+                    nextPatch = patchScript;
                 }
             }
             else
             {
-                if (pair.Value.peasantScript == null
-                    && !(pair.Value.cropState == PatchScript.CropState.Barren && islandScript.GetResourceAmount(ResourceScript.ResourceType.Crop, (int)pair.Value.cropType) == 0))
+                if (patchScript.peasantScript == null
+                    && !(patchScript.cropState == PatchScript.CropState.Barren && islandScript.GetResourceAmount(ResourceScript.ResourceType.Crop, (int)patchScript.cropType) == 0))
                 {
                     //lastWorkedOnPatch = index;
-                    islandScript.UseResource(ResourceScript.ResourceType.Crop, (int)pair.Value.cropType);
-                    return pair.Value;
+                    islandScript.UseResource(ResourceScript.ResourceType.Crop, (int)patchScript.cropType);
+                    return patchScript;
                 }
             }
             index++;
         }
 
-        islandScript.UseResource(ResourceScript.ResourceType.Crop, (int)patch.cropType);
-        return patch;
+        return nextPatch;
     }
 
     public override void FinishUpBusiness()
     {
         base.FinishUpBusiness();
-        foreach (KeyValuePair<Vector2, PatchScript> pair in patchesDictionary)
+        foreach (PatchScript patchScript in patchList)
         {
-            if(pair.Value.cropState != PatchScript.CropState.Barren)
+            if(patchScript.cropState != PatchScript.CropState.Barren)
             {
-                islandScript.AddResource(ResourceScript.ResourceType.Crop, (int)pair.Value.cropType);
+                islandScript.AddResource(ResourceScript.ResourceType.Crop, (int)patchScript.cropType);
             }
         }
     }
 
+    public GardenInfo GetGardenInfo()
+    {
+        GardenInfo gardenInfo = new GardenInfo();
+        foreach(PatchScript patchScript in patchList)
+        {
+            gardenInfo.patchList.Add(patchScript.GetPatchInfo());
+        }
+        foreach (KeyValuePair<Vector2, ResourceScript.CropType> pair in cropDictionary)
+        {
+            gardenInfo.cropDictionary.Add(new SerializableVector2(pair.Key), pair.Value);
+        }
+        gardenInfo.lastWorkedOnPatch = lastWorkedOnPatch;
+        return gardenInfo;
+    }
+
+}
+
+[System.Serializable]
+public class GardenInfo : EnclosureInfo
+{
+    public List<PatchInfo> patchList = new List<PatchInfo>();
+    public Dictionary<SerializableVector2, ResourceScript.CropType> cropDictionary = new Dictionary<SerializableVector2, ResourceScript.CropType>();
+    public int lastWorkedOnPatch;
 }

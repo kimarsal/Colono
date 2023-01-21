@@ -48,15 +48,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   constructionType: 2
   islandScript: {fileID: 0}
+  islandEditor: {fileID: 0}
   cells: []
   length: 3
   width: 3
   entry: {fileID: 2659500063952886743}
+  outline: {fileID: 0}
   maxPeasants: 10
   peasantList: []
   peasantsOnTheirWay: 0
   constructionDetailsScript: {fileID: 0}
-  buildingType: 3
+  buildingType: 4
   orientation: 0
 --- !u!1001 &55199954664440583
 PrefabInstance:
