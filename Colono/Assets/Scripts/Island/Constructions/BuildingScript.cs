@@ -1,15 +1,22 @@
 
 using static BuildingScript;
 
-public class BuildingScript : ConstructionScript
+public abstract class BuildingScript : ConstructionScript
 {
     public enum BuildingType { Warehouse, Cabin, Tavern, Mine, Alchemist};
     public BuildingType buildingType;
     public int orientation;
 
-    public override TaskScript GetNextPendingTask()
+    public override bool GetNextPendingTask(PeasantAdultScript peasantAdultScript)
     {
-        return null;
+        return false;
+    }
+
+    public override PeasantScript RemovePeasant()
+    {
+        PeasantScript peasantScript = base.RemovePeasant();
+        peasantScript.gameObject.SetActive(true);
+        return peasantScript;
     }
 
     public override void FinishUpBusiness()

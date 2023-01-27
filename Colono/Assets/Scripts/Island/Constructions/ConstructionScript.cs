@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class ConstructionScript : MonoBehaviour
+public abstract class ConstructionScript : TaskSourceScript
 {
     public enum ConstructionType { Ship, Enclosure, Building }
     public ConstructionType constructionType;
 
     public IslandScript islandScript;
-    public IslandEditor islandEditor;
+    public virtual IslandEditor islandEditor { get { return islandScript.islandEditor; } }
     public Vector2[] cells;
     public int length;
     public int width;
@@ -20,7 +20,30 @@ public abstract class ConstructionScript : MonoBehaviour
 
     public ConstructionDetailsScript constructionDetailsScript;
 
-    public abstract TaskScript GetNextPendingTask();
+    public abstract void EditConstruction();
+
+    public virtual void AddPeasant(PeasantScript peasantScript)
+    {
+        peasantScript.constructionScript = this;
+        peasantList.Add(peasantScript);
+        peasantsOnTheirWay++;
+    }
+
+    public virtual PeasantScript RemovePeasant()
+    {
+        PeasantScript peasantScript = peasantList[0];
+        peasantList.Remove(peasantScript);
+        if (!peasantScript.gameObject.activeInHierarchy) //Ja havia arribat a l'edifici
+        {
+            peasantScript.gameObject.SetActive(true);
+        }
+        else
+        {
+            peasantsOnTheirWay--;
+        }
+
+        return peasantScript;
+    }
 
     public abstract void FinishUpBusiness();
 

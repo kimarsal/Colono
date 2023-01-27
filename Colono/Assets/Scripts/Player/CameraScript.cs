@@ -1,20 +1,22 @@
 using System.Collections;
-using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class CameraScript : MonoBehaviour
 {
-    private Vector3 navigationOffset;
-    private Vector3 islandOffset;
+    private Vector3 navigationOffset = new Vector3(0, 15, -8);
+    private Vector3 islandOffset = new Vector3(0, 8, -5);
     private Vector3 offset;
-    private GameObject player;
     private PlayerController playerController;
     private GameManager gameManagerScript;
-    private Vector3 islandPosition;
     private Vector3 targetPosition;
     private float speed = 25f;
 
     //Distància màxima amb els marges
+    private float minYIsland = 3f;
+    private float maxYIsland = 25f;
+    private float minX, maxX, minZ, maxZ;
+
     private float xLeftMarginPlayer = 10f;
     private float xRightMarginPlayer = 10f;
     private float zLowerMarginPlayer = -10f;
@@ -25,65 +27,63 @@ public class CameraScript : MonoBehaviour
     private float zLowerMarginIsland = 20f;
     private float zUpperMarginIsland = 50f;
 
-    // Start is called before the first frame update
     void Start()
     {
-        //S'obté Player i el seu script
-        player = GameObject.Find("Player");
-        //offset = gameObject.transform.position;
-        navigationOffset = new Vector3(0, 15, -8);
-        //islandOffset = new Vector3(0, 15, -8);
-        islandOffset = new Vector3(0, 8, -5);
         offset = navigationOffset;
-        playerController = player.GetComponent<PlayerController>();
-        gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
+        playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        gameManagerScript = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
+
+        minX = playerController.xLeftBounds + xLeftMarginPlayer;
+        maxX = playerController.xRightBounds - xRightMarginPlayer;
+        minZ = playerController.zLowerBounds + zLowerMarginPlayer;
+        maxZ = playerController.zUpperBounds - zUpperMarginPlayer;
     }
 
-    // Update is called once per frame
     void LateUpdate()
     {
         if (!gameManagerScript.isInIsland)
         {
             //Es mou la càmera amb el jugador
-            targetPosition = player.transform.position + offset;
+            targetPosition = playerController.transform.position + offset;
 
             //Es manté la càmera dins els marges
-            if (player.transform.position.x < playerController.xLeftBounds + xLeftMarginPlayer)
-                targetPosition = new Vector3(playerController.xLeftBounds + xLeftMarginPlayer, targetPosition.y, targetPosition.z);
-            else if (targetPosition.x > playerController.xRightBounds - xRightMarginPlayer)
-                targetPosition = new Vector3(playerController.xRightBounds - xRightMarginPlayer, targetPosition.y, targetPosition.z);
+            float x = Mathf.Clamp(minX, targetPosition.x, maxX);
+            float y = targetPosition.y;
+            float z = Mathf.Clamp(minZ, targetPosition.z, maxZ);
 
-            if (targetPosition.z < playerController.zLowerBounds + zLowerMarginPlayer)
-                targetPosition = new Vector3(targetPosition.x, targetPosition.y, playerController.zLowerBounds + zLowerMarginPlayer);
-            else if (targetPosition.z > playerController.zUpperBounds - zUpperMarginPlayer)
-                targetPosition = new Vector3(targetPosition.x, targetPosition.y, playerController.zUpperBounds - zUpperMarginPlayer);
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(x, y, z), speed * Time.deltaTime);
         }
         else
         {
-            targetPosition = transform.position + new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical")) * speed * Time.deltaTime;
-
+            //Es mou la càmera amb l'entrada
+            targetPosition = transform.position + new Vector3(Input.GetAxis("Horizontal"), Input.mouseScrollDelta.y * -2, Input.GetAxis("Vertical")) * speed * Time.deltaTime;
+            
             //Es manté la càmera dins els marges
-            if (targetPosition.x < islandPosition.x - IslandGenerator.mapChunkSize / 2 + xLeftMarginIsland)
-                targetPosition = new Vector3(islandPosition.x - IslandGenerator.mapChunkSize / 2 + xLeftMarginIsland, targetPosition.y, targetPosition.z);
-            else if (targetPosition.x > islandPosition.x + IslandGenerator.mapChunkSize / 2 - xRightMarginIsland)
-                targetPosition = new Vector3(islandPosition.x + IslandGenerator.mapChunkSize / 2 - xRightMarginIsland, targetPosition.y, targetPosition.z);
+            float x = Mathf.Clamp(minX, targetPosition.x, maxX);
+            float y = Mathf.Clamp(minYIsland, targetPosition.y, maxYIsland);
+            float z = Mathf.Clamp(minZ, targetPosition.z, maxZ);
 
-            if (targetPosition.z < islandPosition.z - IslandGenerator.mapChunkSize / 2 + zLowerMarginIsland)
-                targetPosition = new Vector3(targetPosition.x, targetPosition.y, islandPosition.z - IslandGenerator.mapChunkSize / 2 + zLowerMarginIsland);
-            else if (targetPosition.z > islandPosition.z + IslandGenerator.mapChunkSize / 2 - zUpperMarginIsland)
-                targetPosition = new Vector3(targetPosition.x, targetPosition.y, islandPosition.z + IslandGenerator.mapChunkSize / 2 - zUpperMarginIsland);
+            Vector3 positionChange = new Vector3(x, y, z) - transform.position;
+            float time = positionChange.magnitude / speed;
+            GetComponent<Rigidbody>().velocity = positionChange / Mathf.Max(time, Time.fixedDeltaTime);
         }
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
     }
 
-    public void SetIslandCamera(Vector3 position)
+    public void SetIslandCamera(Vector3 islandPosition)
     {
-        islandPosition = position;
+        minX = islandPosition.x - IslandGenerator.mapChunkSize / 2 + xLeftMarginIsland;
+        maxX = islandPosition.x + IslandGenerator.mapChunkSize / 2 - xRightMarginIsland;
+        minZ = islandPosition.z - IslandGenerator.mapChunkSize / 2 + zLowerMarginIsland;
+        maxZ = islandPosition.z + IslandGenerator.mapChunkSize / 2 - zUpperMarginIsland;
         StartCoroutine(FastCameraSwipe(true));
     }
 
     public void ResetPlayerCamera()
     {
+        minX = playerController.xLeftBounds + xLeftMarginPlayer;
+        maxX = playerController.xRightBounds - xRightMarginPlayer;
+        minZ = playerController.zLowerBounds + zLowerMarginPlayer;
+        maxZ = playerController.zUpperBounds - zUpperMarginPlayer;
         StartCoroutine(FastCameraSwipe(false));
     }
 
@@ -92,7 +92,7 @@ public class CameraScript : MonoBehaviour
         if (intoIsland)
         {
             float previousSpeed = speed;
-            targetPosition = player.transform.position + islandOffset;
+            targetPosition = playerController.transform.position + islandOffset;
             float distance = Vector3.Distance(transform.position, targetPosition);
             speed = distance / 0.2f; //Fer zoom en 0.2 segons
             offset = islandOffset;
@@ -104,7 +104,7 @@ public class CameraScript : MonoBehaviour
         {
             gameManagerScript.isInIsland = false;
             float previousSpeed = speed;
-            targetPosition = player.transform.position + navigationOffset;
+            targetPosition = playerController.transform.position + navigationOffset;
             float distance = Vector3.Distance(transform.position, targetPosition);
             speed = distance / 0.5f; //Tornar al lloc en 0.5 segons
             offset = navigationOffset;

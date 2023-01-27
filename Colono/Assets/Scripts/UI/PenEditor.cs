@@ -27,19 +27,21 @@ public class PenEditor : MonoBehaviour
             Destroy(row.gameObject);
         }
 
-        penRows = new PenRowScript[System.Enum.GetValues(typeof(AnimalType)).Length];
-        foreach (AnimalType animalType in (AnimalType[])Enum.GetValues(typeof(AnimalType)))
+        int animalTypes = System.Enum.GetValues(typeof(AnimalType)).Length;
+        penRows = new PenRowScript[animalTypes];
+        for (int i = 0; i < animalTypes; i++)
         {
             GameObject gridRow = Instantiate(penRowPrefab, rows);
-            PenRowScript gridRowScript = gridRow.GetComponent<PenRowScript>();
-            gridRowScript.penEditor = this;
-            gridRowScript.animalType = animalType;
-            gridRowScript.animalImage.sprite = islandEditor.GetResourceSprite(ResourceType.Animal, (int)animalType);
-            gridRowScript.penAnimals = penScript.animals[(int)animalType];
-            gridRowScript.shipAnimals = shipScript.animals[(int)animalType];
-            gridRowScript.desiredAmount = penScript.desiredAmounts[(int)animalType];
-            gridRowScript.UpdateValues();
-            penRows[(int)animalType] = gridRowScript;
+            PenRowScript penRowScript = gridRow.GetComponent<PenRowScript>();
+            penRowScript.penEditor = this;
+            penRowScript.animalType = (AnimalType)i;
+            penRowScript.animalImage.sprite = islandEditor.GetResourceSprite(ResourceType.Animal, i);
+            penRowScript.penAnimals = penScript.animals[i];
+            penRowScript.shipAnimals = shipScript.animals[i];
+            penRowScript.desiredAmount = penScript.desiredAmounts[i];
+            penRowScript.pairingCrop = penScript.pairingCrops[i];
+            penRowScript.UpdateValues();
+            penRows[i] = penRowScript;
         }
 
         UpdatePenText();
@@ -82,6 +84,7 @@ public class PenEditor : MonoBehaviour
         penScript.animalList.Add(animalScript);
         penScript.animals[(int)animalScript.animalType]++;
         penScript.animalAmount++;
+        penScript.desiredAmounts[(int)animalScript.animalType]++;
 
         if (animalScript.animalType == AnimalType.Chicken)
         {
@@ -90,10 +93,6 @@ public class PenEditor : MonoBehaviour
         else if (animalScript.animalType == AnimalType.Chick)
         {
             animalScript.transform.localScale = Vector3.one * 0.05f;
-        }
-        else
-        {
-            animalScript.transform.localScale = Vector3.one;
         }
         animalScript.penScript = penScript;
         
@@ -121,6 +120,11 @@ public class PenEditor : MonoBehaviour
     public void ChangeDesiredAmount(AnimalType animalType, int difference)
     {
         penScript.ChangeDesiredAmount(animalType, difference);
+    }
+
+    public void ChangePairingCrop(AnimalType animalType, CropType cropType)
+    {
+        penScript.ChangePairingCrop(animalType, cropType);
     }
 
 }

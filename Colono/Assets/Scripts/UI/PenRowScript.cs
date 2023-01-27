@@ -16,6 +16,8 @@ public class PenRowScript : MonoBehaviour
     public Button moveAnimalToPenButton;
     public Button moveAnimalToShipButton;
     public TextMeshProUGUI animalsInShipText;
+
+    public GameObject adultSection;
     public Dropdown cropDropdown;
     public Button increaseDesiredAmountButton;
     public Button decreaseDesiredAmountButton;
@@ -24,14 +26,15 @@ public class PenRowScript : MonoBehaviour
     public int penAnimals;
     public int shipAnimals;
     public int desiredAmount;
+    public ResourceScript.CropType pairingCrop;
 
     private void Start()
     {
-        if((int)animalType % 2 == 0)
+        if ((int)animalType % 2 == 0)
         {
-            cropDropdown.gameObject.SetActive(false);
-            UpdateDesiredAmount();
+            adultSection.SetActive(false);
         }
+        UpdateDesiredAmount();
     }
 
     public void UpdateValues()
@@ -40,6 +43,7 @@ public class PenRowScript : MonoBehaviour
 
         moveAnimalToPenButton.interactable = shipAnimals > 0;
         moveAnimalToShipButton.interactable = penAnimals > 0;
+        cropDropdown.value = (int)pairingCrop;
 
         UpdateText();
     }
@@ -48,8 +52,18 @@ public class PenRowScript : MonoBehaviour
     {
         penEditor.MoveAnimal(animalType, toPen);
 
-        penAnimals += toPen ? 1 : -1;
-        shipAnimals += toPen ? -1 : 1;
+        if (toPen)
+        {
+            penAnimals++;
+            desiredAmount++;
+            shipAnimals--;
+            UpdateDesiredAmount();
+        }
+        else
+        {
+            penAnimals--;
+            shipAnimals++;
+        }
 
         UpdateValues();
     }
@@ -61,6 +75,11 @@ public class PenRowScript : MonoBehaviour
         desiredAmount += difference;
 
         UpdateDesiredAmount();
+    }
+
+    public void ChangePairingCrop(int cropType)
+    {
+        penEditor.ChangePairingCrop(animalType, (ResourceScript.CropType)cropType);
     }
 
     public void UpdateText()

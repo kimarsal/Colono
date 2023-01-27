@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PeasantChildScript : PeasantScript
 {
+
     public override void UpdateTask()
     {
         StopCharacter();

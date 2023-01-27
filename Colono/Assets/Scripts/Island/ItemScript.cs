@@ -39,7 +39,7 @@ public class ItemScript : TaskScript
             outline.enabled = toClear;
             if (!toClear)
             {
-                islandScript.npcManager.RemoveItemToClear(this);
+                islandScript.RemoveItemToClear(this);
             }
             return true;
         }
@@ -52,7 +52,7 @@ public class ItemScript : TaskScript
         islandScript.AddResource(ResourceScript.ResourceType.Material, (int)materialType);
         if (materialAmount == 0)
         {
-            islandScript.npcManager.RemoveItemToClear(this);
+            islandScript.RemoveItemToClear(this);
             islandScript.RemoveItemAtCell(itemCell);
             Destroy(gameObject);
         }

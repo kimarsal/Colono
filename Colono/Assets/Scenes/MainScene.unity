@@ -17899,7 +17899,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   islandList: []
-  seed: 1
+  seed: 4
   spotDistance: 100
   islandDistance: 20
   playerDistance: 30
@@ -18036,6 +18036,7 @@ MonoBehaviour:
   isInIsland: 0
   cellsTransform: {fileID: 2139576368}
   closestIsland: {fileID: 0}
+  islandEditor: {fileID: 0}
   hasSelectedPeasant: 0
 --- !u!114 &1136053465
 MonoBehaviour:
@@ -18316,7 +18317,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameManager: {fileID: 0}
   islandGenerator: {fileID: 0}
-  islandEditor: {fileID: 0}
   islandScript: {fileID: 0}
 --- !u!1 &1137006982
 GameObject:
@@ -32771,8 +32771,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ship: {fileID: 1189031230}
-  closestIsland: {fileID: 0}
-  distanceToBoardIsland: 2
   arrow: {fileID: 1038950656}
 --- !u!82 &1628606277
 AudioSource:
@@ -33050,7 +33048,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   constructionType: 0
   islandScript: {fileID: 0}
-  islandEditor: {fileID: 1136053465}
   cells: []
   length: 0
   width: 0
@@ -33060,6 +33057,7 @@ MonoBehaviour:
   peasantList: []
   peasantsOnTheirWay: 0
   constructionDetailsScript: {fileID: 0}
+  gameManager: {fileID: 0}
   inventoryScript:
     capacity: 0
     usage: 0
@@ -33067,6 +33065,7 @@ MonoBehaviour:
   animals: 00000000000000000000000000000000
   animalList: []
   animalAmount: 0
+  distanceToBoardIsland: 2
 --- !u!1 &1628891782
 GameObject:
   m_ObjectHideFlags: 0
@@ -34029,6 +34028,7 @@ GameObject:
   - component: {fileID: 1684752368}
   - component: {fileID: 1684752369}
   - component: {fileID: 1684752370}
+  - component: {fileID: 1684752371}
   m_Layer: 0
   m_Name: MainCamera
   m_TagString: MainCamera
@@ -34174,8 +34174,24 @@ SphereCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5
+  m_Radius: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!54 &1684752371
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1684752363}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 112
+  m_CollisionDetection: 0
 --- !u!224 &1686796374 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4641807608631757312, guid: dff7cf2d662f1624caaf55617ebe00c8,
@@ -34292,17 +34308,17 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   colorGradientTexture: {fileID: 0}
   shallowColor: {r: 0, g: 0.7725491, b: 0.62352943, a: 0.5019608}
-  deepColor: {r: 0.01176471, g: 0.28598556, b: 0.50980073, a: 1}
+  deepColor: {r: 0.01176471, g: 0.28597504, b: 0.50980073, a: 1}
   colorDepth: 0.84
-  horizonColor: {r: 0, g: 0.22716206, b: 0.8, a: 1}
+  horizonColor: {r: 0, g: 0.22715157, b: 0.8, a: 1}
   horizonDistance: 20
   shoreFade: 1
-  shoreColor: {r: 0, g: 0.98039216, b: 0.30167186, a: 0}
+  shoreColor: {r: 0, g: 0.98039216, b: 0.30166134, a: 0}
   shoreStrength: 0
   shoreBlend: 1
   shoreDepth: 0.74
   waveColor: {r: 0, g: 0, b: 0, a: 0}
-  underwaterColor: {r: 0.2036477, g: 0.30951494, b: 0.517647, a: 0}
+  underwaterColor: {r: 0.20363775, g: 0.30950445, b: 0.517647, a: 0}
   underwaterColorStrength: 0
   underwaterRefractionStrength: 0.099
   surfaceFoamTexture: {fileID: 2800000, guid: d3b0d77dfe711a04c8ff18ecc260aa66, type: 3}
@@ -45154,7 +45170,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 304184208}
         m_TargetAssemblyTypeName: ConstructionDetailsScript, Assembly-CSharp
-        m_MethodName: ManagePawns
+        m_MethodName: ManagePeasants
         m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -46165,7 +46181,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 304184208}
         m_TargetAssemblyTypeName: ConstructionDetailsScript, Assembly-CSharp
-        m_MethodName: ManagePawns
+        m_MethodName: ManagePeasants
         m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

@@ -5,7 +5,6 @@ using static PatchScript;
 
 public class PatchScript : TaskScript
 {
-    public GardenScript gardenScript;
     public enum CropState { Planted, Grown, Blossomed, Dead, Barren }
 
     public Vector2 cell;
@@ -22,36 +21,37 @@ public class PatchScript : TaskScript
     public void InitializePatch(PatchInfo patchInfo)
     {
         orientation = patchInfo.orientation;
-        crop = Instantiate(gardenScript.islandEditor.GetCropPrefab(cropType, patchInfo.cropState), center, Quaternion.Euler(0, orientation, 0), transform);
+        crop = Instantiate(((GardenScript)taskSourceScript).islandEditor.GetCropPrefab(cropType, patchInfo.cropState), center, Quaternion.Euler(0, orientation, 0), transform);
     }
 
     public void PlantCrop()
     {
         orientation = Random.Range(0, 359);
         cropState = CropState.Planted;
-        crop = Instantiate(gardenScript.islandEditor.GetCropPrefab(cropType, cropState), center, Quaternion.Euler(0, orientation, 0), transform);
+        crop = Instantiate(((GardenScript)taskSourceScript).islandEditor.GetCropPrefab(cropType, cropState), center, Quaternion.Euler(0, orientation, 0), transform);
     }
 
     public override void TaskProgress()
     {
-        if (cropType != gardenScript.cropDictionary[cell])
+        GardenScript gardenScript = (GardenScript)taskSourceScript;
+        if (cropType != gardenScript.cropDictionary[cell]) // S'arrenca l'anterior planta
         {
             cropState = CropState.Barren;
             cropType = gardenScript.cropDictionary[cell];
             Destroy(crop);
         }
-        else if (cropState == CropState.Barren)
+        else if (cropState == CropState.Barren) // Es planta una llavor
         {
             cropType = gardenScript.cropDictionary[cell];
             PlantCrop();
         }
         else
         {
-            if (cropState < CropState.Blossomed)
+            if (cropState < CropState.Blossomed) // Es rega la planta
             {
                 cropState++;
             }
-            else //if (cropState == CropState.Blossomed)
+            else // Es cullen els fruits
             {
                 gardenScript.islandScript.AddResource(ResourceScript.ResourceType.Crop, (int)cropType, 3);
                 cropState = CropState.Grown;
@@ -60,32 +60,14 @@ public class PatchScript : TaskScript
             crop = Instantiate(gardenScript.islandEditor.GetCropPrefab(cropType, cropState), center, Quaternion.Euler(0, orientation, 0), transform);
         }
 
-        if (peasantScript != null) //Si el granjer encara no ha marxat
-        {
-            if (peasantScript.hunger < 1 && peasantScript.exhaustion < 1) //Si el granjer no té gana i no està cansat
-            {
-                PatchScript nextPatch = (PatchScript)gardenScript.GetNextPendingTask();
-                peasantScript.task = nextPatch;
-                if(nextPatch != null)
-                {
-                    nextPatch.peasantScript = peasantScript;
-                    gardenScript.islandScript.UseResource(ResourceScript.ResourceType.Crop, (int)nextPatch.cropType);
-                }
-            }
-            else
-            {
-                peasantScript.task = null;
-            }
-            peasantScript.UpdateTask();
-            peasantScript = null;
-        }
+        base.TaskProgress();
     }
 
     public override void CancelTask()
     {
         if (cropState == CropState.Barren)
         {
-            gardenScript.islandScript.AddResource(ResourceScript.ResourceType.Crop, (int)cropType);
+            ((GardenScript)taskSourceScript).islandScript.AddResource(ResourceScript.ResourceType.Crop, (int)cropType);
         }
     }
 

@@ -11,6 +11,11 @@ public class TavernScript : BuildingScript
         recipeList.Add(new Recipe());
     }
 
+    public override void EditConstruction()
+    {
+        islandScript.gameManager.canvasScript.ShowTavernEditor();
+    }
+
     public void FeedPeasant(PeasantScript peasantScript)
     {
         StartCoroutine(FeedPeasantCoroutine(peasantScript));
@@ -39,16 +44,19 @@ public class TavernScript : BuildingScript
 
         peasantScript.hunger =- hungerPoints;
         peasantScript.tavern = null;
-        if(peasantScript.peasantType == PeasantScript.PeasantType.Adult && peasantScript.constructionScript != null && peasantScript.exhaustion < 1)
+        if (peasantScript.peasantType == PeasantScript.PeasantType.Adult)
         {
             PeasantAdultScript peasantAdultScript = (PeasantAdultScript)peasantScript;
-            if (peasantAdultScript.task == null)
-            {
-                peasantAdultScript.task = peasantAdultScript.constructionScript.GetNextPendingTask();
-                peasantAdultScript.task.peasantScript = peasantAdultScript;
-            }
+            peasantAdultScript.taskSourceScript.GetNextPendingTask(peasantAdultScript);
         }
-        peasantScript.UpdateTask();
+        else peasantScript.UpdateTask();
+    }
+
+    public override PeasantScript RemovePeasant()
+    {
+        PeasantScript peasantScript = base.RemovePeasant();
+        peasantScript.tavern = null;
+        return peasantScript;
     }
 
     public TavernInfo GetTavernInfo()

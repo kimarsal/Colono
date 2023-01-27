@@ -4,13 +4,18 @@ using UnityEngine;
 
 public abstract class TaskScript : MonoBehaviour
 {
-    public enum TaskType { Item, Patch }
+    public TaskSourceScript taskSourceScript;
+    public enum TaskType { Item, Patch, Pairing }
     public Vector3 center;
     public TaskType taskType;
 
-    public PeasantAdultScript peasantScript;
+    public PeasantAdultScript peasantAdultScript;
 
-    public abstract void TaskProgress();
+    public virtual void TaskProgress()
+    {
+        taskSourceScript.GetNextPendingTask(peasantAdultScript);
+        peasantAdultScript = null;
+    }
 
     public abstract void CancelTask();
 }

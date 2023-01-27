@@ -199,7 +199,7 @@ public class CanvasScript : MonoBehaviour
         buttonState = ButtonState.ConstructionDetails;
     }
 
-    public void ShowPenEditor(PenScript penScript)
+    public void ShowPenEditor()
     {
         constructionDetailsAnimator.Play("HideDetails");
 

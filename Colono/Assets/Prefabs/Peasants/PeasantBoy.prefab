@@ -1683,7 +1683,7 @@ GameObject:
   - component: {fileID: 1371654617861279929}
   - component: {fileID: -2109673547217780251}
   m_Layer: 0
-  m_Name: PT_Medieval_Boy_Modular_Free_Pack
+  m_Name: PeasantBoy
   m_TagString: NPC
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1775,6 +1775,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   peasantType: 1
+  peasantGender: 0
   walkSpeed: 0.5
   runSpeed: 1
   isNative: 0
@@ -1788,25 +1789,12 @@ MonoBehaviour:
   age: 0
   hunger: 0
   exhaustion: 0
-  gameManager: {fileID: 0}
   npcManager: {fileID: 0}
   constructionScript: {fileID: 0}
   speechBubble: {fileID: 0}
   peasantDetailsScript: {fileID: 0}
   cabin: {fileID: 0}
   tavern: {fileID: 0}
-  peasantInfo:
-    peasantType: 0
-    isNative: 0
-    head: 0
-    _SKINCOLOR: {r: 0, g: 0, b: 0, a: 0}
-    _HAIRCOLOR: {r: 0, g: 0, b: 0, a: 0}
-    _CLOTH3COLOR: {r: 0, g: 0, b: 0, a: 0}
-    _CLOTH4COLOR: {r: 0, g: 0, b: 0, a: 0}
-    _OTHERCOLOR: {r: 0, g: 0, b: 0, a: 0}
-    age: 0
-    hunger: 0
-    exhaustion: 0
 --- !u!195 &-4882141568408840787
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -1821,7 +1809,7 @@ NavMeshAgent:
   m_Acceleration: 20
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0.05
+  m_StoppingDistance: 0.3
   m_AutoTraverseOffMeshLink: 0
   m_AutoBraking: 0
   m_AutoRepath: 1

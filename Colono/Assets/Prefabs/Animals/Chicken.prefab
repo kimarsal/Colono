@@ -92,7 +92,7 @@ Transform:
   m_GameObject: {fileID: 2092011695450471622}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 4155287956215317536}
@@ -134,7 +134,7 @@ NavMeshAgent:
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0
+  m_StoppingDistance: 0.5
   m_AutoTraverseOffMeshLink: 0
   m_AutoBraking: 0
   m_AutoRepath: 1
@@ -156,11 +156,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   penScript: {fileID: 0}
   animalType: 7
-  walkSpeed: 4
-  runSpeed: 10
+  walkSpeed: 0.5
+  runSpeed: 1
   isRunning: 0
   ageSpeed: 0.1
   age: 1
+  lustSpeed: 0.05
+  timeSinceLastPairing: 0
 --- !u!1 &2333243983222635211
 GameObject:
   m_ObjectHideFlags: 0

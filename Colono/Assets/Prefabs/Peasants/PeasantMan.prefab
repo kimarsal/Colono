@@ -1933,7 +1933,7 @@ GameObject:
   - component: {fileID: 8792296199089095173}
   - component: {fileID: -8592455357991466922}
   m_Layer: 0
-  m_Name: PT_Medieval_Male_Modular_Free_Pack
+  m_Name: PeasantMan
   m_TagString: NPC
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2025,8 +2025,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   peasantType: 0
+  peasantGender: 0
   walkSpeed: 0.9
   runSpeed: 2
+  isNative: 0
   head1: {fileID: 1953896830827328188}
   head2: {fileID: 2938323828424686716}
   lowerNaked: {fileID: 4187010985156663354}
@@ -2034,12 +2036,9 @@ MonoBehaviour:
   lowerClothed: {fileID: 1986968037048491704}
   upperClothed: {fileID: 1125232617463963011}
   material: {fileID: 2100000, guid: c79855c6f54ed954293d041acc3120a8, type: 2}
-  isNative: 0
   age: 20
   hunger: 0
   exhaustion: 0
-  action: 0
-  gameManager: {fileID: 0}
   npcManager: {fileID: 0}
   constructionScript: {fileID: 0}
   speechBubble: {fileID: 8196349547139020954}
@@ -2065,7 +2064,7 @@ NavMeshAgent:
   m_Acceleration: 20
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0.05
+  m_StoppingDistance: 0.3
   m_AutoTraverseOffMeshLink: 0
   m_AutoBraking: 0
   m_AutoRepath: 1

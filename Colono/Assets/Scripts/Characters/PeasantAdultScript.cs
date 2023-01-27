@@ -15,6 +15,18 @@ public class PeasantAdultScript : PeasantScript
     public GameObject basket;
     public GameObject wateringCan;
 
+    public TaskSourceScript taskSourceScript
+    {
+        get
+        {
+            if (constructionScript != null && constructionScript.constructionType == ConstructionScript.ConstructionType.Enclosure)
+            {
+                return constructionScript;
+            }
+            return islandScript;
+        }
+    }
+
     public void ToggleAxe()
     {
         axe.SetActive(!axe.activeSelf);
@@ -56,7 +68,7 @@ public class PeasantAdultScript : PeasantScript
         {
             SetDestination(cabin.entry.position);
         }
-        else if (task != null && hunger < 1 && exhaustion < 1) //Si té una tasca encarregada i pot fer-la
+        else if (task != null) //Si té una tasca encarregada
         {
             SetDestination(task.center);
         }
@@ -75,6 +87,18 @@ public class PeasantAdultScript : PeasantScript
         {
             SetDestination(NPCManager.GetRandomPoint(transform.position));
         }
+    }
+
+    public bool CanBeAsignedTask()
+    {
+        return task == null && hunger < 1 && exhaustion < 1;
+    }
+
+    public void AssignTask(TaskScript taskScript)
+    {
+        task = taskScript;
+        if (task != null) task.peasantAdultScript = this;
+        UpdateTask();
     }
 
     public override void ArrivedAtDestination()
@@ -99,11 +123,9 @@ public class PeasantAdultScript : PeasantScript
             }
             else
             {
-                constructionScript.peasantsOnTheirWay--;
-                constructionScript.UpdateConstructionDetails();
-
                 if (constructionScript.constructionType == ConstructionScript.ConstructionType.Building)
                 {
+                    constructionScript.peasantsOnTheirWay--;
                     gameObject.SetActive(false);
                 }
                 else if (constructionScript.constructionType == ConstructionScript.ConstructionType.Ship)
@@ -111,6 +133,7 @@ public class PeasantAdultScript : PeasantScript
                     ((ShipScript)constructionScript).AddPeasant(GetPeasantInfo());
                     Destroy(gameObject);
                 }
+                constructionScript.UpdateConstructionDetails();
             }
         }
         else
@@ -132,11 +155,11 @@ public class PeasantAdultScript : PeasantScript
                 case ItemScript.ItemType.Pick: animator.SetInteger("Pick", 0); animator.SetInteger("State", (int)PeasantAction.Gathering); break;
             }
         }
-        else
+        else if (task.taskType == TaskScript.TaskType.Patch)
         {
             PatchScript patchScript = (PatchScript)task;
             if (patchScript.cropState != PatchScript.CropState.Barren &&
-                patchScript.cropType != patchScript.gardenScript.cropDictionary[patchScript.cell]) //S'ha d'arrencar l'anterior planta
+                patchScript.cropType != ((GardenScript)patchScript.taskSourceScript).cropDictionary[patchScript.cell]) //S'ha d'arrencar l'anterior planta
             {
                 animator.SetInteger("State", (int)PeasantAction.Pulling);
             }
@@ -150,7 +173,11 @@ public class PeasantAdultScript : PeasantScript
                 }
             }
         }
-        transform.LookAt(task.center);
+        else
+        {
+            ((PairingScript)task).ParticipantHasArrived();
+        }
+        //transform.LookAt(task.center);
         //StartCoroutine(PointTowardsTaskCenter());
     }
 
@@ -165,6 +192,11 @@ public class PeasantAdultScript : PeasantScript
         }
         while (Vector3.Angle(transform.forward, task.center - transform.position) > 10);
     }*/
+
+    public void FeedAnimals()
+    {
+        animator.SetInteger("State", (int)PeasantAction.Feeding);
+    }
 
     public void CancelTask()
     {

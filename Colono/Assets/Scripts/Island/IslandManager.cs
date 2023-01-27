@@ -5,8 +5,8 @@ public class IslandManager : MonoBehaviour
 {
     public List<IslandScript> islandList = new List<IslandScript>();
     private Transform player;
-    private MapController mapController;
     private IslandGenerator islandGenerator;
+    private GameManager gameManager;
     private IslandEditor islandEditor;
 
     public int seed;
@@ -17,27 +17,30 @@ public class IslandManager : MonoBehaviour
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player").transform;
-        mapController = player.GetComponent<MapController>();
         islandGenerator = GetComponent<IslandGenerator>();
-        islandEditor = GetComponent<IslandEditor>();
-
-        //TryToGenerateIsland();
+        gameManager = GetComponent<GameManager>();
     }
 
     void Update()
     {
-        /*foreach(IslandScript islandScript in islands)
+        float minDistance = Vector3.Distance(gameManager.closestIsland.transform.position, player.position);
+        foreach(IslandScript islandScript in islandList)
         {
-            float distance = Vector3.Distance(islandScript.transform.position, player.transform.position);
-            if(!islandScript.gameObject.activeInHierarchy && distance < spotDistance)
+            float distance = Vector3.Distance(islandScript.transform.position, player.position);
+            /*if(!islandScript.gameObject.activeInHierarchy && distance < spotDistance)
             {
                 islandScript.gameObject.SetActive(true);
             }
             else if(islandScript.gameObject.activeInHierarchy && distance > spotDistance)
             {
                 islandScript.gameObject.SetActive(false);
+            }*/
+            if(distance < minDistance)
+            {
+                minDistance = distance;
+                gameManager.closestIsland = islandScript;
             }
-        }*/
+        }
     }
 
     public void TryToGenerateIsland()
@@ -54,8 +57,8 @@ public class IslandManager : MonoBehaviour
             }
         }
         
-        IslandScript islandScript = islandGenerator.GenerateIsland(seed, new Vector2(0,80/*pos.x, pos.z*/), islandEditor);
-        mapController.closestIsland = islandScript;
+        IslandScript islandScript = islandGenerator.GenerateIsland(seed, new Vector2(0,80/*pos.x, pos.z*/));
+        gameManager.closestIsland = islandScript;
         islandList.Add(islandScript);
         
     }

@@ -17,26 +17,32 @@ public class GameManager : MonoBehaviour
 
     public Transform cellsTransform;
     public IslandScript closestIsland;
+    public IslandEditor islandEditor;
     private IslandCellScript islandCellScript;
+    private IslandManager islandManager;
 
     public bool hasSelectedPeasant;
 
     private void Start()
     {
+        islandEditor = GetComponent<IslandEditor>();
         islandCellScript = GetComponent<IslandCellScript>();
         islandCellScript.enabled = false;
 
-        LoadGame();
+        islandManager = GetComponent<IslandManager>();
+        shipScript.gameManager = this;
+        //LoadGame();
+        StartGame();
+
         inventoryEditor.shipInventoryScript = shipScript.inventoryScript;
     }
 
-    public void PlayerIsNearIsland(IslandScript islandScript)
+    public void PlayerIsNearIsland()
     {
         if (!isPlayerNearIsland)
         {
             isPlayerNearIsland = true;
-            canvasScript.PlayerIsNearIsland(islandScript);
-            closestIsland = islandScript;
+            canvasScript.PlayerIsNearIsland(closestIsland);
         }
     }
 
@@ -85,7 +91,7 @@ public class GameManager : MonoBehaviour
     public void RemoveConstruction()
     {
         constructionScript.FinishUpBusiness();
-        closestIsland.npcManager.SendAllPeasantsBack(constructionScript);
+        closestIsland.SendAllPeasantsBack(constructionScript);
         islandCellScript.RemoveConstruction(constructionScript);
         canvasScript.HideConstructionDetails();
     }
@@ -120,7 +126,7 @@ public class GameManager : MonoBehaviour
         cameraScript.ResetPlayerCamera();
         canvasScript.LeaveIsland();
 
-        closestIsland.npcManager.CancelAllTripsToShip(shipScript);
+        closestIsland.CancelAllTripsToShip(shipScript);
         closestIsland.convexColliders.SetActive(true);
         islandCellScript.DestroyAllCells();
         islandCellScript.enabled = false;
@@ -182,10 +188,14 @@ public class GameManager : MonoBehaviour
         }
         shipScript.inventoryScript = gameInfo.inventoryScript;
 
-        IslandManager islandManager = GetComponent<IslandManager>();
         islandManager.seed = gameInfo.seed;
         GetComponent<IslandGenerator>().LoadIslands(gameInfo.islandList);
-        shipScript.GetComponent<MapController>().closestIsland = islandManager.islandList[islandManager.islandList.Count - 1];
+    }
+
+    private void StartGame()
+    {
+        islandManager.TryToGenerateIsland();
+        shipScript.AddDefaultElements();
     }
 }
 

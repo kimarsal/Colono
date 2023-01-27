@@ -4,9 +4,14 @@ using UnityEngine;
 
 public class TrainingScript : EnclosureScript
 {
-    public override TaskScript GetNextPendingTask()
+    public override void EditConstruction()
     {
-        return null;
+        throw new System.NotImplementedException();
+    }
+
+    public override bool GetNextPendingTask(PeasantAdultScript peasantAdultScript)
+    {
+        return false;
     }
 
 }

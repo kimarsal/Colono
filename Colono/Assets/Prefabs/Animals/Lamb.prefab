@@ -777,7 +777,7 @@ NavMeshAgent:
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0
+  m_StoppingDistance: 0.5
   m_AutoTraverseOffMeshLink: 0
   m_AutoBraking: 0
   m_AutoRepath: 1
@@ -804,6 +804,8 @@ MonoBehaviour:
   isRunning: 0
   ageSpeed: 0.1
   age: 0
+  lustSpeed: 0.05
+  timeSinceLastPairing: 0
 --- !u!1 &6039980698932240259
 GameObject:
   m_ObjectHideFlags: 0

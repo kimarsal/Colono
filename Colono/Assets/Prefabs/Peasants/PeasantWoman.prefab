@@ -2329,7 +2329,7 @@ GameObject:
   - component: {fileID: -6096463771212986977}
   - component: {fileID: -9185409014296008347}
   m_Layer: 0
-  m_Name: PT_Medieval_Female_Modular_Free_Pack
+  m_Name: PeasantWoman
   m_TagString: NPC
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2436,7 +2436,6 @@ MonoBehaviour:
   age: 20
   hunger: 0
   exhaustion: 0
-  gameManager: {fileID: 0}
   npcManager: {fileID: 0}
   constructionScript: {fileID: 0}
   speechBubble: {fileID: 6796973763762318536}
@@ -2462,7 +2461,7 @@ NavMeshAgent:
   m_Acceleration: 20
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0.05
+  m_StoppingDistance: 0.3
   m_AutoTraverseOffMeshLink: 0
   m_AutoBraking: 0
   m_AutoRepath: 1

@@ -49,7 +49,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   constructionType: 2
   islandScript: {fileID: 0}
-  islandEditor: {fileID: 0}
   cells: []
   length: 3
   width: 3

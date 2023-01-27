@@ -10,7 +10,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     private enum SelectMode { None, Selecting, Building};
     public GameManager gameManager;
     public IslandGenerator islandGenerator;
-    public IslandEditor islandEditor;
+    public IslandEditor islandEditor { get { return islandScript.islandEditor; } }
     public IslandScript islandScript;
 
     private GameObject[,] cells;
@@ -32,7 +32,6 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     {
         gameManager = GetComponent<GameManager>();
         islandGenerator = GetComponent<IslandGenerator>();
-        islandEditor = GetComponent<IslandEditor>();
         cells = new GameObject[IslandGenerator.mapChunkSize, IslandGenerator.mapChunkSize];
     }
 
@@ -337,15 +336,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             {
                 if (selectedCells.Contains(hoveredCell)) //La nova cel·la hovered està seleccionada
                 {
-                    try
-                    {
-                        cells[x, y].GetComponent<MeshRenderer>().material = islandEditor.selectedHoverMaterial;
-
-                    }
-                    catch(Exception e)
-                    {
-                        Debug.Log(e);
-                    }
+                    cells[x, y].GetComponent<MeshRenderer>().material = islandEditor.selectedHoverMaterial;
                 }
                 else if (!hoveredCells.Contains(hoveredCell))
                 {
@@ -470,8 +461,8 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         {
             if (item.ChangeItemClearingState(toClear)) //Ha canviat d'estat
             {
-                if (toClear) islandScript.npcManager.AddItemToClear(item);
-                else islandScript.npcManager.RemoveItemToClear(item);
+                if (toClear) islandScript.AddItemToClear(item);
+                else islandScript.RemoveItemToClear(item);
             }
         }
     }
@@ -481,6 +472,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     public void CreateEnclosure(EnclosureScript.EnclosureType enclosureType)
     {
         EnclosureScript enclosureScript = islandScript.CreateEnclosure(enclosureType, selectedCells);
+        islandScript.AddConstruction(enclosureScript);
         gameManager.SelectConstruction(enclosureScript);
         DestroyAllCells();
     }
@@ -496,7 +488,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     public void ChooseBuilding(BuildingScript.BuildingType buildingType)
     {
-        selectedBuilding = Instantiate(islandEditor.GetBuilding(buildingType), islandScript.transform.position, Quaternion.identity, islandScript.constructions.transform).GetComponent<BuildingScript>();
+        selectedBuilding = Instantiate(islandEditor.GetBuilding(buildingType), islandScript.transform.position, Quaternion.identity, islandScript.constructionsTransform.transform).GetComponent<BuildingScript>();
 
         selectMode = SelectMode.Building;
         DestroyAllCells();

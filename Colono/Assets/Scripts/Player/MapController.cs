@@ -4,18 +4,10 @@ using UnityEngine;
 
 public class MapController : MonoBehaviour
 {
-    private GameManager gameManager;
     public GameObject ship;
-    public IslandScript closestIsland;
-    public float distanceToBoardIsland = 2f;
 
     public RectTransform arrow;
     private Vector3 destination;
-
-    void Start()
-    {
-        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-    }
 
     void Update()
     {
@@ -41,35 +33,6 @@ public class MapController : MonoBehaviour
                 exitedIslandRadius = false;
             }
         }*/
-
-        bool closeToIsland = false;
-        Vector3 colliderClosestPoint = new Vector3();
-        float minDistance = 10;
-        foreach(MeshCollider meshCollider in closestIsland.convexColliders.GetComponentsInChildren<MeshCollider>())
-        {
-            colliderClosestPoint = Physics.ClosestPoint(transform.position, meshCollider, closestIsland.transform.position, closestIsland.transform.rotation);
-            float distanceToClosestPoint = Vector3.Distance(transform.position, colliderClosestPoint);
-            if (distanceToClosestPoint < minDistance)
-            {
-                minDistance = distanceToClosestPoint;
-            }
-            if(distanceToClosestPoint < distanceToBoardIsland)
-            {
-                closeToIsland = true;
-                break;
-            }
-            
-        }
-
-        if (closeToIsland)
-        {
-            GetComponent<ShipScript>().SetClosestPoint(colliderClosestPoint);
-            gameManager.PlayerIsNearIsland(closestIsland);
-        }
-        else
-        {
-            gameManager.PlayerIsFarFromIsland();
-        }
     }
 
     public void SetDestination(Vector3 newDestination)

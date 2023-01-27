@@ -48,31 +48,12 @@ public class ConstructionDetailsScript : MonoBehaviour
 
     public void EditConstruction()
     {
-        if(constructionScript.constructionType == ConstructionScript.ConstructionType.Ship)
-        {
-            gameManager.canvasScript.ShowInventoryEditor();
-        }
-        else if(constructionScript.constructionType == ConstructionScript.ConstructionType.Enclosure)
-        {
-            switch (((EnclosureScript)constructionScript).enclosureType)
-            {
-                case EnclosureScript.EnclosureType.Garden: gameManager.canvasScript.ShowGardenEditor(); break;
-                case EnclosureScript.EnclosureType.Pen: gameManager.canvasScript.ShowPenEditor((PenScript)constructionScript); break;
-            }
-        }
-        else
-        {
-            switch (((BuildingScript)constructionScript).buildingType)
-            {
-                case BuildingScript.BuildingType.Warehouse: gameManager.canvasScript.ShowInventoryEditor(); break;
-                case BuildingScript.BuildingType.Tavern: gameManager.canvasScript.ShowTavernEditor(); break;
-            }
-        }
+        constructionScript.EditConstruction();
     }
 
-    public void ManagePawns(bool adding)
+    public void ManagePeasants(bool adding)
     {
-        if (gameManager.closestIsland.npcManager.SendPeasantToArea(constructionScript, adding))
+        if (constructionScript.islandScript.ManagePeasants(constructionScript, adding))
         {
             UpdatePeasantNum();
         }

@@ -9,6 +9,7 @@ public class AnimalScript : MonoBehaviour
 {
     public PenScript penScript;
     public ResourceScript.AnimalType animalType;
+    private PairingScript pairingScript;
 
     private NavMeshAgent navMeshAgent;
     private Animator animator;
@@ -19,10 +20,15 @@ public class AnimalScript : MonoBehaviour
     public float ageSpeed = 0.05f;
     public float age;
 
+    public float lustSpeed = 0.05f;
+    public float timeSinceLastPairing;
+    private bool isReadyForPairing;
+
     private void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
+        animator.SetFloat("Speed", 0);
         SetDestination(NPCManager.GetRandomPointWithinRange(penScript.minPos, penScript.maxPos));
     }
 
@@ -33,12 +39,17 @@ public class AnimalScript : MonoBehaviour
 
     void Update()
     {
-        if (!navMeshAgent.isStopped)
+        if (!navMeshAgent.pathPending
+            && navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance
+            && (!navMeshAgent.hasPath || navMeshAgent.velocity.sqrMagnitude == 0f))
         {
-            float d = Vector3.Distance(transform.position, navMeshAgent.destination);
-            if (d < 0.3f) //Ha arribat al destí
+            animator.SetFloat("Speed", 0);
+            if (pairingScript != null)
             {
-                StopCharacter();
+                pairingScript.ParticipantHasArrived();
+            }
+            else
+            {
                 StartCoroutine(WaitForNextRandomDestination());
             }
         }
@@ -53,10 +64,21 @@ public class AnimalScript : MonoBehaviour
             penScript.AgeUpAnimal(this);
         }
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (timeSinceLastPairing < 1)
+        {
+            timeSinceLastPairing += Time.deltaTime * lustSpeed;
+        }
+        else if(!isReadyForPairing)
+        {
+            isReadyForPairing = true;
+            timeSinceLastPairing = 1;
+            penScript.AnimalIsReadyForPairing(this);
+        }
+
+        /*if (Input.GetKeyDown(KeyCode.Space))
         {
             StartCoroutine(Die());
-        }
+        }*/
     }
 
     protected void StopCharacter()
@@ -84,6 +106,19 @@ public class AnimalScript : MonoBehaviour
         navMeshAgent.isStopped = false;
         navMeshAgent.speed = isRunning ? runSpeed : walkSpeed;
         animator.SetFloat("Speed", isRunning ? 1 : 0.5f);
+    }
+
+    public void GetReadyForPairing(PairingScript pairingScript)
+    {
+        this.pairingScript = pairingScript;
+        SetDestination(pairingScript.center);
+    }
+
+    public void EndPairing()
+    {
+        isReadyForPairing = false;
+        pairingScript = null;
+        WaitForNextRandomDestination();
     }
 
     private IEnumerator Die()

@@ -4,26 +4,26 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class IslandScript : MonoBehaviour
+public class IslandScript : TaskSourceScript
 {
     public string islandName;
     public Vector2 offset;
     public bool hasBeenDiscovered;
-
     public MeshData meshData;
     public int[,] regionMap;
 
-    private GameManager gameManager;
-    public IslandEditor islandEditor;
-    public NPCManager npcManager;
+    public GameManager gameManager;
+    public IslandEditor islandEditor { get { return gameManager.islandEditor; } }
     public InventoryScript inventoryScript;
 
     public GameObject convexColliders;
-    public GameObject items;
-    public GameObject constructions;
+    public Transform itemsTransform;
+    public Transform constructionsTransform;
+    public Transform npcsTransform;
 
-    public Dictionary<Vector2, ItemScript> itemList = new Dictionary<Vector2, ItemScript>();
+    private Dictionary<Vector2, ItemScript> itemDictionary = new Dictionary<Vector2, ItemScript>();
     public List<ConstructionScript> constructionList = new List<ConstructionScript>();
+    public List<PeasantScript> peasantList = new List<PeasantScript>();
 
 
     private void Start()
@@ -34,44 +34,47 @@ public class IslandScript : MonoBehaviour
 
     public bool isCellTaken(Vector2 cell)
     {
-        return itemList.ContainsKey(cell);
+        return itemDictionary.ContainsKey(cell);
     }
 
     public ItemScript GetItemByCell(Vector2 cell)
     {
-        return itemList[cell];
+        return itemDictionary[cell];
     }
 
     public void AddItem(ItemScript item, Vector2 cell)
     {
-        itemList.Add(cell, item);
+        itemDictionary.Add(cell, item);
     }
 
     public void RemoveItemAtCell(Vector2 cell)
     {
-        itemList.Remove(cell);
+        itemDictionary.Remove(cell);
     }
 
     public void AddConstruction(ConstructionScript constructionScript)
     {
-        if(constructionScript.constructionType == ConstructionScript.ConstructionType.Building && ((BuildingScript)constructionScript).buildingType == BuildingScript.BuildingType.Warehouse)
+        if(constructionScript.constructionType == ConstructionScript.ConstructionType.Building)
         {
-            inventoryScript.capacity += 30;
+            constructionScript.outline = constructionScript.AddComponent<Outline>();
+            constructionScript.outline.enabled = false;
+            
+            if(((BuildingScript)constructionScript).buildingType == BuildingScript.BuildingType.Warehouse)
+            {
+                inventoryScript.capacity += 30;
+            }
         }
         constructionScript.islandScript = this;
-        constructionScript.islandEditor = islandEditor;
-        constructionScript.outline = constructionScript.AddComponent<Outline>();
-        constructionScript.outline.enabled = false;
         constructionList.Add(constructionScript);
 
         InvertRegions(constructionScript.cells);
         RebakeNavMesh();
     }
 
-    public EnclosureScript CreateEnclosure(EnclosureScript.EnclosureType enclosureType, Vector2[] selectedCells)
+    public EnclosureScript CreateEnclosure(EnclosureScript.EnclosureType enclosureType, Vector2[] selectedCells, EnclosureInfo enclosureInfo = null)
     {
         GameObject enclosure = new GameObject(enclosureType.ToString());
-        enclosure.transform.parent = constructions.transform;
+        enclosure.transform.parent = constructionsTransform.transform;
         enclosure.transform.localPosition = Vector3.zero;
         EnclosureScript enclosureScript = null;
         switch (enclosureType)
@@ -80,48 +83,9 @@ public class IslandScript : MonoBehaviour
             case EnclosureScript.EnclosureType.Pen: enclosureScript = enclosure.AddComponent<PenScript>(); break;
             case EnclosureScript.EnclosureType.Training: enclosureScript = enclosure.AddComponent<TrainingScript>(); break;
         }
-        enclosureScript.constructionType = ConstructionScript.ConstructionType.Enclosure;
-        enclosureScript.cells = selectedCells;
         enclosureScript.enclosureType = enclosureType;
-        enclosureScript.width = (int)selectedCells[selectedCells.Length - 1].x - (int)selectedCells[0].x + 1;
-        enclosureScript.length = (int)selectedCells[selectedCells.Length - 1].y - (int)selectedCells[0].y + 1;
-
-        GameObject fences = new GameObject("Fences");
-        fences.transform.parent = enclosure.transform;
-        fences.transform.localPosition = Vector3.zero;
-        Vector3[] positions;
-        Quaternion[] rotations;
-        MeshGenerator.GetFencePositions(selectedCells, meshData, out positions, out rotations);
-        for (int i = 0; i < positions.Length - 1; i++)
-        {
-            GameObject fence = Instantiate(islandEditor.fences[UnityEngine.Random.Range(0, islandEditor.fences.Length)], transform.position + positions[i], rotations[i], fences.transform);
-            if (i == 0) enclosureScript.minPos = fence.transform.localPosition;
-            else if (i == positions.Length - 2) enclosureScript.maxPos = fence.transform.localPosition - new Vector3(0, 0, 1);
-        }
-
-        if (enclosureType == EnclosureScript.EnclosureType.Pen)
-        {
-            ((PenScript)enclosureScript).openGate = Instantiate(islandEditor.gateOpen, transform.position + positions[positions.Length - 1], rotations[rotations.Length - 1], fences.transform);
-            ((PenScript)enclosureScript).openGate.SetActive(false);
-            ((PenScript)enclosureScript).closedGate = Instantiate(islandEditor.gateClosed, transform.position + positions[positions.Length - 1], rotations[rotations.Length - 1], fences.transform);
-        }
-        else
-        {
-            GameObject post = Instantiate(islandEditor.post, transform.position + positions[positions.Length - 1], rotations[rotations.Length - 1], fences.transform);
-        }
-
-        BoxCollider boxCollider = enclosure.AddComponent<BoxCollider>();
-        boxCollider.center = (enclosureScript.minPos + enclosureScript.maxPos) / 2;
-        boxCollider.size = new Vector3(enclosureScript.maxPos.x - enclosureScript.minPos.x, 1, enclosureScript.minPos.z - enclosureScript.maxPos.z);
-        boxCollider.isTrigger = true;
-
-        enclosureScript.maxPeasants = (enclosureScript.width - 2) * (enclosureScript.length - 2);
-        enclosureScript.minPos += transform.position;
-        enclosureScript.maxPos += transform.position;
-
-        enclosureScript.entry = Instantiate(islandEditor.enclosureCenter, transform.position + boxCollider.center, Quaternion.identity, enclosure.transform).transform;
-
-        AddConstruction(enclosureScript);
+        enclosureScript.cells = selectedCells;
+        enclosureScript.InitializeEnclosure(enclosureInfo, this);
 
         return enclosureScript;
     }
@@ -178,20 +142,25 @@ public class IslandScript : MonoBehaviour
         return null;
     }
 
-    public BuildingScript GetAvailableBuilding(BuildingScript.BuildingType buildingType)
+    public BuildingScript GetAvailableBuilding(BuildingScript.BuildingType buildingType, PeasantScript peasantScript)
     {
+        BuildingScript closestBuildingScript = null;
+        float minDistance = -1;
         foreach (ConstructionScript construction in constructionList)
         {
             if(construction.constructionType == ConstructionScript.ConstructionType.Building)
             {
-                BuildingScript building = (BuildingScript)construction;
-                if (building.buildingType == buildingType && building.peasantList.Count < building.maxPeasants)
+                BuildingScript buildingScript = (BuildingScript)construction;
+                float distance;
+                if (buildingScript.buildingType == buildingType && buildingScript.peasantList.Count < buildingScript.maxPeasants
+                    && NPCManager.CheckIfClosest(buildingScript.transform.position, peasantScript.GetComponent<NavMeshAgent>(), minDistance, out distance))
                 {
-                    return building;
+                    closestBuildingScript = buildingScript;
+                    minDistance = distance;
                 }
             }
         }
-        return null;
+        return closestBuildingScript;
     }
 
     public bool AddResource(ResourceScript.ResourceType resourceType, int resourceIndex, int amount = 1)
@@ -233,7 +202,7 @@ public class IslandScript : MonoBehaviour
         islandInfo.hasBeenDiscovered = hasBeenDiscovered;
 
         islandInfo.itemList = new List<ItemInfo>();
-        foreach(KeyValuePair<Vector2, ItemScript> key in itemList)
+        foreach(KeyValuePair<Vector2, ItemScript> key in itemDictionary)
         {
             islandInfo.itemList.Add(key.Value.GetItemInfo());
         }
@@ -245,7 +214,7 @@ public class IslandScript : MonoBehaviour
         }
 
         islandInfo.peasantList = new List<PeasantInfo>();
-        foreach(PeasantScript peasantScript in npcManager.peasantList)
+        foreach(PeasantScript peasantScript in peasantList)
         {
             islandInfo.peasantList.Add(peasantScript.GetPeasantInfo());
         }
@@ -254,6 +223,131 @@ public class IslandScript : MonoBehaviour
 
         return islandInfo;
     }
+
+    /*NPCMANAGER*/
+
+    public void AddItemToClear(ItemScript itemScript)
+    {
+        taskList.Add(itemScript);
+
+        PeasantAdultScript closestPeasantScript = (PeasantAdultScript)GetClosestPeasant(itemScript.center, true);
+        if (closestPeasantScript != null)
+        {
+            closestPeasantScript.AssignTask(itemScript);
+        }
+    }
+
+    public PeasantScript GetClosestPeasant(Vector3 position, bool mustBeAvailableAdult)
+    {
+        PeasantScript closestPeasantScript = null;
+        float minDistance = -1;
+        for (int i = 0; i < peasantList.Count; i++)
+        {
+            PeasantScript newPeasantScript = peasantList[i];
+            if (!mustBeAvailableAdult //Si pot ser qualsevol
+                || (newPeasantScript.peasantType == PeasantScript.PeasantType.Adult //Si és un adult
+                && ((PeasantAdultScript)newPeasantScript).CanBeAsignedTask())) //Si és un adult disponible
+            {
+                float distance;
+                if (NPCManager.CheckIfClosest(position, newPeasantScript.GetComponent<NavMeshAgent>(), minDistance, out distance))
+                {
+                    closestPeasantScript = newPeasantScript;
+                    minDistance = distance;
+                }
+            }
+        }
+        return closestPeasantScript;
+    }
+
+    public void RemoveItemToClear(ItemScript item)
+    {
+        taskList.Remove(item);
+        PeasantAdultScript peasantScript = item.peasantAdultScript;
+        if (peasantScript != null) //Tenia un NPC vinculat
+        {
+            item.peasantAdultScript = null;
+            GetNextPendingTask(peasantScript);
+        }
+    }
+
+    public override bool GetNextPendingTask(PeasantAdultScript peasantAdultScript)
+    {
+        if (!base.GetNextPendingTask(peasantAdultScript)) return false;
+
+        ItemScript closestItemScript = null;
+        float minDistance = -1;
+        foreach (ItemScript itemScript in taskList)
+        {
+            float distance;
+            if (itemScript.peasantAdultScript == null //Si no té un NPC vinculat
+                && NPCManager.CheckIfClosest(itemScript.transform.position, peasantAdultScript.GetComponent<NavMeshAgent>(), minDistance, out distance))
+            {
+                closestItemScript = itemScript;
+                minDistance = distance;
+            }
+        }
+        peasantAdultScript.AssignTask(closestItemScript);
+        return closestItemScript != null;
+    }
+
+    public bool ManagePeasants(ConstructionScript constructionScript, bool adding)
+    {
+        if (adding) // Enviar a la construcció
+        {
+            PeasantScript peasantScript = GetClosestPeasant(constructionScript.entry.position, constructionScript.constructionType != ConstructionScript.ConstructionType.Ship);
+
+            if (peasantScript != null)
+            {
+                peasantList.Remove(peasantScript);
+                constructionScript.AddPeasant(peasantScript);
+                peasantScript.UpdateTask();
+                return true;
+            }
+            return false;
+        }
+        else // Desvincular de la construcció
+        {
+            PeasantScript peasantScript = constructionScript.RemovePeasant();
+            peasantScript.constructionScript = null;
+            peasantList.Add(peasantScript);
+
+            if (peasantScript.peasantType == PeasantScript.PeasantType.Adult)
+            {
+                GetNextPendingTask((PeasantAdultScript)peasantScript);
+            }
+            else peasantScript.UpdateTask();
+            return true;
+        }
+    }
+
+    public void SendAllPeasantsBack(ConstructionScript constructionScript)
+    {
+        for (int i = 0; i < constructionScript.peasantList.Count; i++)
+        {
+            PeasantScript peasantScript = constructionScript.RemovePeasant();
+            peasantList.Add(peasantScript);
+            if (peasantScript.peasantType == PeasantScript.PeasantType.Adult)
+            {
+                GetNextPendingTask((PeasantAdultScript)peasantScript);
+            }
+            else peasantScript.UpdateTask();
+        }
+    }
+
+    public void CancelAllTripsToShip(ShipScript shipScript)
+    {
+        for (int i = shipScript.peasantList.Count - 1; i >= 0; i--)
+        {
+            PeasantScript peasantScript = shipScript.peasantList[i];
+            peasantList.Add(peasantScript);
+            shipScript.peasantList.Remove(peasantScript);
+            peasantScript.constructionScript = null;
+            if (peasantScript.peasantType == PeasantScript.PeasantType.Adult) GetNextPendingTask((PeasantAdultScript)peasantScript);
+            else peasantScript.UpdateTask();
+        }
+        shipScript.peasantsOnTheirWay = 0;
+    }
+
 }
 
 [System.Serializable]

@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
@@ -6,7 +7,7 @@ public abstract class PeasantScript : MonoBehaviour
 {
     public enum PeasantType { Adult, Child }
     public enum PeasantGender { Male, Female }
-    public enum PeasantAction { Moving, Chopping, Digging, Pulling, Planting, Watering, Gathering, Milking, Dancing };
+    public enum PeasantAction { Moving, Chopping, Digging, Pulling, Planting, Watering, Gathering, Feeding, Milking, Dancing };
 
     [Header("Characteristics")]
     public PeasantType peasantType;
@@ -17,13 +18,13 @@ public abstract class PeasantScript : MonoBehaviour
     public bool isNative = false;
 
     [Header("Appearence")]
-    public GameObject head1;
-    public GameObject head2;
-    public GameObject lowerNaked;
-    public GameObject upperNaked;
-    public GameObject lowerClothed;
-    public GameObject upperClothed;
-    public Material material;
+    [JsonIgnore] public GameObject head1;
+    [JsonIgnore] public GameObject head2;
+    [JsonIgnore] public GameObject lowerNaked;
+    [JsonIgnore] public GameObject upperNaked;
+    [JsonIgnore] public GameObject lowerClothed;
+    [JsonIgnore] public GameObject upperClothed;
+    [JsonIgnore] public Material material;
 
     private int headType;
     private Color _SKINCOLOR;
@@ -41,7 +42,7 @@ public abstract class PeasantScript : MonoBehaviour
     private float exhaustionSpeed = 0.001f;
 
     [Header("Scripts")]
-    public NPCManager npcManager;
+    public IslandScript islandScript;
     public ConstructionScript constructionScript;
     public SpeechBubbleScript speechBubble;
     public PeasantDetailsScript peasantDetailsScript;
@@ -60,6 +61,9 @@ public abstract class PeasantScript : MonoBehaviour
         animator = GetComponent<Animator>();
         navMeshAgent = GetComponent<NavMeshAgent>();
         animator.SetInteger("State", (int)PeasantAction.Moving);
+        animator.SetFloat("Speed", 0);
+
+        UpdateTask();
     }
 
     public void InitializePeasant(PeasantInfo peasantInfo)
@@ -119,9 +123,16 @@ public abstract class PeasantScript : MonoBehaviour
 
     private void Update()
     {
-        age += Time.deltaTime * ageSpeed;
+        UpdateDetails();
 
-        peasantDetailsScript?.UpdateDetails();
+        CheckIfClicked();
+
+        CheckIfArrivedAtDestination();
+    }
+
+    protected void UpdateDetails()
+    {
+        age += Time.deltaTime * ageSpeed;
 
         if (hunger < 1)
         {
@@ -130,8 +141,14 @@ public abstract class PeasantScript : MonoBehaviour
         else if (tavern == null)
         {
             hunger = 1;
-            tavern = (TavernScript)npcManager.islandScript.GetAvailableBuilding(BuildingScript.BuildingType.Tavern);
-            if(tavern != null) UpdateTask();
+            tavern = (TavernScript)islandScript.GetAvailableBuilding(BuildingScript.BuildingType.Tavern, this);
+            if (tavern != null)
+            {
+                tavern.peasantList.Add(this);
+                tavern.peasantsOnTheirWay++;
+                tavern.UpdateConstructionDetails();
+                UpdateTask();
+            }
         }
 
         if (exhaustion < 1)
@@ -141,10 +158,21 @@ public abstract class PeasantScript : MonoBehaviour
         else if (cabin == null)
         {
             exhaustion = 1;
-            cabin = (CabinScript)npcManager.islandScript.GetAvailableBuilding(BuildingScript.BuildingType.Cabin);
-            if(cabin != null) UpdateTask();
+            cabin = (CabinScript)islandScript.GetAvailableBuilding(BuildingScript.BuildingType.Cabin, this);
+            if (cabin != null)
+            {
+                cabin.peasantList.Add(this);
+                cabin.peasantsOnTheirWay++;
+                cabin.UpdateConstructionDetails();
+                UpdateTask();
+            }
         }
 
+        peasantDetailsScript?.UpdateDetails();
+    }
+
+    protected void CheckIfClicked()
+    {
         if (gameManager.CanSelect() && peasantDetailsScript == null)
         {
             RaycastHit raycastHit;
@@ -165,26 +193,22 @@ public abstract class PeasantScript : MonoBehaviour
                 }
             }
         }
-
-        CheckIfArrivedAtDestination();
     }
 
     protected void CheckIfArrivedAtDestination()
     {
-        if (!navMeshAgent.isStopped)
+        if (!navMeshAgent.pathPending
+            && navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance
+            && (!navMeshAgent.hasPath || navMeshAgent.velocity.sqrMagnitude == 0f))
         {
-            float d = Vector3.Distance(transform.position, navMeshAgent.destination);
-            if (d < 0.5f) //Ha arribat al destí
-            {
-                StopCharacter();
-                ArrivedAtDestination();
-            }
+            animator.SetFloat("Speed", 0);
+            ArrivedAtDestination();
         }
     }
 
     protected void StopCharacter()
     {
-        if (navMeshAgent == null)
+        if(navMeshAgent == null)
         {
             animator = GetComponent<Animator>();
             navMeshAgent = GetComponent<NavMeshAgent>();
