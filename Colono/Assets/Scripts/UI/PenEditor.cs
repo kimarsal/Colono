@@ -72,8 +72,8 @@ public class PenEditor : MonoBehaviour
         }
         else
         {
-            AnimalInfo animalInfo = RemoveAnimal(animalType);
-            shipScript.AddAnimal(animalInfo);
+            AnimalScript animalScript = RemoveAnimal(animalType);
+            shipScript.AddAnimal(animalScript);
         }
 
         UpdatePenText();
@@ -99,7 +99,7 @@ public class PenEditor : MonoBehaviour
 
     }
 
-    public AnimalInfo RemoveAnimal(AnimalType animalType)
+    public AnimalScript RemoveAnimal(AnimalType animalType)
     {
         for(int i = 0; i < penScript.animalList.Count; i++)
         {
@@ -109,9 +109,8 @@ public class PenEditor : MonoBehaviour
                 penScript.animalList.RemoveAt(i);
                 penScript.animals[(int)animalType]--;
                 penScript.animalAmount--;
-                AnimalInfo animalInfo = animalScript.GetAnimalInfo();
                 Destroy(animalScript.gameObject);
-                return animalInfo;
+                return animalScript;
             }
         }
         return null;

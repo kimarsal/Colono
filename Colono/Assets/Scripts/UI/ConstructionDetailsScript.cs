@@ -71,19 +71,9 @@ public class ConstructionDetailsScript : MonoBehaviour
             peasantsOnTheirWayText.gameObject.SetActive(false);
         }
 
-        if(constructionScript.constructionType == ConstructionScript.ConstructionType.Ship)
-        {
-            ShipScript shipScript = (ShipScript)constructionScript;
-            peasantNumText.text = shipScript.peasantInfoList.Count.ToString() + "/" + constructionScript.maxPeasants;
-            minusButton.interactable = shipScript.peasantInfoList.Count > 0;
-            plusButton.interactable = shipScript.peasantInfoList.Count < shipScript.maxPeasants;
-        }
-        else
-        {
-            peasantNumText.text = (constructionScript.peasantList.Count - constructionScript.peasantsOnTheirWay).ToString() + "/" + constructionScript.maxPeasants;
-            minusButton.interactable = constructionScript.peasantList.Count > 0;
-            plusButton.interactable = constructionScript.peasantList.Count < constructionScript.maxPeasants;
-        }
+        peasantNumText.text = (constructionScript.peasantList.Count - constructionScript.peasantsOnTheirWay).ToString() + "/" + constructionScript.maxPeasants;
+        minusButton.interactable = constructionScript.peasantList.Count > 0;
+        plusButton.interactable = constructionScript.peasantList.Count < constructionScript.maxPeasants;
     }
 
 }

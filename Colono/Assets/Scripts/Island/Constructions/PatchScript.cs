@@ -70,22 +70,12 @@ public class PatchScript : TaskScript
             ((GardenScript)taskSourceScript).islandScript.AddResource(ResourceScript.ResourceType.Crop, (int)cropType);
         }
     }
-
-    public PatchInfo GetPatchInfo()
-    {
-        PatchInfo patchInfo = new PatchInfo();
-        patchInfo.cell = new SerializableVector2(cell);
-        patchInfo.orientation = orientation;
-        patchInfo.cropType = cropType;
-        patchInfo.cropState = cropState;
-        return patchInfo;
-    }
 }
 
 [System.Serializable]
 public class PatchInfo
 {
-    public SerializableVector2 cell;
+    public Vector2 cell;
     public int orientation;
     public ResourceScript.CropType cropType;
     public CropState cropState;

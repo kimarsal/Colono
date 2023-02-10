@@ -8,6 +8,7 @@ TagManager:
   - Island
   - Cannonball
   - NPC
+  - Construction
   layers:
   - Default
   - TransparentFX
@@ -16,8 +17,8 @@ TagManager:
   - Water
   - UI
   - NavMeshGeometry
-  - 
-  - 
+  - Construction
+  - EnclosureCollider
   - 
   - 
   - 

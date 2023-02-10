@@ -47,7 +47,7 @@ public class TavernScript : BuildingScript
         if (peasantScript.peasantType == PeasantScript.PeasantType.Adult)
         {
             PeasantAdultScript peasantAdultScript = (PeasantAdultScript)peasantScript;
-            peasantAdultScript.taskSourceScript.GetNextPendingTask(peasantAdultScript);
+            peasantAdultScript.taskSourceInterface.GetNextPendingTask(peasantAdultScript);
         }
         else peasantScript.UpdateTask();
     }
@@ -59,16 +59,4 @@ public class TavernScript : BuildingScript
         return peasantScript;
     }
 
-    public TavernInfo GetTavernInfo()
-    {
-        TavernInfo tavernInfo = new TavernInfo();
-        tavernInfo.recipeList = recipeList;
-        return tavernInfo;
-    }
-}
-
-[System.Serializable]
-public class TavernInfo : BuildingInfo
-{
-    public List<Recipe> recipeList;
 }

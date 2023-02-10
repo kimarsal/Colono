@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 2630912286697727264}
   - component: {fileID: 1381825928570284677}
   - component: {fileID: 3803795753941065295}
+  - component: {fileID: 5281066432132295042}
   m_Layer: 0
-  m_Name: _grass_2
+  m_Name: treeSprout
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -83,3 +84,29 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &5281066432132295042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3443336602622132122}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1430096bba10d8d458966e0142371b11, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  center: {x: 0, y: 0, z: 0}
+  taskType: 0
+  peasantAdultScript: {fileID: 0}
+  actionType: 0
+  itemCell: {x: 0, y: 0}
+  orientation: 0
+  materialType: 0
+  materialAmount: 0
+  terrainType: 0
+  itemIndex: 0
+  islandScript: {fileID: 0}
+  isScheduledForClearing: 0
+  growth: 0
+  growthSpeed: 0.1

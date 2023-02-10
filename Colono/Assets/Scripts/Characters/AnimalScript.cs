@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -7,20 +8,22 @@ using UnityEngine.AI;
 
 public class AnimalScript : MonoBehaviour
 {
-    public PenScript penScript;
     public ResourceScript.AnimalType animalType;
-    private PairingScript pairingScript;
+    public Vector3 position;
+    public int orientation;
+    [JsonIgnore] public PenScript penScript;
+    [JsonIgnore] private PairingScript pairingScript;
 
-    private NavMeshAgent navMeshAgent;
-    private Animator animator;
-    public float walkSpeed = 1;
-    public float runSpeed = 2;
-    public bool isRunning = false;
+    [JsonIgnore] private NavMeshAgent navMeshAgent;
+    [JsonIgnore] private Animator animator;
+    [JsonIgnore] public float walkSpeed = 1;
+    [JsonIgnore] public float runSpeed = 2;
+    public bool isRunning;
 
-    public float ageSpeed = 0.05f;
+    [JsonIgnore] public float ageSpeed = 0.05f;
     public float age;
 
-    public float lustSpeed = 0.05f;
+    [JsonIgnore] public float lustSpeed = 0.05f;
     public float timeSinceLastPairing;
     private bool isReadyForPairing;
 
@@ -32,9 +35,12 @@ public class AnimalScript : MonoBehaviour
         SetDestination(NPCManager.GetRandomPointWithinRange(penScript.minPos, penScript.maxPos));
     }
 
-    public void InitializeAnimal(AnimalInfo animalInfo)
+    public void InitializeAnimal(AnimalScript animalScript)
     {
-        age = animalInfo.age;
+        isRunning = animalScript.isRunning;
+        age = animalScript.age;
+        timeSinceLastPairing = animalScript.timeSinceLastPairing;
+        isReadyForPairing = animalScript.isReadyForPairing;
     }
 
     void Update()
@@ -79,6 +85,8 @@ public class AnimalScript : MonoBehaviour
         {
             StartCoroutine(Die());
         }*/
+        position = transform.position;
+        orientation = (int)transform.rotation.y % 360;
     }
 
     protected void StopCharacter()
@@ -128,23 +136,4 @@ public class AnimalScript : MonoBehaviour
         yield return new WaitForSeconds(animator.GetCurrentAnimatorClipInfo(0)[0].clip.length);
         //Destroy(gameObject);
     }
-
-    public AnimalInfo GetAnimalInfo()
-    {
-        AnimalInfo animalInfo = new AnimalInfo();
-        animalInfo.animalType = animalType;
-        animalInfo.position = new SerializableVector3(transform.position);
-        animalInfo.orientation = Mathf.RoundToInt(transform.rotation.eulerAngles.y);
-        animalInfo.age = age;
-        return animalInfo;
-    }
-}
-
-[System.Serializable]
-public class AnimalInfo
-{
-    public ResourceScript.AnimalType animalType;
-    public SerializableVector3 position;
-    public int orientation;
-    public float age;
 }

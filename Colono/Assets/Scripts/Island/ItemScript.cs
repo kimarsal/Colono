@@ -1,23 +1,25 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.Progress;
 
 public class ItemScript : TaskScript
 {
-    public enum ItemType { Chop, Dig, Pull, Pick }
-    public ItemType itemType;
+    public enum ActionType { None, Chop, Dig, Pull, Pick }
+    [JsonIgnore] public ActionType actionType;
     public Vector2 itemCell;
     public int orientation;
 
-    public ResourceScript.MaterialType materialType;
+    [JsonIgnore] public ResourceScript.MaterialType materialType;
     public int materialAmount;
     public Terrain.TerrainType terrainType;
     public int itemIndex;
 
-    public IslandScript islandScript;
+    [JsonIgnore] public IslandScript islandScript;
     public bool isScheduledForClearing;
-    private Outline outline;
+    [JsonIgnore] private Outline outline;
 
     private void Start()
     {
@@ -31,19 +33,14 @@ public class ItemScript : TaskScript
         center = transform.position;
     }
 
-    public bool ChangeItemClearingState(bool toClear)
+    public void ChangeItemClearingState(bool toClear)
     {
-        if (isScheduledForClearing != toClear)
-        {
-            isScheduledForClearing = toClear;
-            outline.enabled = toClear;
-            if (!toClear)
-            {
-                islandScript.RemoveItemToClear(this);
-            }
-            return true;
-        }
-        return false;
+        if (isScheduledForClearing == toClear) return;
+
+        isScheduledForClearing = toClear;
+        outline.enabled = toClear;
+        if (toClear) islandScript.AddItemToClear(this);
+        else islandScript.RemoveItemToClear(this);
     }
 
     public override void TaskProgress()
@@ -62,27 +59,4 @@ public class ItemScript : TaskScript
     {
         return;
     }
-
-    public ItemInfo GetItemInfo()
-    {
-        ItemInfo itemInfo = new ItemInfo();
-        itemInfo.terrainType = terrainType;
-        itemInfo.itemIndex = itemIndex;
-        itemInfo.cell = new SerializableVector2(itemCell);
-        itemInfo.orientation = orientation;
-        itemInfo.materialAmount = materialAmount;
-        itemInfo.isScheduledForClearing = isScheduledForClearing;
-        return itemInfo;
-    }
-}
-
-[System.Serializable]
-public class ItemInfo
-{
-    public Terrain.TerrainType terrainType;
-    public int itemIndex;
-    public SerializableVector2 cell;
-    public int orientation;
-    public int materialAmount;
-    public bool isScheduledForClearing;
 }

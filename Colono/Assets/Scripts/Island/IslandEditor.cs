@@ -51,7 +51,7 @@ public class IslandEditor : MonoBehaviour
     public GameObject[] pepper;
     public GameObject[] corn;
 
-    public GameObject[] grass;
+    public GameObject cropSprout;
 
     [Header("Animals")]
     public GameObject[] animals;
@@ -65,6 +65,8 @@ public class IslandEditor : MonoBehaviour
     public GameObject[] fieldItems;
     public GameObject[] hillItems;
     public GameObject[] mountainItems;
+
+    public GameObject treeSprout;
 
     [Header("Others")]
     public GameObject coastObstacle;
@@ -86,8 +88,8 @@ public class IslandEditor : MonoBehaviour
     {
         switch (terrainType)
         {
-            case Terrain.TerrainType.Grass: return fieldItems[itemIndex];
-            case Terrain.TerrainType.Grass2: return hillItems[itemIndex];
+            case Terrain.TerrainType.Field: return fieldItems[itemIndex];
+            case Terrain.TerrainType.Hill: return hillItems[itemIndex];
         }
         return null;
     }
@@ -96,13 +98,24 @@ public class IslandEditor : MonoBehaviour
     {
         switch (terrainType)
         {
-            case Terrain.TerrainType.Grass: itemIndex = Random.Range(0, fieldItems.Length); return fieldItems[itemIndex];
-            case Terrain.TerrainType.Grass2: itemIndex = Random.Range(0, hillItems.Length); return hillItems[itemIndex];
+            case Terrain.TerrainType.Field: itemIndex = Random.Range(0, fieldItems.Length); return fieldItems[itemIndex];
+            case Terrain.TerrainType.Hill: itemIndex = Random.Range(0, hillItems.Length); return hillItems[itemIndex];
         }
         itemIndex = -1;
         return null;
     }
-    
+
+    public GameObject getRandomTreePrefab(Terrain.TerrainType terrainType, out int itemIndex)
+    {
+        switch (terrainType)
+        {
+            case Terrain.TerrainType.Field: itemIndex = Random.Range(0, 14); return fieldItems[itemIndex];
+            case Terrain.TerrainType.Hill: itemIndex = Random.Range(0, 4); return hillItems[itemIndex];
+        }
+        itemIndex = -1;
+        return null;
+    }
+
     public GameObject GetCropPrefab(CropType cropType, CropState cropState)
     {
         GameObject prefab = null;
@@ -120,7 +133,7 @@ public class IslandEditor : MonoBehaviour
             case CropType.Pepper: prefab = pepper[(int)cropState]; break;
             case CropType.Corn: prefab = corn[(int)cropState]; break;
         }
-        if (prefab == null) prefab = grass[(int)cropState];
+        if (prefab == null) prefab = cropSprout;
         return prefab;
     }
 

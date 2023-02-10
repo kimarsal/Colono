@@ -25,7 +25,7 @@ public class CabinScript : BuildingScript
         if (peasantScript.peasantType == PeasantScript.PeasantType.Adult)
         {
             PeasantAdultScript peasantAdultScript = (PeasantAdultScript)peasantScript;
-            peasantAdultScript.taskSourceScript.GetNextPendingTask(peasantAdultScript);
+            peasantAdultScript.taskSourceInterface.GetNextPendingTask(peasantAdultScript);
         }
         else peasantScript.UpdateTask();
     }

@@ -41,7 +41,7 @@ public class PeasantChildScript : PeasantScript
         }
         else if (constructionScript != null) //Si té el vaixell com a destí
         {
-            ((ShipScript)constructionScript).AddPeasant(GetPeasantInfo());
+            ((ShipScript)constructionScript).AddPeasant(this);
             constructionScript.peasantsOnTheirWay--;
             constructionScript.UpdateConstructionDetails();
             Destroy(gameObject);

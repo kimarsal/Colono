@@ -1,27 +1,31 @@
+using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using static Terrain;
+using static UnityEngine.Rendering.DebugUI.Table;
 
-public class IslandScript : TaskSourceScript
+public class IslandScript : MonoBehaviour, TaskSourceInterface
 {
     public string islandName;
     public Vector2 offset;
     public bool hasBeenDiscovered;
-    public MeshData meshData;
-    public int[,] regionMap;
-
-    public GameManager gameManager;
+    [JsonIgnore] public MeshData meshData;
+    [JsonIgnore] public int[,] regionMap;
+    
     public IslandEditor islandEditor { get { return gameManager.islandEditor; } }
     public InventoryScript inventoryScript;
 
-    public GameObject convexColliders;
-    public Transform itemsTransform;
-    public Transform constructionsTransform;
-    public Transform npcsTransform;
+    [JsonIgnore] public GameManager gameManager;
+    [JsonIgnore] public GameObject convexColliders;
+    [JsonIgnore] public Transform itemsTransform;
+    [JsonIgnore] public Transform constructionsTransform;
+    [JsonIgnore] public Transform npcsTransform;
 
-    private Dictionary<Vector2, ItemScript> itemDictionary = new Dictionary<Vector2, ItemScript>();
+    public Dictionary<Vector2, ItemScript> itemDictionary = new Dictionary<Vector2, ItemScript>();
+    public List<ItemScript> itemsToClear = new List<ItemScript>();
     public List<ConstructionScript> constructionList = new List<ConstructionScript>();
     public List<PeasantScript> peasantList = new List<PeasantScript>();
 
@@ -42,14 +46,32 @@ public class IslandScript : TaskSourceScript
         return itemDictionary[cell];
     }
 
-    public void AddItem(ItemScript item, Vector2 cell)
+    public void AddItem(ItemScript itemScript)
     {
-        itemDictionary.Add(cell, item);
+        itemScript.islandScript = this;
+        itemDictionary.Add(itemScript.itemCell, itemScript);
     }
 
     public void RemoveItemAtCell(Vector2 cell)
     {
         itemDictionary.Remove(cell);
+    }
+
+    public void PlantTrees(Vector2[] selectedCells)
+    {
+        foreach (Vector2 cell in selectedCells)
+        {
+            Vector3 itemPos = transform.position + MeshGenerator.GetCellCenter(cell, meshData);
+            int orientation = Random.Range(0, 360);
+            TerrainType terrainType = gameManager.GetComponent<IslandGenerator>().regions[regionMap[(int)cell.x, (int)cell.y]].type;
+
+            TreeSproutScript treeSproutScript = Instantiate(islandEditor.treeSprout, itemPos, Quaternion.Euler(0, orientation, 0), itemsTransform.transform).GetComponent<TreeSproutScript>();
+            treeSproutScript.terrainType = terrainType;
+            treeSproutScript.itemIndex = -1;
+            treeSproutScript.itemCell = cell;
+            treeSproutScript.orientation = orientation;
+            AddItem(treeSproutScript);
+        }
     }
 
     public void AddConstruction(ConstructionScript constructionScript)
@@ -71,7 +93,7 @@ public class IslandScript : TaskSourceScript
         RebakeNavMesh();
     }
 
-    public EnclosureScript CreateEnclosure(EnclosureScript.EnclosureType enclosureType, Vector2[] selectedCells, EnclosureInfo enclosureInfo = null)
+    public EnclosureScript CreateEnclosure(EnclosureScript.EnclosureType enclosureType, Vector2[] selectedCells, EnclosureScript enclosureInfo = null)
     {
         GameObject enclosure = new GameObject(enclosureType.ToString());
         enclosure.transform.parent = constructionsTransform.transform;
@@ -194,41 +216,11 @@ public class IslandScript : TaskSourceScript
         return true;
     }
 
-    public IslandInfo GetIslandInfo()
-    {
-        IslandInfo islandInfo = new IslandInfo();
-        islandInfo.islandName = islandName;
-        islandInfo.offset = new SerializableVector2(offset);
-        islandInfo.hasBeenDiscovered = hasBeenDiscovered;
-
-        islandInfo.itemList = new List<ItemInfo>();
-        foreach(KeyValuePair<Vector2, ItemScript> key in itemDictionary)
-        {
-            islandInfo.itemList.Add(key.Value.GetItemInfo());
-        }
-
-        islandInfo.constructionList = new List<ConstructionInfo>();
-        foreach(ConstructionScript constructionScript in constructionList)
-        {
-            islandInfo.constructionList.Add(constructionScript.GetConstructionInfo());
-        }
-
-        islandInfo.peasantList = new List<PeasantInfo>();
-        foreach(PeasantScript peasantScript in peasantList)
-        {
-            islandInfo.peasantList.Add(peasantScript.GetPeasantInfo());
-        }
-
-        islandInfo.inventoryScript = inventoryScript;
-
-        return islandInfo;
-    }
-
     /*NPCMANAGER*/
 
     public void AddItemToClear(ItemScript itemScript)
     {
-        taskList.Add(itemScript);
+        itemsToClear.Add(itemScript);
 
         PeasantAdultScript closestPeasantScript = (PeasantAdultScript)GetClosestPeasant(itemScript.center, true);
         if (closestPeasantScript != null)
@@ -261,7 +253,7 @@ public class IslandScript : TaskSourceScript
 
     public void RemoveItemToClear(ItemScript item)
     {
-        taskList.Remove(item);
+        itemsToClear.Remove(item);
         PeasantAdultScript peasantScript = item.peasantAdultScript;
         if (peasantScript != null) //Tenia un NPC vinculat
         {
@@ -270,13 +262,13 @@ public class IslandScript : TaskSourceScript
         }
     }
 
-    public override bool GetNextPendingTask(PeasantAdultScript peasantAdultScript)
+    public bool GetNextPendingTask(PeasantAdultScript peasantAdultScript)
     {
-        if (!base.GetNextPendingTask(peasantAdultScript)) return false;
+        if (!peasantAdultScript.CanBeAsignedTask()) return false;
 
         ItemScript closestItemScript = null;
         float minDistance = -1;
-        foreach (ItemScript itemScript in taskList)
+        foreach (ItemScript itemScript in itemsToClear)
         {
             float distance;
             if (itemScript.peasantAdultScript == null //Si no té un NPC vinculat
@@ -339,6 +331,8 @@ public class IslandScript : TaskSourceScript
         for (int i = shipScript.peasantList.Count - 1; i >= 0; i--)
         {
             PeasantScript peasantScript = shipScript.peasantList[i];
+            if (!peasantScript.gameObject.activeInHierarchy) continue;
+
             peasantList.Add(peasantScript);
             shipScript.peasantList.Remove(peasantScript);
             peasantScript.constructionScript = null;
@@ -348,16 +342,4 @@ public class IslandScript : TaskSourceScript
         shipScript.peasantsOnTheirWay = 0;
     }
 
-}
-
-[System.Serializable]
-public class IslandInfo
-{
-    public string islandName;
-    public SerializableVector2 offset;
-    public bool hasBeenDiscovered;
-    public List<ItemInfo> itemList;
-    public List<ConstructionInfo> constructionList;
-    public List<PeasantInfo> peasantList;
-    public InventoryScript inventoryScript;
 }

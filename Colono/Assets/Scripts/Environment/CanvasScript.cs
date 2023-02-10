@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class CanvasScript : MonoBehaviour
 {
-    public enum ButtonState { Idle, ItemButtons, BuildingButtons, EnclosureButtons, ConstructionDetails, PeasantDetails, PopUp };
+    public enum ButtonState { Idle, ItemButtons, BuildingButtons, EnclosureButtons, Editing, ConstructionDetails, PeasantDetails, PopUp };
     [Header("Animations")]
     public ButtonState buttonState = ButtonState.Idle;
     private Animator canvasAnimator;
@@ -30,7 +30,6 @@ public class CanvasScript : MonoBehaviour
 
     [Header("Buttons")]
     public Button boardIslandButton;
-    public Button cancelClearingButton;
 
     private void Start()
     {
@@ -51,12 +50,14 @@ public class CanvasScript : MonoBehaviour
     public void BoardIsland()
     {
         canvasAnimator.Play("BoardIsland");
-        buildingButtonsAnimator.Play("ShowBuildingButtons");
+        itemButtonsAnimator.Play("ShowTabHeader");
+        enclosureButtonsAnimator.Play("ShowTabHeader");
+        buildingButtonsAnimator.Play("ShowTabHeader");
 
         buttonState = ButtonState.Idle;
     }
 
-    public void ShowButtons()
+    public void ShowDefaultButtons()
     {
         switch (buttonState)
         {
@@ -65,20 +66,46 @@ public class CanvasScript : MonoBehaviour
         }
 
         canvasAnimator.Play("ShowLeaveIslandButton");
-        buildingButtonsAnimator.Play("ShowBuildingButtons");
+        itemButtonsAnimator.Play("ShowTabHeader");
+        enclosureButtonsAnimator.Play("ShowTabHeader");
+        buildingButtonsAnimator.Play("ShowTabHeader");
 
         buttonState = ButtonState.Idle;
+    }
+
+    public void HideTopButtons()
+    {
+        switch (buttonState)
+        {
+            case ButtonState.Idle:
+                itemButtonsAnimator.Play("HideTabHeader");
+                enclosureButtonsAnimator.Play("HideTabHeader");
+                buildingButtonsAnimator.Play("HideTabHeader");
+                break;
+            case ButtonState.ItemButtons:
+                itemButtonsAnimator.Play("HideWholeTab");
+                enclosureButtonsAnimator.Play("HideTabHeader");
+                buildingButtonsAnimator.Play("HideTabHeader");
+                break;
+            case ButtonState.EnclosureButtons:
+                itemButtonsAnimator.Play("HideWholeTab");
+                enclosureButtonsAnimator.Play("HideWholeTab");
+                buildingButtonsAnimator.Play("HideTabHeader");
+                break;
+            case ButtonState.BuildingButtons:
+                itemButtonsAnimator.Play("HideTabHeader");
+                enclosureButtonsAnimator.Play("HideTabHeader");
+                buildingButtonsAnimator.Play("HideWholeTab");
+                break;
+        }
     }
 
     public void HideButtons()
     {
+        HideTopButtons();
         canvasAnimator.Play("HideLeaveIslandButton");
         switch (buttonState)
         {
-            case ButtonState.Idle: buildingButtonsAnimator.Play("HideBuildingButtons"); break;
-            case ButtonState.ItemButtons: itemButtonsAnimator.Play("HideItemButtons"); break;
-            case ButtonState.BuildingButtons: buildingButtonsAnimator.Play("HideAllBuildingButtons"); break;
-            case ButtonState.EnclosureButtons: enclosureButtonsAnimator.Play("HideEnclosureButtons"); break;
             case ButtonState.ConstructionDetails: constructionDetailsAnimator.Play("HideDetails"); break;
             case ButtonState.PeasantDetails: peasantDetailsAnimator.Play("HideDetails"); break;
         }
@@ -86,42 +113,63 @@ public class CanvasScript : MonoBehaviour
         buttonState = ButtonState.Idle;
     }
 
-    public void SelectArea()
-    {
-        canvasAnimator.Play("ShowLeaveIslandButton");
-        enclosureButtonsAnimator.Play("ShowEnclosureButtons");
-
-        buttonState = ButtonState.EnclosureButtons;
-    }
-
-    public void UnselectArea()
-    {
-        if (buttonState == ButtonState.ItemButtons) itemButtonsAnimator.Play("HideItemButtons");
-        else enclosureButtonsAnimator.Play("HideEnclosureButtons");
-        buildingButtonsAnimator.Play("ShowBuildingButtons");
-
-        buttonState = ButtonState.Idle;
-    }
-
-    public void SelectItems(bool areScheduledForClearing)
-    {
-        cancelClearingButton.gameObject.SetActive(areScheduledForClearing);
-        canvasAnimator.Play("ShowLeaveIslandButton");
-        itemButtonsAnimator.Play("ShowItemButtons");
-
-        buttonState = ButtonState.ItemButtons;
-    }
-
-    public void Build()
+    public void OpenCloseItemButtons()
     {
         if (buttonState == ButtonState.Idle)
         {
-            buildingButtonsAnimator.Play("ShowBuildingOptionsButtons");
+            itemButtonsAnimator.Play("ShowTabContent");
+            enclosureButtonsAnimator.Play("HideTabHeader");
+            buildingButtonsAnimator.Play("HideTabHeader");
+            buttonState = ButtonState.ItemButtons;
+        }
+        else
+        {
+            itemButtonsAnimator.Play("HideTabContent");
+            enclosureButtonsAnimator.Play("ShowTabHeader");
+            buildingButtonsAnimator.Play("ShowTabHeader");
+            buttonState = ButtonState.Idle;
+        }
+    }
+
+    public void OpenCloseEnclosureButtons()
+    {
+        if (buttonState == ButtonState.Idle)
+        {
+            itemButtonsAnimator.Play("HideTabHeader");
+            enclosureButtonsAnimator.Play("ShowTabContent");
+            buildingButtonsAnimator.Play("HideTabHeader");
+            buttonState = ButtonState.EnclosureButtons;
+        }
+        else
+        {
+            itemButtonsAnimator.Play("ShowTabHeader");
+            enclosureButtonsAnimator.Play("HideTabContent");
+            buildingButtonsAnimator.Play("ShowTabHeader");
+            buttonState = ButtonState.Idle;
+        }
+    }
+
+    public void ChooseEnclosure()
+    {
+        canvasAnimator.Play("HideLeaveIslandButton");
+        enclosureButtonsAnimator.Play("HideWholeTab");
+        buttonState = ButtonState.Editing;
+    }
+
+    public void OpenCloseBuildingButtons()
+    {
+        if (buttonState == ButtonState.Idle)
+        {
+            itemButtonsAnimator.Play("HideTabHeader");
+            enclosureButtonsAnimator.Play("HideTabHeader");
+            buildingButtonsAnimator.Play("ShowTabContent");
             buttonState = ButtonState.BuildingButtons;
         }
         else
         {
-            buildingButtonsAnimator.Play("HideBuildingOptionsButtons");
+            itemButtonsAnimator.Play("ShowTabHeader");
+            enclosureButtonsAnimator.Play("ShowTabHeader");
+            buildingButtonsAnimator.Play("HideTabContent");
             buttonState = ButtonState.Idle;
         }
     }
@@ -129,23 +177,50 @@ public class CanvasScript : MonoBehaviour
     public void ChooseBuilding()
     {
         canvasAnimator.Play("HideLeaveIslandButton");
-        buildingButtonsAnimator.Play("HideAllBuildingButtons");
+        buildingButtonsAnimator.Play("HideWholeTab");
+        buttonState = ButtonState.Editing;
+    }
+
+
+    public void ShowPeasantDetails(PeasantScript peasantScript)
+    {
+        peasantDetailsScript.SetPeasantDetails(peasantScript);
+
+        HideTopButtons();
+        if (buttonState == ButtonState.ConstructionDetails)
+        {
+            constructionDetailsAnimator.Play("HideDetails");
+        }
+        else if(buttonState != ButtonState.PeasantDetails)
+        {
+            canvasAnimator.Play("HideLeaveIslandButton");
+            peasantDetailsAnimator.Play("ShowDetails");
+        }
+
+        buttonState = ButtonState.PeasantDetails;
+    }
+
+    public void HidePeasantDetails()
+    {
+        peasantDetailsAnimator.Play("HideDetails");
+
+        ShowDefaultButtons();
     }
 
     public void ShowConstructionDetails(ConstructionScript constructionScript)
     {
         constructionDetailsScript.SetConstructionDetails(constructionScript);
 
-        canvasAnimator.Play("HideLeaveIslandButton");
-        switch (buttonState)
+        HideTopButtons();
+        if (buttonState == ButtonState.PeasantDetails)
         {
-            case ButtonState.Idle: buildingButtonsAnimator.Play("HideBuildingButtons"); break;
-            case ButtonState.ItemButtons: buildingButtonsAnimator.Play("HideItemButtons"); break;
-            case ButtonState.BuildingButtons: buildingButtonsAnimator.Play("HideAllBuildingButtons"); break;
-            case ButtonState.EnclosureButtons: enclosureButtonsAnimator.Play("HideEnclosureButtons"); break;
-            case ButtonState.PeasantDetails: peasantDetailsAnimator.Play("HideDetails"); break;
+            peasantDetailsAnimator.Play("HideDetails");
         }
-        constructionDetailsAnimator.Play("ShowDetails");
+        if(buttonState != ButtonState.ConstructionDetails)
+        {
+            canvasAnimator.Play("HideLeaveIslandButton");
+            constructionDetailsAnimator.Play("ShowDetails");
+        }
 
         buttonState = ButtonState.ConstructionDetails;
     }
@@ -153,10 +228,8 @@ public class CanvasScript : MonoBehaviour
     public void HideConstructionDetails()
     {
         constructionDetailsAnimator.Play("HideDetails");
-        buildingButtonsAnimator.Play("ShowBuildingButtons");
-        canvasAnimator.Play("ShowLeaveIslandButton");
 
-        buttonState = ButtonState.Idle;
+        ShowDefaultButtons();
     }
 
     public void ShowInventoryEditor()
@@ -239,35 +312,6 @@ public class CanvasScript : MonoBehaviour
         buttonState = ButtonState.ConstructionDetails;
     }
 
-    public void ShowPeasantDetails(PeasantScript peasantScript)
-    {
-        peasantDetailsScript.SetPeasantDetails(peasantScript);
-
-        canvasAnimator.Play("HideLeaveIslandButton");
-        switch (buttonState)
-        {
-            case ButtonState.Idle: buildingButtonsAnimator.Play("HideBuildingButtons"); break;
-            case ButtonState.ItemButtons: buildingButtonsAnimator.Play("HideItemButtons"); break;
-            case ButtonState.BuildingButtons: buildingButtonsAnimator.Play("HideAllBuildingButtons"); break;
-            case ButtonState.EnclosureButtons: enclosureButtonsAnimator.Play("HideEnclosureButtons"); break;
-            case ButtonState.ConstructionDetails: constructionDetailsAnimator.Play("HideDetails"); break;
-        }
-        peasantDetailsAnimator.Play("ShowDetails");
-
-        buttonState = ButtonState.ConstructionDetails;
-    }
-
-    public void HidePeasantDetails()
-    {
-        canvasAnimator.Play("ShowLeaveIslandButton");
-        buildingButtonsAnimator.Play("ShowBuildingButtons");
-        peasantDetailsAnimator.Play("HideDetails");
-
-        peasantDetailsScript.peasantScript.peasantDetailsScript = null;
-
-        buttonState = ButtonState.Idle;
-    }
-
     public void UpdateInventoryRow(ResourceScript.ResourceType resourceType, int resourceIndex)
     {
         inventoryEditor.UpdateInventoryRow(resourceType, resourceIndex);
@@ -280,14 +324,9 @@ public class CanvasScript : MonoBehaviour
 
     public void LeaveIsland()
     {
+        HideButtons();
+
         canvasAnimator.Play("LeaveIsland");
-        switch (buttonState)
-        {
-            case ButtonState.Idle: buildingButtonsAnimator.Play("HideBuildingButtons"); break;
-            case ButtonState.ItemButtons: buildingButtonsAnimator.Play("HideItemButtons"); break;
-            case ButtonState.BuildingButtons: buildingButtonsAnimator.Play("HideAllBuildingButtons"); break;
-            case ButtonState.EnclosureButtons: enclosureButtonsAnimator.Play("HideEnclosureButtons"); break;
-        }
     }
 
 }

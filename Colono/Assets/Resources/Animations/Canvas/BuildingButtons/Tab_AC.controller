@@ -7,7 +7,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: ShowBuildingOptionsButtons
+  m_Name: ShowTabContent
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -32,7 +32,7 @@ AnimatorController:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: BuildingButtons_AC
+  m_Name: Tab_AC
   serializedVersion: 5
   m_AnimatorParameters: []
   m_AnimatorLayers:
@@ -55,7 +55,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: ShowBuildingButtons
+  m_Name: ShowTabHeader
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -81,7 +81,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: HideBuildingButtons
+  m_Name: HideTabHeader
   m_Speed: -1
   m_CycleOffset: 0
   m_Transitions: []
@@ -107,7 +107,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: HideAllBuildingButtons
+  m_Name: HideWholeTab
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -170,7 +170,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: BuildingButtonsIdle_Anim
+  m_Name: TabIdle
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -196,7 +196,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: HideBuildingOptionsButtons
+  m_Name: HideTabContent
   m_Speed: -1
   m_CycleOffset: 0
   m_Transitions: []

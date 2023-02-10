@@ -12,47 +12,49 @@ public abstract class PeasantScript : MonoBehaviour
     [Header("Characteristics")]
     public PeasantType peasantType;
     public PeasantGender peasantGender;
-    public float walkSpeed;
-    public float runSpeed;
-    private bool isRunning = false;
-    public bool isNative = false;
+    public Vector3 position;
+    public int orientation;
+    [JsonIgnore] public float walkSpeed;
+    [JsonIgnore] public float runSpeed;
+    private bool isRunning;
+    public bool isNative;
 
     [Header("Appearence")]
-    [JsonIgnore] public GameObject head1;
-    [JsonIgnore] public GameObject head2;
-    [JsonIgnore] public GameObject lowerNaked;
-    [JsonIgnore] public GameObject upperNaked;
-    [JsonIgnore] public GameObject lowerClothed;
-    [JsonIgnore] public GameObject upperClothed;
-    [JsonIgnore] public Material material;
+    [JsonIgnore] [SerializeField] private GameObject head1;
+    [JsonIgnore] [SerializeField] private GameObject head2;
+    [JsonIgnore] [SerializeField] private GameObject lowerNaked;
+    [JsonIgnore] [SerializeField] private GameObject upperNaked;
+    [JsonIgnore] [SerializeField] private GameObject lowerClothed;
+    [JsonIgnore] [SerializeField] private GameObject upperClothed;
+    [JsonIgnore] [SerializeField] private Material material;
 
-    private int headType;
-    private Color _SKINCOLOR;
-    private Color _HAIRCOLOR;
-    private Color _CLOTH3COLOR;
-    private Color _CLOTH4COLOR;
-    private Color _OTHERCOLOR;
+    public int headType;
+    public Color _SKINCOLOR;
+    public Color _HAIRCOLOR;
+    public Color _CLOTH3COLOR;
+    public Color _CLOTH4COLOR;
+    public Color _OTHERCOLOR;
 
     [Header("State")]
     public float age;
     public float hunger;
     public float exhaustion;
-    private float ageSpeed = 0.1f;
-    private float hungerSpeed = 0.001f;
-    private float exhaustionSpeed = 0.001f;
+    [JsonIgnore] private float ageSpeed = 0.1f;
+    [JsonIgnore] private float hungerSpeed = 0.001f;
+    [JsonIgnore] private float exhaustionSpeed = 0.001f;
 
     [Header("Scripts")]
-    public IslandScript islandScript;
-    public ConstructionScript constructionScript;
-    public SpeechBubbleScript speechBubble;
-    public PeasantDetailsScript peasantDetailsScript;
-    public CabinScript cabin;
-    public TavernScript tavern;
-    private GameManager gameManager;
+    [JsonIgnore] public IslandScript islandScript;
+    [JsonIgnore] public ConstructionScript constructionScript;
+    [JsonIgnore] public SpeechBubbleScript speechBubble;
+    [JsonIgnore] public PeasantDetailsScript peasantDetailsScript;
+    [JsonIgnore] public CabinScript cabin;
+    [JsonIgnore] public TavernScript tavern;
+    [JsonIgnore] private GameManager gameManager;
 
-    private Outline outline;
-    protected Animator animator;
-    protected NavMeshAgent navMeshAgent;
+    [JsonIgnore] public Outline outline;
+    [JsonIgnore] protected Animator animator;
+    [JsonIgnore] protected NavMeshAgent navMeshAgent;
 
     private void Start()
     {
@@ -63,21 +65,25 @@ public abstract class PeasantScript : MonoBehaviour
         animator.SetInteger("State", (int)PeasantAction.Moving);
         animator.SetFloat("Speed", 0);
 
+        SetAppearence();
         UpdateTask();
     }
 
-    public void InitializePeasant(PeasantInfo peasantInfo)
+    public void InitializePeasant(PeasantScript peasantScript)
     {
-        transform.position = peasantInfo.position.UnityVector;
-        isNative = peasantInfo.isNative;
+        isRunning = peasantScript.isRunning;
+        isNative = peasantScript.isNative;
 
-        headType = peasantInfo.headType;
-        _SKINCOLOR = peasantInfo._SKINCOLOR.UnityColor;
-        _HAIRCOLOR = peasantInfo._HAIRCOLOR.UnityColor;
-        _CLOTH3COLOR = peasantInfo._CLOTH3COLOR.UnityColor;
-        _CLOTH4COLOR = peasantInfo._CLOTH4COLOR.UnityColor;
-        _OTHERCOLOR = peasantInfo._OTHERCOLOR.UnityColor;
+        headType = peasantScript.headType;
+        _SKINCOLOR = peasantScript._SKINCOLOR;
+        _HAIRCOLOR = peasantScript._HAIRCOLOR;
+        _CLOTH3COLOR = peasantScript._CLOTH3COLOR;
+        _CLOTH4COLOR = peasantScript._CLOTH4COLOR;
+        _OTHERCOLOR = peasantScript._OTHERCOLOR;
+    }
 
+    public void SetAppearence()
+    {
         GameObject head, lower, upper;
         if (headType == 0)
         {
@@ -119,15 +125,17 @@ public abstract class PeasantScript : MonoBehaviour
         lower.GetComponent<SkinnedMeshRenderer>().material = newMaterial;
         upper.GetComponent<SkinnedMeshRenderer>().material = newMaterial;
 
+        transform.localScale = Vector3.one * 0.45f;
     }
 
     private void Update()
     {
         UpdateDetails();
 
-        CheckIfClicked();
-
         CheckIfArrivedAtDestination();
+
+        position = transform.position;
+        orientation = (int)transform.rotation.y % 360;
     }
 
     protected void UpdateDetails()
@@ -169,30 +177,6 @@ public abstract class PeasantScript : MonoBehaviour
         }
 
         peasantDetailsScript?.UpdateDetails();
-    }
-
-    protected void CheckIfClicked()
-    {
-        if (gameManager.CanSelect() && peasantDetailsScript == null)
-        {
-            RaycastHit raycastHit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out raycastHit, 100f))
-            {
-                if (raycastHit.transform.gameObject.GetComponent<PeasantScript>() == this)
-                {
-                    outline.enabled = true;
-                    if (Input.GetMouseButtonDown(0))
-                    {
-                        gameManager.SelectPeasant(this);
-                    }
-                }
-                else
-                {
-                    outline.enabled = false;
-                }
-            }
-        }
     }
 
     protected void CheckIfArrivedAtDestination()
@@ -243,50 +227,4 @@ public abstract class PeasantScript : MonoBehaviour
     public abstract void UpdateTask();
 
     public abstract void ArrivedAtDestination();
-
-    public PeasantInfo GetPeasantInfo()
-    {
-        PeasantInfo peasantInfo = new PeasantInfo();
-        peasantInfo.peasantType = peasantType;
-        peasantInfo.peasantGender = peasantGender;
-        peasantInfo.isNative = isNative;
-
-        peasantInfo.headType = headType;
-        peasantInfo._SKINCOLOR = new SerializableColor(_SKINCOLOR);
-        peasantInfo._HAIRCOLOR = new SerializableColor(_HAIRCOLOR);
-        peasantInfo._CLOTH3COLOR = new SerializableColor(_CLOTH3COLOR);
-        peasantInfo._CLOTH4COLOR = new SerializableColor(_CLOTH4COLOR);
-        peasantInfo._OTHERCOLOR = new SerializableColor(_OTHERCOLOR);
-
-        peasantInfo.position = new SerializableVector3(transform.position);
-        peasantInfo.orientation = Mathf.RoundToInt(transform.rotation.eulerAngles.y);
-
-        peasantInfo.age = age;
-        peasantInfo.hunger = hunger;
-        peasantInfo.exhaustion = exhaustion;
-
-        return peasantInfo;
-    }
-}
-
-[System.Serializable]
-public class PeasantInfo
-{
-    public PeasantScript.PeasantType peasantType;
-    public PeasantScript.PeasantGender peasantGender;
-    public bool isNative;
-
-    public int headType;
-    public SerializableColor _SKINCOLOR;
-    public SerializableColor _HAIRCOLOR;
-    public SerializableColor _CLOTH3COLOR;
-    public SerializableColor _CLOTH4COLOR;
-    public SerializableColor _OTHERCOLOR;
-
-    public SerializableVector3 position;
-    public int orientation;
-
-    public float age;
-    public float hunger;
-    public float exhaustion;
 }

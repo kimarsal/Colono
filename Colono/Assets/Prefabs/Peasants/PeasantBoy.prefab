@@ -1698,7 +1698,7 @@ Transform:
   m_GameObject: {fileID: 6186233313534555122}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.4, y: 0.4, z: 0.4}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 4213497731357959039}
@@ -1776,6 +1776,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   peasantType: 1
   peasantGender: 0
+  position: {x: 0, y: 0, z: 0}
+  orientation: 0
   walkSpeed: 0.5
   runSpeed: 1
   isNative: 0
@@ -1786,10 +1788,16 @@ MonoBehaviour:
   lowerClothed: {fileID: 4139624726697195581}
   upperClothed: {fileID: 7252637255923568080}
   material: {fileID: 2100000, guid: c79855c6f54ed954293d041acc3120a8, type: 2}
+  headType: 0
+  _SKINCOLOR: {r: 0, g: 0, b: 0, a: 0}
+  _HAIRCOLOR: {r: 0, g: 0, b: 0, a: 0}
+  _CLOTH3COLOR: {r: 0, g: 0, b: 0, a: 0}
+  _CLOTH4COLOR: {r: 0, g: 0, b: 0, a: 0}
+  _OTHERCOLOR: {r: 0, g: 0, b: 0, a: 0}
   age: 0
   hunger: 0
   exhaustion: 0
-  npcManager: {fileID: 0}
+  islandScript: {fileID: 0}
   constructionScript: {fileID: 0}
   speechBubble: {fileID: 0}
   peasantDetailsScript: {fileID: 0}

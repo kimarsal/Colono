@@ -1,7 +1,7 @@
 using UnityEngine;
 using static UnityEngine.Mesh;
 
-public abstract class EnclosureScript : ConstructionScript
+public abstract class EnclosureScript : ConstructionScript, TaskSourceInterface
 {
     public enum EnclosureType { Garden, Pen, Training };
     public EnclosureType enclosureType;
@@ -9,7 +9,7 @@ public abstract class EnclosureScript : ConstructionScript
     public Vector3 minPos;
     public Vector3 maxPos;
 
-    public virtual void InitializeEnclosure(EnclosureInfo enclosureInfo, IslandScript islandScript)
+    public virtual void InitializeEnclosure(EnclosureScript enclosureScript, IslandScript islandScript)
     {
         this.islandScript = islandScript;
         constructionType = ConstructionType.Enclosure;
@@ -46,6 +46,7 @@ public abstract class EnclosureScript : ConstructionScript
         boxCollider.center = (minPos + maxPos) / 2;
         boxCollider.size = new Vector3(maxPos.x - minPos.x, 1, minPos.z - maxPos.z);
         boxCollider.isTrigger = true;
+        gameObject.layer = 8;
 
         maxPeasants = (width - 2) * (length - 2);
         minPos += transform.position;
@@ -53,6 +54,8 @@ public abstract class EnclosureScript : ConstructionScript
 
         entry = Instantiate(islandEditor.enclosureCenter, transform.position + boxCollider.center, Quaternion.identity, transform).transform;
     }
+
+    public abstract bool GetNextPendingTask(PeasantAdultScript peasantAdultScript);
 
     public override void AddPeasant(PeasantScript peasantScript)
     {
@@ -89,27 +92,4 @@ public abstract class EnclosureScript : ConstructionScript
             }
         }
     }
-
-    public EnclosureInfo GetEnclosureInfo()
-    {
-        EnclosureInfo enclosureInfo = null;
-        switch (enclosureType)
-        {
-            case EnclosureType.Garden: enclosureInfo = ((GardenScript)this).GetGardenInfo(); break;
-            case EnclosureType.Pen: enclosureInfo = ((PenScript)this).GetPenInfo(); break;
-            default: enclosureInfo = new EnclosureInfo(); break;
-        }
-        enclosureInfo.enclosureType = enclosureType;
-        enclosureInfo.minPos = new SerializableVector3(minPos);
-        enclosureInfo.maxPos = new SerializableVector3(maxPos);
-        return enclosureInfo;
-    }
-}
-
-[System.Serializable]
-public class EnclosureInfo : ConstructionInfo
-{
-    public EnclosureScript.EnclosureType enclosureType;
-    public SerializableVector3 minPos;
-    public SerializableVector3 maxPos;
 }

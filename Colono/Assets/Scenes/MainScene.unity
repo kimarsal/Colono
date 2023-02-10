@@ -1431,7 +1431,7 @@ GameObject:
   - component: {fileID: 40296152}
   m_Layer: 0
   m_Name: Starboard Baluster 2
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -1508,7 +1508,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 40296148}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 34.9, y: 1, z: 0.87100005}
@@ -1531,7 +1531,7 @@ GameObject:
   - component: {fileID: 57302428}
   m_Layer: 0
   m_Name: Bow Baluster
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -1608,7 +1608,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 57302424}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 34.9, y: 1, z: 0.87100005}
@@ -1907,7 +1907,7 @@ RectTransform:
   m_Children:
   - {fileID: 1203928389}
   m_Father: {fileID: 889264984}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1960,8 +1960,8 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1136053464}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: ChangeSelectedItemsState
-        m_Mode: 6
+        m_MethodName: ClearItems
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -2092,9 +2092,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 536791328}
-        m_TargetAssemblyTypeName: CanvasScript, Assembly-CSharp
-        m_MethodName: HidePeasantDetails
+      - m_Target: {fileID: 1136053464}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: UnselectPeasant
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2543,7 +2543,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Close
+  m_text: Items
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2717,7 +2717,7 @@ GameObject:
   - component: {fileID: 125033855}
   m_Layer: 0
   m_Name: Cube.001
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -2794,7 +2794,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 125033851}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 3.5060003, y: 1.4840001, z: 1.5630001}
@@ -3055,7 +3055,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1136053464}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: CreateEnclosure
+        m_MethodName: ChooseEnclosure
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3221,7 +3221,7 @@ GameObject:
   - component: {fileID: 154200614}
   m_Layer: 0
   m_Name: Cube.002
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -3298,7 +3298,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 154200610}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 9.244, y: 1.294, z: 7.6630006}
@@ -3342,10 +3342,10 @@ RectTransform:
   m_Father: {fileID: 484316615}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 700, y: 100}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 25}
+  m_SizeDelta: {x: 0, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &162293685
 MonoBehaviour:
@@ -3366,7 +3366,7 @@ MonoBehaviour:
     m_Bottom: 0
   m_ChildAlignment: 4
   m_Spacing: 20
-  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0
@@ -3722,7 +3722,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   outlineMode: 0
   outlineColor: {r: 1, g: 1, b: 1, a: 1}
-  outlineWidth: 10
+  outlineWidth: 4
   precomputeOutline: 0
   bakeKeys: []
   bakeValues: []
@@ -3840,7 +3840,7 @@ GameObject:
   - component: {fileID: 238738814}
   m_Layer: 0
   m_Name: Cube.004
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -3927,7 +3927,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 238738810}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 1.1120001, y: 1, z: 0.92700005}
@@ -4253,7 +4253,7 @@ GameObject:
   - component: {fileID: 286242566}
   m_Layer: 0
   m_Name: Cylinder.004
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -4330,7 +4330,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 286242562}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 1, y: 1, z: 1}
@@ -4690,7 +4690,7 @@ GameObject:
   - component: {fileID: 338528683}
   m_Layer: 0
   m_Name: Cylinder.005
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -4767,7 +4767,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 338528679}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 1, y: 1, z: 1}
@@ -5149,7 +5149,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Close
+  m_text: 'Enclosures
+
+'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -6152,7 +6154,7 @@ GameObject:
   - component: {fileID: 460800267}
   m_Layer: 0
   m_Name: Cylinder.012
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -6229,7 +6231,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 460800263}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 1, y: 1, z: 1}
@@ -6271,12 +6273,12 @@ RectTransform:
   - {fileID: 162293684}
   - {fileID: 2082195500}
   m_Father: {fileID: 536791323}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 120}
-  m_SizeDelta: {x: 0, y: 50}
+  m_AnchoredPosition: {x: 0, y: 50}
+  m_SizeDelta: {x: 0, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &484316616
 MonoBehaviour:
@@ -6285,7 +6287,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 484316614}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
   m_Name: 
@@ -6314,7 +6316,7 @@ Animator:
   m_GameObject: {fileID: 484316614}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 9b5853180dd98cb4ba8c290a84fdbf13, type: 2}
+  m_Controller: {fileID: 9100000, guid: 0ffbac799e9eab545a662818d3fc5b47, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -6824,7 +6826,7 @@ GameObject:
   - component: {fileID: 511187251}
   m_Layer: 0
   m_Name: Port Baluster
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -6901,7 +6903,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 511187247}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 114.00001, y: 1, z: 0.87100005}
@@ -7113,8 +7115,8 @@ RectTransform:
   - {fileID: 992006177}
   - {fileID: 1872551643}
   - {fileID: 1438021764}
-  - {fileID: 679072325}
   - {fileID: 484316615}
+  - {fileID: 679072325}
   - {fileID: 304184206}
   - {fileID: 1643373903}
   - {fileID: 11789747}
@@ -7217,7 +7219,6 @@ MonoBehaviour:
   tavernEditor: {fileID: 21747733}
   inventoryEditor: {fileID: 678864773}
   boardIslandButton: {fileID: 992006178}
-  cancelClearingButton: {fileID: 1233780826}
 --- !u!1 &548663527
 GameObject:
   m_ObjectHideFlags: 0
@@ -7308,7 +7309,7 @@ GameObject:
   - component: {fileID: 558688639}
   m_Layer: 0
   m_Name: Cylinder.007
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -7385,7 +7386,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 558688635}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 1, y: 1, z: 1}
@@ -8003,7 +8004,7 @@ GameObject:
   - component: {fileID: 613176753}
   m_Layer: 0
   m_Name: Cube.007
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -8080,7 +8081,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 613176749}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 2.255, y: 2.0870001, z: 1}
@@ -8676,6 +8677,141 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 658952648}
   m_CullTransparentMesh: 1
+--- !u!1 &675489799
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 675489800}
+  - component: {fileID: 675489802}
+  - component: {fileID: 675489801}
+  m_Layer: 5
+  m_Name: Text (TMP)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &675489800
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 675489799}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1972120004}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &675489801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 675489799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: Plant
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4281479730
+  m_fontColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: -1183493901
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 22
+  m_fontSizeBase: 22
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 0
+  m_fontSizeMax: 0
+  m_fontStyle: 0
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_enableWordWrapping: 0
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 0
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &675489802
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 675489799}
+  m_CullTransparentMesh: 1
 --- !u!1 &677728530
 GameObject:
   m_ObjectHideFlags: 0
@@ -8839,7 +8975,7 @@ RectTransform:
   - {fileID: 1459307139}
   - {fileID: 1075551949}
   m_Father: {fileID: 536791323}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
@@ -9386,7 +9522,7 @@ GameObject:
   - component: {fileID: 719119438}
   m_Layer: 0
   m_Name: Main Sail
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -9463,7 +9599,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 719119434}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 1.005, y: 1, z: 0.22100002}
@@ -9888,7 +10024,7 @@ GameObject:
   - component: {fileID: 785708439}
   m_Layer: 0
   m_Name: Cylinder
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -9965,7 +10101,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 785708435}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 1, y: 1, z: 1}
@@ -10596,15 +10732,16 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1972120004}
   - {fileID: 77205695}
   - {fileID: 1233780825}
   m_Father: {fileID: 1438021764}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 700, y: 100}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 25}
+  m_SizeDelta: {x: 0, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &889264985
 MonoBehaviour:
@@ -10625,7 +10762,7 @@ MonoBehaviour:
     m_Bottom: 0
   m_ChildAlignment: 4
   m_Spacing: 20
-  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0
@@ -11328,7 +11465,7 @@ GameObject:
   - component: {fileID: 963504312}
   m_Layer: 0
   m_Name: Starboard Baluster.001
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -11405,7 +11542,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963504308}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 34.9, y: 1, z: 0.87100005}
@@ -11758,7 +11895,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Build
+  m_text: Buildings
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -11849,7 +11986,7 @@ GameObject:
   - component: {fileID: 982989607}
   m_Layer: 0
   m_Name: Cylinder.002
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -11926,7 +12063,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 982989603}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 1, y: 1, z: 1}
@@ -11949,7 +12086,7 @@ GameObject:
   - component: {fileID: 986132924}
   m_Layer: 0
   m_Name: Cube.008
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -12029,7 +12166,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 986132920}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 13.000001, y: 1, z: 1}
@@ -17074,7 +17211,7 @@ GameObject:
   - component: {fileID: 1055127185}
   m_Layer: 0
   m_Name: Cylinder.060
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -17151,7 +17288,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1055127181}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 1, y: 1, z: 1}
@@ -17444,7 +17581,7 @@ GameObject:
   - component: {fileID: 1075551951}
   - component: {fileID: 1075551950}
   m_Layer: 5
-  m_Name: BuildButton
+  m_Name: OpenCloseBuildingButtons
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17466,10 +17603,10 @@ RectTransform:
   m_Father: {fileID: 679072325}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -25}
-  m_SizeDelta: {x: 250, y: 40}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: -300, y: 25}
+  m_SizeDelta: {x: 200, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1075551950
 MonoBehaviour:
@@ -17517,7 +17654,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 536791328}
         m_TargetAssemblyTypeName: CanvasScript, Assembly-CSharp
-        m_MethodName: Build
+        m_MethodName: OpenCloseBuildingButtons
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -17579,7 +17716,7 @@ GameObject:
   - component: {fileID: 1086701097}
   m_Layer: 0
   m_Name: Cylinder.006
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -17656,7 +17793,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1086701093}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 1, y: 1, z: 1}
@@ -17779,7 +17916,7 @@ GameObject:
   - component: {fileID: 1116728683}
   m_Layer: 0
   m_Name: Cylinder.001
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -17856,7 +17993,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1116728679}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 1, y: 1, z: 1}
@@ -18037,7 +18174,8 @@ MonoBehaviour:
   cellsTransform: {fileID: 2139576368}
   closestIsland: {fileID: 0}
   islandEditor: {fileID: 0}
-  hasSelectedPeasant: 0
+  islandCellScript: {fileID: 0}
+  canSelectIslandElements: 0
 --- !u!114 &1136053465
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18168,9 +18306,8 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 919132149155446097, guid: b6f7519a416ad504794a4b0adc0ff4bf, type: 3}
   - {fileID: 919132149155446097, guid: cd6c6f8f600328242ac75207b0a981e0, type: 3}
-  grass:
-  - {fileID: 8264058532159319278, guid: 9ae45a910e210c947b61707f1f67c1fe, type: 3}
-  - {fileID: 3443336602622132122, guid: c1c11d0eee23cb448b66d4839d016663, type: 3}
+  cropSprout: {fileID: 8264058532159319278, guid: 9ae45a910e210c947b61707f1f67c1fe,
+    type: 3}
   animals:
   - {fileID: 4421536717734654673, guid: 5e2f3d69a3d1ecc4280d046a4525ab56, type: 3}
   - {fileID: 191173753677048913, guid: fe2996b49ed98224cad167a4abb70894, type: 3}
@@ -18299,6 +18436,8 @@ MonoBehaviour:
   - {fileID: 7318494566717715563, guid: 69ba8b78a50252f4fa750ec4524891cb, type: 3}
   - {fileID: 3458883366876466120, guid: 34da05dac067e1f4ea83cb5db9c3f70a, type: 3}
   - {fileID: 850774228511494286, guid: 86a82f74c4ecffb4bbe12884a6d3f5e2, type: 3}
+  treeSprout: {fileID: 3443336602622132122, guid: c1c11d0eee23cb448b66d4839d016663,
+    type: 3}
   coastObstacle: {fileID: 3416981438331723783, guid: 2475e5b29f878c740be7d9c50d10e6ad,
     type: 3}
   enclosureCenter: {fileID: 3192485407342391892, guid: 34b7e0ee1989fe24390e94b452610abd,
@@ -18316,8 +18455,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManager: {fileID: 0}
-  islandGenerator: {fileID: 0}
   islandScript: {fileID: 0}
+  selectFunction: 0
+  selectMode: 0
 --- !u!1 &1137006982
 GameObject:
   m_ObjectHideFlags: 0
@@ -18336,7 +18476,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1137006983
 RectTransform:
   m_ObjectHideFlags: 0
@@ -18466,7 +18606,7 @@ GameObject:
   - component: {fileID: 1167624702}
   m_Layer: 0
   m_Name: Cylinder.057
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -18543,7 +18683,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1167624698}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 1, y: 1, z: 1}
@@ -18944,7 +19084,7 @@ GameObject:
   - component: {fileID: 1212051936}
   m_Layer: 0
   m_Name: Starboard Baluster.004
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -19021,7 +19161,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1212051932}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 34.9, y: 1, z: 0.87100005}
@@ -19210,7 +19350,7 @@ GameObject:
   - component: {fileID: 1216770247}
   m_Layer: 0
   m_Name: Port Baluster 2
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -19287,7 +19427,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1216770243}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 34.9, y: 1, z: 0.87100005}
@@ -19506,7 +19646,7 @@ GameObject:
   - component: {fileID: 1233780827}
   - component: {fileID: 1233780826}
   m_Layer: 5
-  m_Name: CancelClearingButton
+  m_Name: CancelItemClearingButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -19526,7 +19666,7 @@ RectTransform:
   m_Children:
   - {fileID: 1939098940}
   m_Father: {fileID: 889264984}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -19579,8 +19719,8 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1136053464}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: ChangeSelectedItemsState
-        m_Mode: 6
+        m_MethodName: CancelItemClearing
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -24838,7 +24978,7 @@ GameObject:
   - component: {fileID: 1344457167}
   m_Layer: 0
   m_Name: Cube.006
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -24916,7 +25056,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1344457163}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 13.000001, y: 1, z: 1}
@@ -25222,7 +25362,7 @@ GameObject:
   - component: {fileID: 1399552138}
   m_Layer: 0
   m_Name: Cube.005
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -25299,7 +25439,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1399552134}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 1, y: 1, z: 1}
@@ -25843,8 +25983,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 120}
-  m_SizeDelta: {x: 0, y: 50}
+  m_AnchoredPosition: {x: 0, y: 50}
+  m_SizeDelta: {x: 0, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!95 &1438021765
 Animator:
@@ -25856,7 +25996,7 @@ Animator:
   m_GameObject: {fileID: 1438021763}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 4ff42f670e00e5e4c90a047aa15f8442, type: 2}
+  m_Controller: {fileID: 9100000, guid: 0ffbac799e9eab545a662818d3fc5b47, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -25873,7 +26013,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1438021763}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
   m_Name: 
@@ -25906,7 +26046,7 @@ GameObject:
   - component: {fileID: 1455691931}
   m_Layer: 0
   m_Name: Cylinder.011
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -25983,7 +26123,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1455691927}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 1, y: 1, z: 1}
@@ -26029,10 +26169,10 @@ RectTransform:
   m_Father: {fileID: 679072325}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 25}
-  m_SizeDelta: {x: 1000, y: 50}
+  m_SizeDelta: {x: 0, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1459307140
 MonoBehaviour:
@@ -26052,8 +26192,8 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4
-  m_Spacing: 0
-  m_ChildForceExpandWidth: 1
+  m_Spacing: 20
+  m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0
@@ -26240,7 +26380,7 @@ GameObject:
   - component: {fileID: 1471824831}
   m_Layer: 0
   m_Name: Cylinder.008
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -26317,7 +26457,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1471824827}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 1, y: 1, z: 1}
@@ -26340,7 +26480,7 @@ GameObject:
   - component: {fileID: 1473155949}
   m_Layer: 0
   m_Name: Cylinder.003
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -26417,7 +26557,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1473155945}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 1, y: 1, z: 1}
@@ -26826,7 +26966,7 @@ GameObject:
   - component: {fileID: 1536228258}
   m_Layer: 0
   m_Name: Cube.003
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -26903,7 +27043,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1536228254}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 9.244, y: 1.294, z: 7.6630006}
@@ -31956,7 +32096,7 @@ GameObject:
   - component: {fileID: 1558004428}
   m_Layer: 0
   m_Name: Stern Sail
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -32033,7 +32173,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1558004424}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 1.003, y: 1, z: 0.126}
@@ -32294,7 +32434,7 @@ GameObject:
   - component: {fileID: 1601835494}
   m_Layer: 0
   m_Name: Bow Sail
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -32371,7 +32511,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1601835490}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 1.0020001, y: 1, z: 0.07700001}
@@ -33047,21 +33187,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   constructionType: 0
-  islandScript: {fileID: 0}
   cells: []
   length: 0
   width: 0
-  entry: {fileID: 1727147591}
-  outline: {fileID: 226870831}
   maxPeasants: 100
   peasantList: []
   peasantsOnTheirWay: 0
+  islandScript: {fileID: 0}
   constructionDetailsScript: {fileID: 0}
+  entry: {fileID: 1727147591}
+  outline: {fileID: 226870831}
   gameManager: {fileID: 0}
+  position: {x: 0, y: 0, z: 0}
+  orientation: 0
   inventoryScript:
     capacity: 0
     usage: 0
-  peasantInfoList: []
   animals: 00000000000000000000000000000000
   animalList: []
   animalAmount: 0
@@ -33283,7 +33424,7 @@ GameObject:
   - component: {fileID: 1632545972}
   m_Layer: 0
   m_Name: Starboard Baluster
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -33360,7 +33501,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1632545968}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 114.00001, y: 1, z: 0.87100005}
@@ -34087,7 +34228,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 87
+    m_Bits: 471
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -34161,7 +34302,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_EventMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 247
   m_MaxRayIntersections: 0
 --- !u!135 &1684752370
 SphereCollider:
@@ -34308,17 +34449,17 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   colorGradientTexture: {fileID: 0}
   shallowColor: {r: 0, g: 0.7725491, b: 0.62352943, a: 0.5019608}
-  deepColor: {r: 0.01176471, g: 0.28597504, b: 0.50980073, a: 1}
+  deepColor: {r: 0.01176471, g: 0.28596342, b: 0.50980073, a: 1}
   colorDepth: 0.84
-  horizonColor: {r: 0, g: 0.22715157, b: 0.8, a: 1}
+  horizonColor: {r: 0, g: 0.22713992, b: 0.8, a: 1}
   horizonDistance: 20
   shoreFade: 1
-  shoreColor: {r: 0, g: 0.98039216, b: 0.30166134, a: 0}
+  shoreColor: {r: 0, g: 0.98039216, b: 0.30164972, a: 0}
   shoreStrength: 0
   shoreBlend: 1
   shoreDepth: 0.74
   waveColor: {r: 0, g: 0, b: 0, a: 0}
-  underwaterColor: {r: 0.20363775, g: 0.30950445, b: 0.517647, a: 0}
+  underwaterColor: {r: 0.20362672, g: 0.30949283, b: 0.517647, a: 0}
   underwaterColorStrength: 0
   underwaterRefractionStrength: 0.099
   surfaceFoamTexture: {fileID: 2800000, guid: d3b0d77dfe711a04c8ff18ecc260aa66, type: 3}
@@ -34724,7 +34865,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1136053464}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: CreateEnclosure
+        m_MethodName: ChooseEnclosure
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -35358,7 +35499,7 @@ GameObject:
   - component: {fileID: 1733593604}
   m_Layer: 0
   m_Name: Starboard Baluster.005
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -35435,7 +35576,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1733593600}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 34.9, y: 1, z: 0.87100005}
@@ -35859,7 +36000,7 @@ GameObject:
   - component: {fileID: 1821349453}
   - component: {fileID: 1821349452}
   m_Layer: 5
-  m_Name: CloseItemButtons
+  m_Name: OpenCloseItemButtons
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -35883,7 +36024,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 300, y: 25}
   m_SizeDelta: {x: 200, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1821349452
@@ -35932,7 +36073,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 536791328}
         m_TargetAssemblyTypeName: CanvasScript, Assembly-CSharp
-        m_MethodName: UnselectArea
+        m_MethodName: OpenCloseItemButtons
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -36429,7 +36570,7 @@ GameObject:
   - component: {fileID: 1874688540}
   m_Layer: 0
   m_Name: Starboard Baluster.006
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -36506,7 +36647,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1874688536}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 57.500004, y: 1, z: 1.565}
@@ -41873,6 +42014,140 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!1 &1972120003
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1972120004}
+  - component: {fileID: 1972120007}
+  - component: {fileID: 1972120006}
+  - component: {fileID: 1972120005}
+  m_Layer: 5
+  m_Name: PlantTreesButton
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1972120004
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1972120003}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 675489800}
+  m_Father: {fileID: 889264984}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 200, y: 40}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1972120005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1972120003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 1972120006}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1136053464}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: PlantTrees
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+--- !u!114 &1972120006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1972120003}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &1972120007
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1972120003}
+  m_CullTransparentMesh: 1
 --- !u!1 &1982281645
 GameObject:
   m_ObjectHideFlags: 0
@@ -42105,7 +42380,7 @@ GameObject:
   - component: {fileID: 1994672925}
   m_Layer: 0
   m_Name: Cylinder.009
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -42182,7 +42457,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1994672921}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 2.058, y: 2.058, z: 1}
@@ -42430,7 +42705,7 @@ GameObject:
   - component: {fileID: 1999817568}
   m_Layer: 0
   m_Name: Cylinder.010
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -42507,7 +42782,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1999817564}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 1, y: 1, z: 1}
@@ -43014,7 +43289,7 @@ GameObject:
   - component: {fileID: 2057988463}
   m_Layer: 0
   m_Name: Starboard Baluster.002
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -43091,7 +43366,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2057988459}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 34.9, y: 1, z: 0.87100005}
@@ -43321,7 +43596,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1136053464}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: CreateEnclosure
+        m_MethodName: ChooseEnclosure
         m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -43382,7 +43657,7 @@ GameObject:
   - component: {fileID: 2082195502}
   - component: {fileID: 2082195501}
   m_Layer: 5
-  m_Name: CloseEnclosureButtons
+  m_Name: OpenCloseEnclosureButtons
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -43404,9 +43679,9 @@ RectTransform:
   m_Father: {fileID: 484316615}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 25}
   m_SizeDelta: {x: 200, y: 40}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2082195501
@@ -43455,7 +43730,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 536791328}
         m_TargetAssemblyTypeName: CanvasScript, Assembly-CSharp
-        m_MethodName: UnselectArea
+        m_MethodName: OpenCloseEnclosureButtons
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -44254,7 +44529,7 @@ GameObject:
   - component: {fileID: 2126754069}
   m_Layer: 0
   m_Name: Starboard Baluster.003
-  m_TagString: Untagged
+  m_TagString: Construction
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 1
   m_StaticEditorFlags: 0
@@ -44331,7 +44606,7 @@ NavMeshObstacle:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2126754065}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Shape: 1
   m_Extents: {x: 34.9, y: 1, z: 0.87100005}

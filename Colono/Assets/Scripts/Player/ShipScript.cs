@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,42 +7,42 @@ using Random = UnityEngine.Random;
 
 public class ShipScript : ConstructionScript
 {
-    public GameManager gameManager;
-    public override IslandEditor islandEditor { get { return gameManager.islandEditor; } }
-    public InventoryScript inventoryScript;
+    [JsonIgnore] public GameManager gameManager;
+    [JsonIgnore] public override IslandEditor islandEditor { get { return gameManager.islandEditor; } }
 
-    public List<PeasantInfo> peasantInfoList;
+    public Vector3 position;
+    public int orientation;
+
+    public InventoryScript inventoryScript;
     public int[] animals;
-    public List<AnimalInfo> animalList;
+    public List<AnimalScript> animalList;
     public int animalAmount;
 
-    public float distanceToBoardIsland = 2f;
+    [JsonIgnore] public float distanceToBoardIsland = 2f;
 
     public void AddDefaultElements()
     {
-        peasantInfoList = new List<PeasantInfo>();
         for (int i = 0; i < 10; i++)
         {
-            PeasantInfo peasantInfo = new PeasantInfo();
-            peasantInfo.peasantType = Random.Range(0, 2) == 0 ? PeasantScript.PeasantType.Adult : PeasantScript.PeasantType.Child;
-            peasantInfo.peasantGender = Random.Range(0, 2) == 0 ? PeasantScript.PeasantGender.Male : PeasantScript.PeasantGender.Female;
-            peasantInfo.isNative = false;
-
-            peasantInfo.headType = Random.Range(0, 2);
-            peasantInfo._SKINCOLOR = new SerializableColor(islandEditor.GetRandomSkinColor());
-            peasantInfo._HAIRCOLOR = new SerializableColor(islandEditor.GetRandomHairColor());
-            peasantInfo._CLOTH3COLOR = new SerializableColor(Random.ColorHSV());
-            peasantInfo._CLOTH4COLOR = new SerializableColor(Random.ColorHSV());
-            peasantInfo._OTHERCOLOR = new SerializableColor(Random.ColorHSV());
-
-            peasantInfo.position = new SerializableVector3(Vector3.zero);
-            peasantInfo.age = 10;
+            PeasantScript.PeasantType peasantType = (PeasantScript.PeasantType)Random.Range(0, 2);
+            PeasantScript.PeasantGender peasantGender = (PeasantScript.PeasantGender)Random.Range(0, 2);
+            PeasantScript peasantScript = Instantiate(islandEditor.GetNPCPrefab(peasantType, peasantGender), entry.position, Quaternion.identity, entry).GetComponent<PeasantScript>();
+            peasantScript.isNative = false;
             
-            AddPeasant(peasantInfo);
+            peasantScript.headType = Random.Range(0, 2);
+            peasantScript._SKINCOLOR = islandEditor.GetRandomSkinColor();
+            peasantScript._HAIRCOLOR = islandEditor.GetRandomHairColor();
+            peasantScript._CLOTH3COLOR = Random.ColorHSV();
+            peasantScript._CLOTH4COLOR = Random.ColorHSV();
+            peasantScript._OTHERCOLOR = Random.ColorHSV();
+
+            peasantScript.gameObject.SetActive(false);
+
+            peasantList.Add(peasantScript);
         }
 
         animals = new int[Enum.GetValues(typeof(ResourceScript.AnimalType)).Length];
-        animalList = new List<AnimalInfo>();
+        animalList = new List<AnimalScript>();
         AddAnimal(ResourceScript.AnimalType.Cow);
         AddAnimal(ResourceScript.AnimalType.Cow);
         AddAnimal(ResourceScript.AnimalType.Pig);
@@ -59,28 +60,6 @@ public class ShipScript : ConstructionScript
 
     void Update()
     {
-        if (gameManager.CanSelect() && constructionDetailsScript == null)
-        {
-            RaycastHit raycastHit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out raycastHit, 100f))
-            {
-                if (raycastHit.transform.gameObject.CompareTag("Player"))
-                {
-                    outline.enabled = true;
-                    if (Input.GetMouseButtonDown(0))
-                    {
-                        gameManager.SelectShip();
-                    }
-                }
-                else
-                {
-                    outline.enabled = false;
-                }
-            }
-        }
-
-
         bool closeToIsland = false;
         Vector3 colliderClosestPoint = new Vector3();
         float minDistance = 10;
@@ -109,6 +88,9 @@ public class ShipScript : ConstructionScript
         {
             gameManager.PlayerIsFarFromIsland();
         }
+
+        position = transform.position;
+        orientation = (int)transform.rotation.y % 360;
     }
 
     public override void EditConstruction()
@@ -125,32 +107,23 @@ public class ShipScript : ConstructionScript
         }
     }
 
-    public void AddPeasant(PeasantInfo peasantInfo)
-    {
-        peasantInfoList.Add(peasantInfo);
-    }
-
     public override PeasantScript RemovePeasant()
     {
-        PeasantInfo peasantInfo = peasantInfoList[0];
-        peasantInfoList.RemoveAt(0);
-        PeasantScript peasantScript = Instantiate(islandEditor.GetNPCPrefab(peasantInfo.peasantType, peasantInfo.peasantGender),
-            entry.position, Quaternion.identity, gameManager.closestIsland.npcsTransform).GetComponent<PeasantScript>();
-        peasantScript.transform.localScale = Vector3.one * 0.4f;
-        peasantScript.InitializePeasant(peasantInfo);
+        PeasantScript peasantScript = base.RemovePeasant();
+        peasantScript.transform.parent = gameManager.closestIsland.npcsTransform;
         peasantScript.islandScript = gameManager.closestIsland;
         return peasantScript;
     }
 
     private void AddAnimal(ResourceScript.AnimalType animalType)
     {
-        AddAnimal(islandEditor.GetAnimalPrefab(animalType).GetComponent<AnimalScript>().GetAnimalInfo());
+        AddAnimal(islandEditor.GetAnimalPrefab(animalType).GetComponent<AnimalScript>());
     }
 
-    public void AddAnimal(AnimalInfo animalInfo)
+    public void AddAnimal(AnimalScript animalScript)
     {
-        animalList.Add(animalInfo);
-        animals[(int)animalInfo.animalType]++;
+        animalList.Add(animalScript);
+        animals[(int)animalScript.animalType]++;
         animalAmount++;
     }
 
@@ -158,8 +131,8 @@ public class ShipScript : ConstructionScript
     {
         for (int i = 0; i < animalList.Count; i++)
         {
-            AnimalInfo animalInfo = animalList[i];
-            if (animalInfo.animalType == animalType)
+            AnimalScript animal = animalList[i];
+            if (animal.animalType == animalType)
             {
                 animalList.RemoveAt(i);
                 animals[(int)animalType]--;
@@ -169,7 +142,7 @@ public class ShipScript : ConstructionScript
                     Quaternion.Euler(0, UnityEngine.Random.Range(0, 359), 0),
                     penScript.animalTransform).GetComponent<AnimalScript>();
                 animalScript.penScript = penScript;
-                animalScript.age = animalInfo.age;
+                animalScript.age = animal.age;
                 return animalScript;
             }
         }

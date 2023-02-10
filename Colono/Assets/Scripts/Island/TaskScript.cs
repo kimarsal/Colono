@@ -4,7 +4,7 @@ using UnityEngine;
 
 public abstract class TaskScript : MonoBehaviour
 {
-    public TaskSourceScript taskSourceScript;
+    public TaskSourceInterface taskSourceScript;
     public enum TaskType { Item, Patch, Pairing }
     public Vector3 center;
     public TaskType taskType;
@@ -13,6 +13,7 @@ public abstract class TaskScript : MonoBehaviour
 
     public virtual void TaskProgress()
     {
+        peasantAdultScript.task = null;
         taskSourceScript.GetNextPendingTask(peasantAdultScript);
         peasantAdultScript = null;
     }

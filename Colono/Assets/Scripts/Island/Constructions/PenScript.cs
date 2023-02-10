@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -41,24 +40,24 @@ public class PenScript : EnclosureScript
         canvasScript = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>().canvasScript;
     }
 
-    public override void InitializeEnclosure(EnclosureInfo enclosureInfo, IslandScript islandScript)
+    public override void InitializeEnclosure(EnclosureScript enclosureScript, IslandScript islandScript)
     {
-        base.InitializeEnclosure(enclosureInfo, islandScript);
+        base.InitializeEnclosure(enclosureScript, islandScript);
 
         animalTransform = new GameObject("Animals").transform;
         animalTransform.parent = transform;
         animalTransform.localPosition = Vector3.zero;
 
-        PenInfo penInfo = (PenInfo)enclosureInfo;
+        PenScript penScript = (PenScript)enclosureScript;
 
-        if (penInfo != null)
+        if (penScript != null)
         {
-            foreach (AnimalInfo animalInfo in penInfo.animalList)
+            foreach (AnimalScript animal in penScript.animalList)
             {
-                GameObject animalPrefab = islandScript.islandEditor.GetAnimalPrefab(animalInfo.animalType);
-                AnimalScript animalScript = Instantiate(animalPrefab, animalInfo.position.UnityVector,
-                    Quaternion.Euler(0, animalInfo.orientation, 0), animalTransform).GetComponent<AnimalScript>();
-                animalScript.InitializeAnimal(animalInfo);
+                GameObject animalPrefab = islandScript.islandEditor.GetAnimalPrefab(animal.animalType);
+                AnimalScript animalScript = Instantiate(animalPrefab, animal.position,
+                    Quaternion.Euler(0, animal.orientation, 0), animalTransform).GetComponent<AnimalScript>();
+                animalScript.InitializeAnimal(animal);
 
             }
         }
@@ -189,7 +188,7 @@ public class PenScript : EnclosureScript
 
     public override bool GetNextPendingTask(PeasantAdultScript peasantAdultScript)
     {
-        if (!base.GetNextPendingTask(peasantAdultScript)) return false;
+        if (!peasantAdultScript.CanBeAsignedTask()) return false;
 
         TaskScript nextTaskScript = null;
         int index = (lastAnimalTypePairing + 1) % animalTypes;
@@ -211,19 +210,4 @@ public class PenScript : EnclosureScript
         return nextTaskScript != null;
     }
 
-    public PenInfo GetPenInfo()
-    {
-        PenInfo penInfo = new PenInfo();
-        foreach(AnimalScript animalScript in animalList)
-        {
-            penInfo.animalList.Add(animalScript.GetAnimalInfo());
-        }
-        return penInfo;
-    }
-}
-
-[System.Serializable]
-public class PenInfo : EnclosureInfo
-{
-    public List<AnimalInfo> animalList = new List<AnimalInfo>();
 }

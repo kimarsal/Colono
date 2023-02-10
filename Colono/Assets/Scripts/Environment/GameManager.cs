@@ -3,6 +3,11 @@ using UnityEngine;
 using System.IO;
 using Newtonsoft.Json;
 using System;
+using System.Net.Sockets;
+using UnityEngine.UI;
+using static Terrain;
+using static UnityEngine.Rendering.DebugUI.Table;
+using System.Runtime.CompilerServices;
 
 public class GameManager : MonoBehaviour
 {
@@ -10,7 +15,6 @@ public class GameManager : MonoBehaviour
     public CameraScript cameraScript;
     public CanvasScript canvasScript;
     public InventoryEditor inventoryEditor;
-    private ConstructionScript constructionScript;
 
     private bool isPlayerNearIsland = false;
     public bool isInIsland = false;
@@ -18,15 +22,20 @@ public class GameManager : MonoBehaviour
     public Transform cellsTransform;
     public IslandScript closestIsland;
     public IslandEditor islandEditor;
-    private IslandCellScript islandCellScript;
+    public IslandCellScript islandCellScript;
     private IslandManager islandManager;
 
-    public bool hasSelectedPeasant;
+    public bool canSelectIslandElements;
+    private PeasantScript hoveredPeasant;
+    private PeasantScript selectedPeasant;
+    private ConstructionScript hoveredConstruction;
+    private ConstructionScript selectedConstruction;
 
     private void Start()
     {
         islandEditor = GetComponent<IslandEditor>();
         islandCellScript = GetComponent<IslandCellScript>();
+        islandCellScript.gameManager = this;
         islandCellScript.enabled = false;
 
         islandManager = GetComponent<IslandManager>();
@@ -35,6 +44,79 @@ public class GameManager : MonoBehaviour
         StartGame();
 
         inventoryEditor.shipInventoryScript = shipScript.inventoryScript;
+    }
+
+    private void Update()
+    {
+        if (canSelectIslandElements)
+        {
+            RaycastHit raycastHit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (!Physics.Raycast(ray, out raycastHit, 100f))
+            {
+                return;
+            }
+
+            if (raycastHit.transform.gameObject.CompareTag("NPC"))
+            {
+                PeasantScript peasantScript = raycastHit.transform.GetComponent<PeasantScript>();
+                if(peasantScript != hoveredPeasant)
+                {
+                    if (hoveredPeasant != null && hoveredPeasant != selectedPeasant) hoveredPeasant.outline.enabled = false;
+                    hoveredPeasant = peasantScript;
+                    peasantScript.outline.enabled = true;
+                }
+                if (Input.GetMouseButtonDown(0))
+                {
+                    SelectPeasant(peasantScript);
+                }
+            }
+            else
+            {
+                if (hoveredPeasant != null && hoveredPeasant != selectedPeasant)
+                {
+                    hoveredPeasant.outline.enabled = false;
+                    hoveredPeasant = null;
+                }
+            }
+
+            if (raycastHit.transform.gameObject.CompareTag("Construction"))
+            {
+                ConstructionScript constructionScript = raycastHit.transform.GetComponentInParent<ConstructionScript>();
+                if (constructionScript != hoveredConstruction)
+                {
+                    if (hoveredConstruction != null && hoveredConstruction != selectedConstruction) hoveredConstruction.outline.enabled = false;
+                    hoveredConstruction = constructionScript;
+                    constructionScript.outline.enabled = true;
+                }
+                if (Input.GetMouseButtonDown(0))
+                {
+                    SelectConstruction(constructionScript);
+                }
+            }
+            else if (raycastHit.transform.gameObject.CompareTag("Player"))
+            {
+                ConstructionScript constructionScript = raycastHit.transform.GetComponent<ConstructionScript>();
+                if (constructionScript != hoveredConstruction)
+                {
+                    if (hoveredConstruction != null && hoveredConstruction != selectedConstruction) hoveredConstruction.outline.enabled = false;
+                    hoveredConstruction = constructionScript;
+                    constructionScript.outline.enabled = true;
+                }
+                if (Input.GetMouseButtonDown(0))
+                {
+                    SelectConstruction(constructionScript);
+                }
+            }
+            else
+            {
+                if (hoveredConstruction != null && hoveredConstruction != selectedConstruction)
+                {
+                    hoveredConstruction.outline.enabled = false;
+                    hoveredConstruction = null;
+                }
+            }
+        }
     }
 
     public void PlayerIsNearIsland()
@@ -54,70 +136,129 @@ public class GameManager : MonoBehaviour
         canvasScript.BoardIsland();
 
         shipScript.islandScript = closestIsland;
-
-        islandCellScript.enabled = true;
         islandCellScript.islandScript = closestIsland;
+        canSelectIslandElements = true;
     }
 
-    public void ChangeSelectedItemsState(bool toClear)
+    public void DisableIslandCellScript()
     {
-        islandCellScript.ChangeSelectedItemsState(toClear);
-        islandCellScript.DestroyAllCells();
-
-        canvasScript.UnselectArea();
+        islandCellScript.enabled = false;
+        canSelectIslandElements = true;
     }
 
     public void SelectShip()
     {
-        islandCellScript.DestroyAllCells();
-
         SelectConstruction(shipScript);
     }
 
     public void SelectPeasant(PeasantScript peasantScript)
     {
-        hasSelectedPeasant = true;
-        islandCellScript.DestroyAllCells();
+        if (selectedConstruction != null)
+        {
+            selectedConstruction.constructionDetailsScript = null;
+            selectedConstruction.outline.enabled = false;
+            selectedConstruction.outline.OutlineWidth = 2;
+        }
+        if (selectedPeasant != null)
+        {
+            selectedPeasant.peasantDetailsScript = null;
+            selectedPeasant.outline.enabled = false;
+            selectedPeasant.outline.OutlineWidth = 2;
+        }
+        selectedPeasant = peasantScript;
+        selectedPeasant.outline.enabled = true;
+        selectedPeasant.outline.OutlineWidth = 8;
 
         canvasScript.ShowPeasantDetails(peasantScript);
     }
 
-    public void ChooseBuilding(int type)
+    public void UnselectPeasant()
     {
-        islandCellScript.ChooseBuilding((BuildingScript.BuildingType)type);
+        selectedPeasant.peasantDetailsScript = null;
+        selectedPeasant.outline.enabled = false;
+        selectedPeasant.outline.OutlineWidth = 2;
+        selectedPeasant = null;
+        canvasScript.HidePeasantDetails();
+    }
+
+    public void PlantTrees()
+    {
+        canvasScript.itemButtonsAnimator.Play("HideWholeTab");
+        islandCellScript.enabled = true;
+        islandCellScript.selectFunction = IslandCellScript.SelectFunction.PlantTrees;
+        islandCellScript.selectMode = IslandCellScript.SelectMode.None;
+        canSelectIslandElements = false;
+    }
+
+    public void ClearItems()
+    {
+        canvasScript.itemButtonsAnimator.Play("HideWholeTab");
+        islandCellScript.enabled = true;
+        islandCellScript.selectFunction = IslandCellScript.SelectFunction.ClearItems;
+        islandCellScript.selectMode = IslandCellScript.SelectMode.None;
+        canSelectIslandElements = false;
+    }
+
+    public void CancelItemClearing()
+    {
+        canvasScript.itemButtonsAnimator.Play("HideWholeTab");
+        islandCellScript.enabled = true;
+        islandCellScript.selectFunction = IslandCellScript.SelectFunction.CancelItemClearing;
+        islandCellScript.selectMode = IslandCellScript.SelectMode.None;
+        canSelectIslandElements = false;
+    }
+
+    public void ChooseBuilding(int buildingType)
+    {
+        islandCellScript.enabled = true;
+        islandCellScript.ChooseBuilding((BuildingScript.BuildingType)buildingType);
         canvasScript.ChooseBuilding();
+        canSelectIslandElements = false;
     }
 
     public void RemoveConstruction()
     {
-        constructionScript.FinishUpBusiness();
-        closestIsland.SendAllPeasantsBack(constructionScript);
-        islandCellScript.RemoveConstruction(constructionScript);
+        selectedConstruction.FinishUpBusiness();
+        closestIsland.SendAllPeasantsBack(selectedConstruction);
+        closestIsland.RemoveConstruction(selectedConstruction);
         canvasScript.HideConstructionDetails();
     }
 
-    public void CreateEnclosure(int enclosureType)
+    public void ChooseEnclosure(int enclosureType)
     {
-        islandCellScript.CreateEnclosure((EnclosureScript.EnclosureType) enclosureType);
+        islandCellScript.enabled = true;
+        islandCellScript.ChooseEnclosure((EnclosureScript.EnclosureType)enclosureType);
+        canvasScript.ChooseEnclosure();
+        canSelectIslandElements = false;
     }
 
     public void SelectConstruction(ConstructionScript newConstructionScript)
     {
-        if(constructionScript != null)
+        if (selectedPeasant != null)
         {
-            constructionScript.outline.enabled = false;
+            selectedPeasant.peasantDetailsScript = null;
+            selectedPeasant.outline.enabled = false;
+            selectedPeasant.outline.OutlineWidth = 2;
         }
-        constructionScript = newConstructionScript;
-        constructionScript.outline.enabled = true;
-        canvasScript.ShowConstructionDetails(constructionScript);
+        if (selectedConstruction != null)
+        {
+            selectedConstruction.constructionDetailsScript = null;
+            selectedConstruction.outline.enabled = false;
+            selectedConstruction.outline.OutlineWidth = 2;
+        }
+        selectedConstruction = newConstructionScript;
+        selectedConstruction.outline.enabled = true;
+        selectedConstruction.outline.OutlineWidth = 8;
+
+        canvasScript.ShowConstructionDetails(selectedConstruction);
     }
 
     public void UnselectConstrucion()
     {
-        constructionScript.constructionDetailsScript = null;
-        constructionScript.outline.enabled = false;
-        constructionScript = null;
-        islandCellScript.DestroyAllCells();
+        selectedConstruction.constructionDetailsScript = null;
+        selectedConstruction.outline.enabled = false;
+        selectedConstruction.outline.OutlineWidth = 2;
+        selectedConstruction = null;
         canvasScript.HideConstructionDetails();
     }
 
@@ -130,6 +271,7 @@ public class GameManager : MonoBehaviour
         closestIsland.convexColliders.SetActive(true);
         islandCellScript.DestroyAllCells();
         islandCellScript.enabled = false;
+        canSelectIslandElements = false;
     }
 
     public void PlayerIsFarFromIsland()
@@ -141,31 +283,20 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public bool CanSelect()
-    {
-        return isInIsland && canvasScript.buttonState != CanvasScript.ButtonState.PopUp;
-    }
-
     public void SaveGame()
     {
         IslandManager islandManager = GetComponent<IslandManager>();
 
         GameInfo gameInfo = new GameInfo();
         gameInfo.seed = islandManager.seed;
-        gameInfo.playerPosition = new SerializableVector3(shipScript.transform.position);
-        gameInfo.playerOrientation = Mathf.RoundToInt(shipScript.transform.rotation.eulerAngles.y);
+        gameInfo.shipScript = shipScript;
+        gameInfo.islandList = islandManager.islandList;
 
-        gameInfo.peasantList = shipScript.peasantInfoList;
-        gameInfo.animalList = shipScript.animalList;
-        gameInfo.inventoryScript = shipScript.inventoryScript;
-
-        gameInfo.islandList = new List<IslandInfo>();
-        foreach (IslandScript islandScript in islandManager.islandList)
+        string json = JsonConvert.SerializeObject(gameInfo, Formatting.Indented, new JsonSerializerSettings
         {
-            gameInfo.islandList.Add(islandScript.GetIslandInfo());
-        }
-
-        string json = JsonConvert.SerializeObject(gameInfo, Formatting.Indented, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
+            TypeNameHandling = TypeNameHandling.Auto,
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+        });
         File.WriteAllText("gameInfo.json", json);
     }
 
@@ -173,21 +304,12 @@ public class GameManager : MonoBehaviour
     {
         GameInfo gameInfo = JsonConvert.DeserializeObject<GameInfo>(File.ReadAllText("gameInfo.json"), new JsonSerializerSettings
         {
-            TypeNameHandling = TypeNameHandling.Auto
+            TypeNameHandling = TypeNameHandling.Auto,
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
         });
 
-        shipScript.transform.position = gameInfo.playerPosition.UnityVector;
-        shipScript.transform.rotation = Quaternion.Euler(0, gameInfo.playerOrientation, 0);
-
-        shipScript.peasantInfoList = gameInfo.peasantList;
-        shipScript.animals = new int[Enum.GetValues(typeof(ResourceScript.AnimalType)).Length];
-        shipScript.animalList = new List<AnimalInfo>();
-        foreach (AnimalInfo animalInfo in gameInfo.animalList)
-        {
-            shipScript.AddAnimal(animalInfo);
-        }
-        shipScript.inventoryScript = gameInfo.inventoryScript;
-
+        shipScript.transform.position = gameInfo.shipScript.position;
+        shipScript.transform.rotation = Quaternion.Euler(0, gameInfo.shipScript.orientation, 0);
         islandManager.seed = gameInfo.seed;
         GetComponent<IslandGenerator>().LoadIslands(gameInfo.islandList);
     }
@@ -203,121 +325,6 @@ public class GameManager : MonoBehaviour
 public class GameInfo
 {
     public int seed;
-    public SerializableVector3 playerPosition;
-    public int playerOrientation;
-    public List<PeasantInfo> peasantList = new List<PeasantInfo>();
-    public List<AnimalInfo> animalList = new List<AnimalInfo>();
-    public InventoryScript inventoryScript;
-    public List<IslandInfo> islandList = new List<IslandInfo>();
-}
-
-[System.Serializable]
-public class SerializableVector3
-{
-    public float x;
-    public float y;
-    public float z;
-
-    [JsonIgnore]
-    public Vector3 UnityVector
-    {
-        get
-        {
-            return new Vector3(x, y, z);
-        }
-    }
-
-    public SerializableVector3(Vector3 v)
-    {
-        x = v.x;
-        y = v.y;
-        z = v.z;
-    }
-}
-
-
-[System.Serializable]
-public class SerializableColor
-{
-    public float r;
-    public float g;
-    public float b;
-
-    [JsonIgnore]
-    public Color UnityColor
-    {
-        get
-        {
-            return new Color(r, g, b);
-        }
-    }
-
-    public SerializableColor(Color c)
-    {
-        r = c.r;
-        g = c.g;
-        b = c.b;
-    }
-}
-
-[System.Serializable]
-public class SerializableVector2
-{
-    public float x;
-    public float y;
-
-    [JsonIgnore]
-    public Vector2 UnityVector
-    {
-        get
-        {
-            return new Vector2(x, y);
-        }
-    }
-
-    public SerializableVector2(Vector2 v)
-    {
-        x = v.x;
-        y = v.y;
-    }
-
-    public static List<SerializableVector2> GetSerializableList(List<Vector2> vList)
-    {
-        List<SerializableVector2> list = new List<SerializableVector2>(vList.Count);
-        for (int i = 0; i < vList.Count; i++)
-        {
-            list.Add(new SerializableVector2(vList[i]));
-        }
-        return list;
-    }
-
-    public static List<Vector2> GetSerializableList(List<SerializableVector2> vList)
-    {
-        List<Vector2> list = new List<Vector2>(vList.Count);
-        for (int i = 0; i < vList.Count; i++)
-        {
-            list.Add(vList[i].UnityVector);
-        }
-        return list;
-    }
-
-    public static SerializableVector2[] GetSerializableArray(Vector2[] vList)
-    {
-        SerializableVector2[] list = new SerializableVector2[vList.Length];
-        for (int i = 0; i < vList.Length; i++)
-        {
-            list[i] = new SerializableVector2(vList[i]);
-        }
-        return list;
-    }
-
-    public static Vector2[] GetSerializableArray(SerializableVector2[] vList)
-    {
-        Vector2[] list = new Vector2[vList.Length];
-        for (int i = 0; i < vList.Length; i++)
-        {
-            list[i] = vList[i].UnityVector;
-        }
-        return list;
-    }
+    public ShipScript shipScript;
+    public List<IslandScript> islandList = new List<IslandScript>();
 }

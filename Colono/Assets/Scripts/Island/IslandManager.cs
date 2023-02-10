@@ -7,7 +7,6 @@ public class IslandManager : MonoBehaviour
     private Transform player;
     private IslandGenerator islandGenerator;
     private GameManager gameManager;
-    private IslandEditor islandEditor;
 
     public int seed;
     public float spotDistance = 100f;

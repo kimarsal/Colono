@@ -15,13 +15,13 @@ public class PeasantAdultScript : PeasantScript
     public GameObject basket;
     public GameObject wateringCan;
 
-    public TaskSourceScript taskSourceScript
+    public TaskSourceInterface taskSourceInterface
     {
         get
         {
             if (constructionScript != null && constructionScript.constructionType == ConstructionScript.ConstructionType.Enclosure)
             {
-                return constructionScript;
+                return (EnclosureScript)constructionScript;
             }
             return islandScript;
         }
@@ -130,7 +130,7 @@ public class PeasantAdultScript : PeasantScript
                 }
                 else if (constructionScript.constructionType == ConstructionScript.ConstructionType.Ship)
                 {
-                    ((ShipScript)constructionScript).AddPeasant(GetPeasantInfo());
+                    ((ShipScript)constructionScript).AddPeasant(this);
                     Destroy(gameObject);
                 }
                 constructionScript.UpdateConstructionDetails();
@@ -147,12 +147,12 @@ public class PeasantAdultScript : PeasantScript
         hasTaskChanged = false;
         if (task.taskType == TaskScript.TaskType.Item)
         {
-            switch (((ItemScript)task).itemType)
+            switch (((ItemScript)task).actionType)
             {
-                case ItemScript.ItemType.Chop: animator.SetInteger("State", (int)PeasantAction.Chopping); break;
-                case ItemScript.ItemType.Dig: animator.SetInteger("State", (int)PeasantAction.Digging); break;
-                case ItemScript.ItemType.Pull: animator.SetInteger("State", (int)PeasantAction.Pulling); break;
-                case ItemScript.ItemType.Pick: animator.SetInteger("Pick", 0); animator.SetInteger("State", (int)PeasantAction.Gathering); break;
+                case ItemScript.ActionType.Chop: animator.SetInteger("State", (int)PeasantAction.Chopping); break;
+                case ItemScript.ActionType.Dig: animator.SetInteger("State", (int)PeasantAction.Digging); break;
+                case ItemScript.ActionType.Pull: animator.SetInteger("State", (int)PeasantAction.Pulling); break;
+                case ItemScript.ActionType.Pick: animator.SetInteger("Pick", 0); animator.SetInteger("State", (int)PeasantAction.Gathering); break;
             }
         }
         else if (task.taskType == TaskScript.TaskType.Patch)

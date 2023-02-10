@@ -1,24 +1,24 @@
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class ConstructionScript : TaskSourceScript
+public abstract class ConstructionScript : MonoBehaviour
 {
     public enum ConstructionType { Ship, Enclosure, Building }
     public ConstructionType constructionType;
-
-    public IslandScript islandScript;
-    public virtual IslandEditor islandEditor { get { return islandScript.islandEditor; } }
     public Vector2[] cells;
     public int length;
     public int width;
-    public Transform entry;
-    public Outline outline;
 
     public int maxPeasants;
     public List<PeasantScript> peasantList = new List<PeasantScript>();
     public int peasantsOnTheirWay;
 
-    public ConstructionDetailsScript constructionDetailsScript;
+    [JsonIgnore] public IslandScript islandScript;
+    [JsonIgnore] public ConstructionDetailsScript constructionDetailsScript;
+    [JsonIgnore] public virtual IslandEditor islandEditor { get { return islandScript.islandEditor; } }
+    [JsonIgnore] public Transform entry;
+    [JsonIgnore] public Outline outline;
 
     public abstract void EditConstruction();
 
@@ -32,8 +32,8 @@ public abstract class ConstructionScript : TaskSourceScript
     public virtual PeasantScript RemovePeasant()
     {
         PeasantScript peasantScript = peasantList[0];
-        peasantList.Remove(peasantScript);
-        if (!peasantScript.gameObject.activeInHierarchy) //Ja havia arribat a l'edifici
+        peasantList.RemoveAt(0);
+        if (!peasantScript.gameObject.activeInHierarchy)
         {
             peasantScript.gameObject.SetActive(true);
         }
@@ -51,38 +51,4 @@ public abstract class ConstructionScript : TaskSourceScript
     {
         constructionDetailsScript?.UpdatePeasantNum();
     }
-
-    public virtual ConstructionInfo GetConstructionInfo()
-    {
-        ConstructionInfo constructionInfo = null;
-        if(constructionType == ConstructionType.Enclosure)
-        {
-            constructionInfo = ((EnclosureScript)this).GetEnclosureInfo();
-        }
-        else
-        {
-            constructionInfo = ((BuildingScript)this).GetBuildingInfo();
-        }
-        constructionInfo.constructionType = constructionType;
-        foreach(PeasantScript peasantScript in peasantList)
-        {
-            constructionInfo.peasantList.Add(peasantScript.GetPeasantInfo());
-        }
-        constructionInfo.cells = SerializableVector2.GetSerializableArray(cells);
-        constructionInfo.length = length;
-        constructionInfo.width = width;
-        return constructionInfo;
-    }
-}
-
-[System.Serializable]
-public class ConstructionInfo
-{
-    public ConstructionScript.ConstructionType constructionType;
-    public List<PeasantInfo> peasantList = new List<PeasantInfo>();
-
-    public SerializableVector2[] cells;
-    public int length;
-    public int width;
-
 }

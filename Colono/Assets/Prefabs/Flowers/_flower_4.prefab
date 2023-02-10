@@ -99,11 +99,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   center: {x: 0, y: 0, z: 0}
   taskType: 0
-  peasantScript: {fileID: 0}
-  itemType: 3
+  peasantAdultScript: {fileID: 0}
+  actionType: 3
   itemCell: {x: 0, y: 0}
+  orientation: 0
   materialType: 2
   materialAmount: 1
+  terrainType: 0
+  itemIndex: 0
   islandScript: {fileID: 0}
   isScheduledForClearing: 0
 --- !u!208 &8231583569065564246
