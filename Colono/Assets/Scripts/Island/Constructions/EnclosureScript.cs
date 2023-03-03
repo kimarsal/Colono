@@ -1,5 +1,5 @@
+using Newtonsoft.Json;
 using UnityEngine;
-using static UnityEngine.Mesh;
 
 public abstract class EnclosureScript : ConstructionScript, TaskSourceInterface
 {
@@ -8,6 +8,8 @@ public abstract class EnclosureScript : ConstructionScript, TaskSourceInterface
 
     public Vector3 minPos;
     public Vector3 maxPos;
+
+    [JsonIgnore] public override string title { get { return enclosureType.ToString(); } }
 
     public virtual void InitializeEnclosure(EnclosureScript enclosureScript, IslandScript islandScript)
     {
@@ -24,16 +26,14 @@ public abstract class EnclosureScript : ConstructionScript, TaskSourceInterface
         MeshGenerator.GetFencePositions(cells, islandScript.meshData, out positions, out rotations);
         for (int i = 0; i < positions.Length - 1; i++)
         {
-            GameObject fence = Instantiate(islandEditor.fences[UnityEngine.Random.Range(0, islandEditor.fences.Length)], transform.position + positions[i], rotations[i], fences.transform);
+            GameObject fence = Instantiate(islandEditor.GetRandomFencePrefab(), transform.position + positions[i], rotations[i], fences.transform);
             if (i == 0) minPos = fence.transform.localPosition;
             else if (i == positions.Length - 2) maxPos = fence.transform.localPosition - new Vector3(0, 0, 1);
         }
 
         if (enclosureType == EnclosureType.Pen)
         {
-            ((PenScript)this).openGate = Instantiate(islandEditor.gateOpen, transform.position + positions[positions.Length - 1], rotations[rotations.Length - 1], fences.transform);
-            ((PenScript)this).openGate.SetActive(false);
-            ((PenScript)this).closedGate = Instantiate(islandEditor.gateClosed, transform.position + positions[positions.Length - 1], rotations[rotations.Length - 1], fences.transform);
+            GameObject closedGate = Instantiate(islandEditor.gate, transform.position + positions[positions.Length - 1], rotations[rotations.Length - 1], fences.transform);
         }
         else
         {
@@ -55,13 +55,35 @@ public abstract class EnclosureScript : ConstructionScript, TaskSourceInterface
         entry = Instantiate(islandEditor.enclosureCenter, transform.position + boxCollider.center, Quaternion.identity, transform).transform;
     }
 
-    public abstract bool GetNextPendingTask(PeasantAdultScript peasantAdultScript);
+    public virtual bool GetNextPendingTask(PeasantAdultScript peasantAdultScript)
+    {
+        return false;
+    }
 
     public override void AddPeasant(PeasantScript peasantScript)
     {
         base.AddPeasant(peasantScript);
 
         GetNextPendingTask((PeasantAdultScript)peasantScript);
+    }
+
+    public override PeasantScript RemovePeasant()
+    {
+        PeasantAdultScript peasantScript = (PeasantAdultScript)peasantList[0];
+        for(int i = 0; i < peasantList.Count; i++)
+        {
+            PeasantAdultScript peasantAdultScript = (PeasantAdultScript)peasantList[i];
+            if(peasantAdultScript.task == null)
+            {
+                peasantScript = peasantAdultScript;
+                break;
+            }
+        }
+        peasantScript.CancelTask();
+        peasantList.Remove(peasantScript);
+        peasantsOnTheirWay--;
+
+        return peasantScript;
     }
 
     private void OnTriggerEnter(Collider other)

@@ -16,16 +16,22 @@ public class TavernScript : BuildingScript
         islandScript.gameManager.canvasScript.ShowTavernEditor();
     }
 
-    public void FeedPeasant(PeasantScript peasantScript)
+    public override PeasantScript PeasantHasArrived(PeasantScript peasantScript)
     {
-        StartCoroutine(FeedPeasantCoroutine(peasantScript));
+        PeasantScript newPeasantScript = base.PeasantHasArrived(peasantScript);
+        StartCoroutine(FeedPeasantCoroutine(newPeasantScript));
+        return null;
     }
 
     private IEnumerator FeedPeasantCoroutine(PeasantScript peasantScript)
     {
-        peasantScript.gameObject.SetActive(false);
         yield return new WaitForSeconds(5);
-        peasantScript.gameObject.SetActive(true);
+
+        PeasantScript newPeasantScript = Instantiate(peasantScript.gameObject,
+                entry.position, Quaternion.identity,
+                islandScript.npcsTransform).GetComponent<PeasantScript>();
+        newPeasantScript.InitializePeasant(peasantScript);
+        Destroy(peasantScript.gameObject);
 
         int hungerPoints = 0;
         foreach(Recipe recipe in recipeList)
@@ -42,14 +48,14 @@ public class TavernScript : BuildingScript
             }
         }
 
-        peasantScript.hunger =- hungerPoints;
-        peasantScript.tavern = null;
-        if (peasantScript.peasantType == PeasantScript.PeasantType.Adult)
+        newPeasantScript.hunger =- hungerPoints;
+        newPeasantScript.tavern = null;
+        if (newPeasantScript.peasantType == PeasantScript.PeasantType.Adult)
         {
-            PeasantAdultScript peasantAdultScript = (PeasantAdultScript)peasantScript;
+            PeasantAdultScript peasantAdultScript = (PeasantAdultScript)newPeasantScript;
             peasantAdultScript.taskSourceInterface.GetNextPendingTask(peasantAdultScript);
         }
-        else peasantScript.UpdateTask();
+        else newPeasantScript.UpdateTask();
     }
 
     public override PeasantScript RemovePeasant()

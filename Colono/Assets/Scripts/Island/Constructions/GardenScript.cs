@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -127,7 +128,8 @@ public class GardenScript : EnclosureScript
         {
             PatchScript patchScript = patchList[index];
             if (patchScript.peasantAdultScript == null
-                && !(patchScript.cropState == PatchScript.CropState.Barren && islandScript.GetResourceAmount(ResourceScript.ResourceType.Crop, (int)patchScript.cropType) == 0))
+                && !(patchScript.cropState == PatchScript.CropState.Barren
+                && islandScript.GetResourceAmount(ResourceScript.ResourceType.Crop, (int)patchScript.cropType) == 0))
             {
                 if(patchScript.cropState == PatchScript.CropState.Barren)
                 {
@@ -144,6 +146,35 @@ public class GardenScript : EnclosureScript
         return nextPatchScript != null;
     }
 
+    public int UseNewCrops(ResourceScript.CropType cropType, int remainingAmount)
+    {
+        int i = 0, j = 0;
+        while(i < peasantList.Count)
+        {
+            PeasantAdultScript peasantAdultScript = (PeasantAdultScript)peasantList[i];
+            if (peasantAdultScript.CanBeAsignedTask())
+            {
+                while (j < patchList.Count)
+                {
+                    PatchScript patchScript = patchList[j];
+                    if(patchScript.peasantAdultScript == null
+                        && patchScript.cropState == PatchScript.CropState.Barren
+                        && patchScript.cropType == cropType)
+                    {
+                        peasantAdultScript.AssignTask(patchScript);
+                        remainingAmount--;
+                        if (remainingAmount == 0) return 0;
+                        else break;
+                    }
+                    j++;
+                }
+                break;
+            }
+            i++;
+        }
+        return remainingAmount;
+    }
+
     public override void FinishUpBusiness()
     {
         base.FinishUpBusiness();
@@ -155,5 +186,4 @@ public class GardenScript : EnclosureScript
             }
         }
     }
-
 }

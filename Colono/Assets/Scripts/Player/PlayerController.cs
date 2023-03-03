@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(FloatObjectScript))]
@@ -42,14 +41,13 @@ public class PlayerController : MonoBehaviour
 
 		//S'obtenen les mides del mar
 		GameObject sea = GameObject.Find("Sea");
-		float seaWidth = sea.GetComponent<Renderer>().bounds.size.x;
-		float seaLength = sea.GetComponent<Renderer>().bounds.size.z;
+		Bounds seaBounds = sea.GetComponent<Renderer>().bounds;
 
 		//Es calculen les posicions màximes i mínimes del jugador dins el mar
-		xLeftBounds = sea.transform.position.x - seaWidth / 2 + xLeftMargin;
-		xRightBounds = sea.transform.position.x + seaWidth / 2 - xRightMargin;
-		zLowerBounds = sea.transform.position.z - seaLength / 2 + zLowerMargin;
-		zUpperBounds = sea.transform.position.z + seaLength / 2 - zUpperMargin;
+		xLeftBounds = sea.transform.position.x - seaBounds.size.x / 2 + xLeftMargin;
+		xRightBounds = sea.transform.position.x + seaBounds.size.x / 2 - xRightMargin;
+		zLowerBounds = sea.transform.position.z - seaBounds.size.z / 2 + zLowerMargin;
+		zUpperBounds = sea.transform.position.z + seaBounds.size.z / 2 - zUpperMargin;
 	}
 
     // Update is called once per frame
@@ -60,7 +58,7 @@ public class PlayerController : MonoBehaviour
 			Balance();
 			Movement();
 			Steer();
-			SoundAndParticles();
+			//SoundAndParticles();
 		}
 	}
 

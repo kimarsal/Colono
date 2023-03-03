@@ -8,11 +8,11 @@ using UnityEngine.UI;
 public class InventoryEditor : MonoBehaviour
 {
     public IslandEditor islandEditor;
-    public InventoryScript islandInventoryScript;
     public InventoryScript shipInventoryScript;
+    public InventoryScript islandInventoryScript;
 
-    public TextMeshProUGUI islandInventoryText;
     public TextMeshProUGUI shipInventoryText;
+    public TextMeshProUGUI islandInventoryText;
 
     public Transform rows;
     public ScrollRect scrollRect;
@@ -29,8 +29,8 @@ public class InventoryEditor : MonoBehaviour
         gridRowScript.resourceType = resourceType;
         gridRowScript.resourceIndex = resourceIndex;
         gridRowScript.resourceImage.sprite = islandEditor.GetResourceSprite(resourceType, resourceIndex);
-        gridRowScript.islandResources = islandInventoryScript.GetResourceAmount(resourceType, resourceIndex);
         gridRowScript.shipResources = shipInventoryScript.GetResourceAmount(resourceType, resourceIndex);
+        gridRowScript.islandResources = islandInventoryScript.GetResourceAmount(resourceType, resourceIndex);
         gridRowScript.UpdateValues();
         inventoryRows[(int)resourceType][resourceIndex] = gridRowScript;
     }
@@ -92,16 +92,16 @@ public class InventoryEditor : MonoBehaviour
         }
 
         InventoryRowScript inventoryRowScript = inventoryRows[(int)resourceType][resourceIndex];
-        inventoryRowScript.islandResources = islandInventoryScript.GetResourceAmount(resourceType, resourceIndex);
         inventoryRowScript.shipResources = shipInventoryScript.GetResourceAmount(resourceType, resourceIndex);
+        inventoryRowScript.islandResources = islandInventoryScript.GetResourceAmount(resourceType, resourceIndex);
         inventoryRowScript.UpdateValues();
         UpdateInventoryText();
     }
 
     public void UpdateInventoryText()
     {
-        islandInventoryText.text = islandInventoryScript.usage + "/" + islandInventoryScript.capacity;
         shipInventoryText.text = shipInventoryScript.usage + "/" + shipInventoryScript.capacity;
+        islandInventoryText.text = islandInventoryScript.usage + "/" + islandInventoryScript.capacity;
     }
 
     public bool MoveResource(ResourceType resourceType, int resourceIndex, int difference)

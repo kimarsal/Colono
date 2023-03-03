@@ -18,7 +18,6 @@ public class PenRowScript : MonoBehaviour
     public TextMeshProUGUI animalsInShipText;
 
     public GameObject adultSection;
-    public Dropdown cropDropdown;
     public Button increaseDesiredAmountButton;
     public Button decreaseDesiredAmountButton;
     public TextMeshProUGUI desiredAmountText;
@@ -26,7 +25,6 @@ public class PenRowScript : MonoBehaviour
     public int penAnimals;
     public int shipAnimals;
     public int desiredAmount;
-    public ResourceScript.CropType pairingCrop;
 
     private void Start()
     {
@@ -43,7 +41,6 @@ public class PenRowScript : MonoBehaviour
 
         moveAnimalToPenButton.interactable = shipAnimals > 0;
         moveAnimalToShipButton.interactable = penAnimals > 0;
-        cropDropdown.value = (int)pairingCrop;
 
         UpdateText();
     }
@@ -75,11 +72,6 @@ public class PenRowScript : MonoBehaviour
         desiredAmount += difference;
 
         UpdateDesiredAmount();
-    }
-
-    public void ChangePairingCrop(int cropType)
-    {
-        penEditor.ChangePairingCrop(animalType, (ResourceScript.CropType)cropType);
     }
 
     public void UpdateText()

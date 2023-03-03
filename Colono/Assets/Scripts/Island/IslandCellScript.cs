@@ -1,12 +1,6 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using static EnclosureScript;
-using static UnityEngine.Rendering.DebugUI.Table;
 
 public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerMoveHandler
 {
@@ -26,7 +20,6 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     private Vector2[] selectedCells = new Vector2[0];
     private bool wasOtherCellHovered = false;
     private bool isSelectionValid = false;
-    private Vector2 lastMousePosition;
 
     private EnclosureScript.EnclosureType selectedEnclosureType;
     private BuildingScript selectedBuilding;
@@ -62,26 +55,34 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             }
             else if (Input.GetKeyDown(KeyCode.Escape))
             {
-                selectMode = SelectMode.None;
                 Destroy(selectedBuilding.gameObject); //Eliminar l'edifici
-                DestroyAllCells();
                 gameManager.canvasScript.ShowDefaultButtons();
+                gameManager.DisableIslandCellScript();
             }
         }
         else {
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                selectMode = SelectMode.None;
-                DestroyAllCells();
-                wasOtherCellHovered = false;
                 gameManager.canvasScript.ShowDefaultButtons();
+                gameManager.DisableIslandCellScript();
             }
         }
     }
 
     private void GetPointerCoordinates(PointerEventData eventData, out int x, out int y)
     {
-        Vector3 islandPoint = eventData.pointerCurrentRaycast.worldPosition - islandScript.transform.position;
+        Vector3 islandPoint;
+        if (eventData != null)
+        {
+            islandPoint = eventData.pointerCurrentRaycast.worldPosition - islandScript.transform.position;
+        }
+        else
+        {
+            RaycastHit raycastHit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Physics.Raycast(ray, out raycastHit, 100f);
+            islandPoint = raycastHit.point - islandScript.transform.position;
+        }
         Vector2 mapPoint = new Vector2(IslandGenerator.mapChunkSize / 2 + islandPoint.x, IslandGenerator.mapChunkSize / 2 - islandPoint.z);
         x = Mathf.FloorToInt(mapPoint.x);
         y = Mathf.FloorToInt(mapPoint.y);
@@ -89,9 +90,6 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        int x, y;
-        GetPointerCoordinates(eventData, out x, out y);
-
         if (selectMode == SelectMode.Building) //Si intenta col·locar l'edifici
         {
             if (!isSelectionValid) //Si la posició no és vàlida
@@ -108,21 +106,33 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 gameManager.SelectConstruction(selectedBuilding);
 
             }
-            DestroyAllCells();
             gameManager.DisableIslandCellScript();
         }
 
         else
         {
-            if (islandScript.regionMap[x, y] >= 0 && //Si és terreny disponible
-                (islandGenerator.regions[islandScript.regionMap[x, y]].type == Terrain.TerrainType.Field
-                || islandGenerator.regions[islandScript.regionMap[x, y]].type == Terrain.TerrainType.Hill)) //Si la cel·la és gespa
+            if (wasOtherCellHovered)
             {
                 selectMode = SelectMode.Selecting;
+                selectedCell = hoveredCell;
 
-                selectedCell = new Vector2(x, y);
-                lastMousePosition = new Vector2(x, y);
-                OnPointerMove(null);
+                isSelectionValid = true;
+
+                if (islandScript.regionMap[(int)selectedCell.x, (int)selectedCell.y] < 0 // No està disponible
+                    || (islandGenerator.regions[islandScript.regionMap[(int)selectedCell.x, (int)selectedCell.y]].type != Terrain.TerrainType.Field
+                    && islandGenerator.regions[islandScript.regionMap[(int)selectedCell.x, (int)selectedCell.y]].type != Terrain.TerrainType.Hill)) //No és gespa
+                {
+                    isSelectionValid = false;
+                }
+                else if (islandScript.isCellTaken(selectedCell))
+                {
+                    selectedItems = new List<ItemScript>() { islandScript.itemDictionary[selectedCell] };
+
+                    if (selectFunction == SelectFunction.PlantTrees) isSelectionValid = false;
+                }
+                else if (selectFunction != SelectFunction.PlantTrees) isSelectionValid = false;
+
+                cells[(int)selectedCell.x, (int)selectedCell.y].GetComponent<MeshRenderer>().material = islandEditor.selectingFirstCellMaterial;
             }
             else
             {
@@ -134,9 +144,6 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        /*int x, y;
-        GetPointerCoordinates(eventData, out x, out y);*/
-
         if (isSelectionValid)
         {
             if (selectFunction == SelectFunction.CreateEnclosure)
@@ -148,6 +155,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             else if(selectFunction == SelectFunction.PlantTrees)
             {
                 islandScript.PlantTrees(selectedCells);
+                gameManager.canvasScript.ShowDefaultButtons();
             }
             else
             {
@@ -163,23 +171,13 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             gameManager.canvasScript.ShowDefaultButtons();
         }
 
-        DestroyAllCells();
         gameManager.DisableIslandCellScript();
     }
 
     public void OnPointerMove(PointerEventData eventData)
     {
         int x, y;
-        if (eventData == null)
-        {
-            x = (int)lastMousePosition.x;
-            y = (int)lastMousePosition.y;
-        }
-        else
-        {
-            GetPointerCoordinates(eventData, out x, out y);
-            lastMousePosition = new Vector2(x, y);
-        }
+        GetPointerCoordinates(eventData, out x, out y);
         
         if (wasOtherCellHovered && hoveredCell.x == x && hoveredCell.y == y) return; //La cel·la és la mateixa a la hovered
 

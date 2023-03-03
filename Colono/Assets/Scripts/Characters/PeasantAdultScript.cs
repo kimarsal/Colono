@@ -7,7 +7,6 @@ using UnityEngine;
 public class PeasantAdultScript : PeasantScript
 {
     public TaskScript task;
-    private bool hasTaskChanged;
 
     [Header("Tools")]
     public GameObject axe;
@@ -105,11 +104,11 @@ public class PeasantAdultScript : PeasantScript
     {
         if (tavern != null) //Si ha anat a menjar
         {
-            tavern.FeedPeasant(this);
+            tavern.PeasantHasArrived(this);
         }
         else if (cabin != null) //Si ha anat a dormir
         {
-            cabin.RestPeasant(this);
+            cabin.PeasantHasArrived(this);
         }
         else if (task != null) //Si té una tasca encarregada
         {
@@ -123,17 +122,7 @@ public class PeasantAdultScript : PeasantScript
             }
             else
             {
-                if (constructionScript.constructionType == ConstructionScript.ConstructionType.Building)
-                {
-                    constructionScript.peasantsOnTheirWay--;
-                    gameObject.SetActive(false);
-                }
-                else if (constructionScript.constructionType == ConstructionScript.ConstructionType.Ship)
-                {
-                    ((ShipScript)constructionScript).AddPeasant(this);
-                    Destroy(gameObject);
-                }
-                constructionScript.UpdateConstructionDetails();
+                constructionScript.PeasantHasArrived(this);
             }
         }
         else
@@ -144,7 +133,6 @@ public class PeasantAdultScript : PeasantScript
 
     public void DoTask()
     {
-        hasTaskChanged = false;
         if (task.taskType == TaskScript.TaskType.Item)
         {
             switch (((ItemScript)task).actionType)
@@ -175,7 +163,7 @@ public class PeasantAdultScript : PeasantScript
         }
         else
         {
-            ((PairingScript)task).ParticipantHasArrived();
+            //Fight
         }
         //transform.LookAt(task.center);
         //StartCoroutine(PointTowardsTaskCenter());
@@ -193,27 +181,23 @@ public class PeasantAdultScript : PeasantScript
         while (Vector3.Angle(transform.forward, task.center - transform.position) > 10);
     }*/
 
-    public void FeedAnimals()
-    {
-        animator.SetInteger("State", (int)PeasantAction.Feeding);
-    }
-
     public void CancelTask()
     {
         if (task != null)
         {
+            animator.SetTrigger("CancelTask");
             task.CancelTask();
-            hasTaskChanged = true;
+            task = null;
         }
     }
 
     private void TaskProgress()
     {
-        if (!hasTaskChanged)
+        if(task != null)
         {
             task.TaskProgress();
+            hunger += 0.05f;
+            exhaustion += 0.05f;
         }
-        hunger += 0.05f;
-        exhaustion += 0.05f;
     }
 }

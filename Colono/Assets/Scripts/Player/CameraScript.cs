@@ -22,10 +22,10 @@ public class CameraScript : MonoBehaviour
     private float zLowerMarginPlayer = -10f;
     private float zUpperMarginPlayer = 15f;
 
-    private float xLeftMarginIsland = 40f;
-    private float xRightMarginIsland = 40f;
-    private float zLowerMarginIsland = 20f;
-    private float zUpperMarginIsland = 50f;
+    private float xLeftMarginIsland = 10f;
+    private float xRightMarginIsland = 10f;
+    private float zLowerMarginIsland = 5f;
+    private float zUpperMarginIsland = 15f;
 
     void Start()
     {
@@ -47,9 +47,9 @@ public class CameraScript : MonoBehaviour
             targetPosition = playerController.transform.position + offset;
 
             //Es manté la càmera dins els marges
-            float x = Mathf.Clamp(minX, targetPosition.x, maxX);
+            float x = Mathf.Clamp(targetPosition.x, minX, maxX);
             float y = targetPosition.y;
-            float z = Mathf.Clamp(minZ, targetPosition.z, maxZ);
+            float z = Mathf.Clamp(targetPosition.z, minZ, maxZ);
 
             transform.position = Vector3.MoveTowards(transform.position, new Vector3(x, y, z), speed * Time.deltaTime);
         }
@@ -59,9 +59,9 @@ public class CameraScript : MonoBehaviour
             targetPosition = transform.position + new Vector3(Input.GetAxis("Horizontal"), Input.mouseScrollDelta.y * -2, Input.GetAxis("Vertical")) * speed * Time.deltaTime;
             
             //Es manté la càmera dins els marges
-            float x = Mathf.Clamp(minX, targetPosition.x, maxX);
-            float y = Mathf.Clamp(minYIsland, targetPosition.y, maxYIsland);
-            float z = Mathf.Clamp(minZ, targetPosition.z, maxZ);
+            float x = Mathf.Clamp(targetPosition.x, minX, maxX);
+            float y = Mathf.Clamp(targetPosition.y, minYIsland, maxYIsland);
+            float z = Mathf.Clamp(targetPosition.z, minZ, maxZ);
 
             Vector3 positionChange = new Vector3(x, y, z) - transform.position;
             float time = positionChange.magnitude / speed;

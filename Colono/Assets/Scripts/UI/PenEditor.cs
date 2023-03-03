@@ -1,16 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using static ResourceScript;
 using UnityEngine.UI;
-using System;
 
 public class PenEditor : MonoBehaviour
 {
     public IslandEditor islandEditor;
     public PenScript penScript;
-    public ShipScript shipScript;
+    public PenScript shipScript;
 
     public TextMeshProUGUI penAnimalsText;
     public TextMeshProUGUI shipAnimalsText;
@@ -39,7 +36,6 @@ public class PenEditor : MonoBehaviour
             penRowScript.penAnimals = penScript.animals[i];
             penRowScript.shipAnimals = shipScript.animals[i];
             penRowScript.desiredAmount = penScript.desiredAmounts[i];
-            penRowScript.pairingCrop = penScript.pairingCrops[i];
             penRowScript.UpdateValues();
             penRows[i] = penRowScript;
         }
@@ -50,80 +46,38 @@ public class PenEditor : MonoBehaviour
 
     public void UpdatePenRow(AnimalType animalType)
     {
-        PenRowScript penRowScript = penRows[(int)animalType];
-        penRowScript.penAnimals = penScript.animals[(int)animalType];
-        penRowScript.shipAnimals = shipScript.animals[(int)animalType];
-        penRowScript.UpdateValues();
-        UpdatePenText();
+        if (penRows.Length != 0)
+        {
+            PenRowScript penRowScript = penRows[(int)animalType];
+            penRowScript.penAnimals = penScript.animals[(int)animalType];
+            penRowScript.shipAnimals = shipScript.animals[(int)animalType];
+            penRowScript.UpdateValues();
+            UpdatePenText();
+        }
     }
 
     public void UpdatePenText()
     {
-        penAnimalsText.text = penScript.animalAmount + "/" + penScript.maxPeasants;
-        shipAnimalsText.text = shipScript.animalAmount + "/" + shipScript.maxPeasants;
+        penAnimalsText.text = penScript.animalList.Count + "/" + penScript.maxPeasants;
+        shipAnimalsText.text = shipScript.animalList.Count + "/" + shipScript.maxPeasants;
     }
 
     public void MoveAnimal(AnimalType animalType, bool toPen)
     {
-        if(toPen)
-        {
-            AnimalScript animalScript = shipScript.RemoveAnimal(penScript, animalType);
-            AddAnimal(animalScript);
-        }
-        else
-        {
-            AnimalScript animalScript = RemoveAnimal(animalType);
-            shipScript.AddAnimal(animalScript);
-        }
+        PenScript origin = toPen ? shipScript : penScript;
+        PenScript destination = toPen ? penScript : shipScript;
+        
+        AnimalScript animalScript = origin.RemoveAnimal(animalType);
+        if (animalScript == null) return;
+        
+        destination.AddAnimal(animalScript);
 
         UpdatePenText();
-    }
-
-    public void AddAnimal(AnimalScript animalScript)
-    {
-        penScript.animalList.Add(animalScript);
-        penScript.animals[(int)animalScript.animalType]++;
-        penScript.animalAmount++;
-        penScript.desiredAmounts[(int)animalScript.animalType]++;
-
-        if (animalScript.animalType == AnimalType.Chicken)
-        {
-            animalScript.transform.localScale = Vector3.one * 0.1f;
-        }
-        else if (animalScript.animalType == AnimalType.Chick)
-        {
-            animalScript.transform.localScale = Vector3.one * 0.05f;
-        }
-        animalScript.penScript = penScript;
-        
-
-    }
-
-    public AnimalScript RemoveAnimal(AnimalType animalType)
-    {
-        for(int i = 0; i < penScript.animalList.Count; i++)
-        {
-            AnimalScript animalScript = penScript.animalList[i];
-            if(animalScript.animalType == animalType)
-            {
-                penScript.animalList.RemoveAt(i);
-                penScript.animals[(int)animalType]--;
-                penScript.animalAmount--;
-                Destroy(animalScript.gameObject);
-                return animalScript;
-            }
-        }
-        return null;
     }
 
     public void ChangeDesiredAmount(AnimalType animalType, int difference)
     {
         penScript.ChangeDesiredAmount(animalType, difference);
-    }
-
-    public void ChangePairingCrop(AnimalType animalType, CropType cropType)
-    {
-        penScript.ChangePairingCrop(animalType, cropType);
     }
 
 }

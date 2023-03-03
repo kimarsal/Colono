@@ -33,18 +33,15 @@ public class PeasantChildScript : PeasantScript
     {
         if (tavern != null) //Si ha anat a menjar
         {
-            tavern.FeedPeasant(this);
+            tavern.PeasantHasArrived(this);
         }
         else if (cabin != null) //Si ha anat a dormir
         {
-            cabin.RestPeasant(this);
+            cabin.PeasantHasArrived(this);
         }
         else if (constructionScript != null) //Si té el vaixell com a destí
         {
-            ((ShipScript)constructionScript).AddPeasant(this);
-            constructionScript.peasantsOnTheirWay--;
-            constructionScript.UpdateConstructionDetails();
-            Destroy(gameObject);
+            constructionScript.PeasantHasArrived(this);
         }
         else
         {

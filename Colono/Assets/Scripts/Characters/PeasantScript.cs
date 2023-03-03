@@ -39,9 +39,10 @@ public abstract class PeasantScript : MonoBehaviour
     public float age;
     public float hunger;
     public float exhaustion;
+    public bool isInBuilding;
     [JsonIgnore] private float ageSpeed = 0.1f;
-    [JsonIgnore] private float hungerSpeed = 0.001f;
-    [JsonIgnore] private float exhaustionSpeed = 0.001f;
+    [JsonIgnore] private float hungerSpeed = 0.01f;
+    [JsonIgnore] private float exhaustionSpeed = 0.01f;
 
     [Header("Scripts")]
     [JsonIgnore] public IslandScript islandScript;
@@ -65,6 +66,8 @@ public abstract class PeasantScript : MonoBehaviour
         animator.SetInteger("State", (int)PeasantAction.Moving);
         animator.SetFloat("Speed", 0);
 
+        transform.localScale = Vector3.one * 0.45f;
+
         SetAppearence();
         UpdateTask();
     }
@@ -80,6 +83,10 @@ public abstract class PeasantScript : MonoBehaviour
         _CLOTH3COLOR = peasantScript._CLOTH3COLOR;
         _CLOTH4COLOR = peasantScript._CLOTH4COLOR;
         _OTHERCOLOR = peasantScript._OTHERCOLOR;
+
+        age = peasantScript.age;
+        hunger = peasantScript.hunger;
+        exhaustion = peasantScript.exhaustion;
     }
 
     public void SetAppearence()
@@ -124,8 +131,6 @@ public abstract class PeasantScript : MonoBehaviour
         head.GetComponent<SkinnedMeshRenderer>().material = newMaterial;
         lower.GetComponent<SkinnedMeshRenderer>().material = newMaterial;
         upper.GetComponent<SkinnedMeshRenderer>().material = newMaterial;
-
-        transform.localScale = Vector3.one * 0.45f;
     }
 
     private void Update()
@@ -135,7 +140,7 @@ public abstract class PeasantScript : MonoBehaviour
         CheckIfArrivedAtDestination();
 
         position = transform.position;
-        orientation = (int)transform.rotation.y % 360;
+        orientation = (int)transform.rotation.eulerAngles.y % 360;
     }
 
     protected void UpdateDetails()
@@ -146,7 +151,7 @@ public abstract class PeasantScript : MonoBehaviour
         {
             hunger += Time.deltaTime * hungerSpeed;
         }
-        else if (tavern == null)
+        else if (!isInBuilding && tavern == null)
         {
             hunger = 1;
             tavern = (TavernScript)islandScript.GetAvailableBuilding(BuildingScript.BuildingType.Tavern, this);
@@ -163,7 +168,7 @@ public abstract class PeasantScript : MonoBehaviour
         {
             exhaustion += Time.deltaTime * exhaustionSpeed;
         }
-        else if (cabin == null)
+        else if (!isInBuilding && cabin == null)
         {
             exhaustion = 1;
             cabin = (CabinScript)islandScript.GetAvailableBuilding(BuildingScript.BuildingType.Cabin, this);

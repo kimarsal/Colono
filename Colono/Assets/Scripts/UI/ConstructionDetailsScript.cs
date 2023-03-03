@@ -24,26 +24,20 @@ public class ConstructionDetailsScript : MonoBehaviour
         constructionScript = newConstructionScript;
         constructionScript.constructionDetailsScript = this;
 
-        switch (constructionScript.constructionType)
+        title.text = constructionScript.title;
+        if (constructionScript.canManagePeasants)
         {
-            case ConstructionScript.ConstructionType.Building: title.text = ((BuildingScript)constructionScript).buildingType.ToString(); break;
-            case ConstructionScript.ConstructionType.Enclosure: title.text = ((EnclosureScript)constructionScript).enclosureType.ToString(); break;
-            case ConstructionScript.ConstructionType.Ship: title.text = constructionScript.constructionType.ToString(); break;
-        }
-
-        if (constructionScript.constructionType == ConstructionScript.ConstructionType.Building
-            && ((BuildingScript)constructionScript).buildingType != BuildingScript.BuildingType.Mine)
-        {
-            peasantButtons.SetActive(false);
-            peasantNumText.enabled = ((BuildingScript)constructionScript).buildingType != BuildingScript.BuildingType.Warehouse;
+            peasantButtons.SetActive(true);
+            peasantsOnTheirWayText.enabled = true;
         }
         else
         {
-            peasantButtons.SetActive(true);
-            peasantNumText.enabled = true;
-            UpdatePeasantNum();
+            peasantButtons.SetActive(false);
+            peasantsOnTheirWayText.enabled = false;
         }
-        removeConstructionButton.gameObject.SetActive(constructionScript.constructionType != ConstructionScript.ConstructionType.Ship);
+        UpdatePeasantNum();
+
+        removeConstructionButton.gameObject.SetActive(constructionScript.canBeRemoved);
     }
 
     public void EditConstruction()
@@ -63,17 +57,18 @@ public class ConstructionDetailsScript : MonoBehaviour
     {
         if (constructionScript.peasantsOnTheirWay != 0)
         {
-            peasantsOnTheirWayText.gameObject.SetActive(true);
+            peasantsOnTheirWayText.enabled = true;
             peasantsOnTheirWayText.text = (constructionScript.peasantsOnTheirWay > 0 ? "+" : "") + constructionScript.peasantsOnTheirWay;
         }
         else
         {
-            peasantsOnTheirWayText.gameObject.SetActive(false);
+            peasantsOnTheirWayText.enabled = false;
         }
 
-        peasantNumText.text = (constructionScript.peasantList.Count - constructionScript.peasantsOnTheirWay).ToString() + "/" + constructionScript.maxPeasants;
-        minusButton.interactable = constructionScript.peasantList.Count > 0;
-        plusButton.interactable = constructionScript.peasantList.Count < constructionScript.maxPeasants;
+        int peasantCount = constructionScript.peasantCount;
+        peasantNumText.text = (peasantCount - constructionScript.peasantsOnTheirWay).ToString() + "/" + constructionScript.maxPeasants;
+        minusButton.interactable = peasantCount > 0;
+        plusButton.interactable = peasantCount < constructionScript.maxPeasants;
     }
 
 }

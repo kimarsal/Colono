@@ -9,25 +9,31 @@ public class CabinScript : BuildingScript
         throw new NotImplementedException();
     }
 
-    public void RestPeasant(PeasantScript peasantScript)
+    public override PeasantScript PeasantHasArrived(PeasantScript peasantScript)
     {
-        StartCoroutine(RestPeasantCoroutine(peasantScript));
+        PeasantScript newPeasantScript = base.PeasantHasArrived(peasantScript);
+        StartCoroutine(RestPeasantCoroutine(newPeasantScript));
+        return null;
     }
 
     private IEnumerator RestPeasantCoroutine(PeasantScript peasantScript)
     {
-        peasantScript.gameObject.SetActive(false);
-        yield return new WaitForSeconds(10);
-        peasantScript.gameObject.SetActive(true);
+        yield return new WaitForSeconds(5);
 
-        peasantScript.exhaustion = 0;
-        peasantScript.cabin = null;
-        if (peasantScript.peasantType == PeasantScript.PeasantType.Adult)
+        PeasantScript newPeasantScript = Instantiate(peasantScript.gameObject,
+                entry.position, Quaternion.identity,
+                islandScript.npcsTransform).GetComponent<PeasantScript>();
+        newPeasantScript.InitializePeasant(peasantScript);
+        Destroy(peasantScript.gameObject);
+
+        newPeasantScript.exhaustion = 0;
+        newPeasantScript.cabin = null;
+        if (newPeasantScript.peasantType == PeasantScript.PeasantType.Adult)
         {
-            PeasantAdultScript peasantAdultScript = (PeasantAdultScript)peasantScript;
+            PeasantAdultScript peasantAdultScript = (PeasantAdultScript)newPeasantScript;
             peasantAdultScript.taskSourceInterface.GetNextPendingTask(peasantAdultScript);
         }
-        else peasantScript.UpdateTask();
+        else newPeasantScript.UpdateTask();
     }
 
     public override PeasantScript RemovePeasant()

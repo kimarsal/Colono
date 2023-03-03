@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 
 [System.Serializable]
 public class InventoryScript
@@ -14,7 +13,6 @@ public class InventoryScript
         resources[0] = new int[Enum.GetValues(typeof(ResourceScript.MaterialType)).Length];
         resources[1] = new int[Enum.GetValues(typeof(ResourceScript.CropType)).Length];
         resources[2] = new int[Enum.GetValues(typeof(ResourceScript.MeatType)).Length];
-        resources[3] = new int[Enum.GetValues(typeof(ResourceScript.AnimalType)).Length];
     }
 
     public int GetResourceAmount(ResourceScript.ResourceType resourceType, int resourceIndex)

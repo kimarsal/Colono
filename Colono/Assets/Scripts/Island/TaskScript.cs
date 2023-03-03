@@ -5,7 +5,7 @@ using UnityEngine;
 public abstract class TaskScript : MonoBehaviour
 {
     public TaskSourceInterface taskSourceScript;
-    public enum TaskType { Item, Patch, Pairing }
+    public enum TaskType { Item, Patch }
     public Vector3 center;
     public TaskType taskType;
 

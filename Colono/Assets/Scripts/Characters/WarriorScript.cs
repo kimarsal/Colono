@@ -6,7 +6,7 @@ public class WarriorScript : MonoBehaviour
 {
     public float walkSpeed;
     public float runSpeed;
-    private bool isRunning = false;
+    //private bool isRunning = false;
 
     public GameObject head1;
     public GameObject head2;

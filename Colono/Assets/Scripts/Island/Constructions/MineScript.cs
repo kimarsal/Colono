@@ -1,10 +1,13 @@
 
+using Newtonsoft.Json;
 using UnityEngine;
 
 public class MineScript : BuildingScript
 {
     private float timeSinceLastExtraction;
     public float extractionSpeed = 0.2f;
+
+    [JsonIgnore] public override bool canManagePeasants { get { return true; } }
 
     private void Update()
     {

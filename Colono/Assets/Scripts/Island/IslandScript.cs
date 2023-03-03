@@ -19,7 +19,7 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
     public InventoryScript inventoryScript;
 
     [JsonIgnore] public GameManager gameManager;
-    [JsonIgnore] public GameObject convexColliders;
+    //[JsonIgnore] public GameObject convexColliders;
     [JsonIgnore] public Transform itemsTransform;
     [JsonIgnore] public Transform constructionsTransform;
     [JsonIgnore] public Transform npcsTransform;
@@ -33,7 +33,6 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
     private void Start()
     {
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-        convexColliders = transform.GetChild(0).gameObject;
     }
 
     public bool isCellTaken(Vector2 cell)
@@ -114,6 +113,7 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
 
     public void RemoveConstruction(ConstructionScript constructionScript)
     {
+        SendAllPeasantsBack(constructionScript);
         if (constructionScript.constructionType == ConstructionScript.ConstructionType.Building && ((BuildingScript)constructionScript).buildingType == BuildingScript.BuildingType.Warehouse)
         {
             inventoryScript.capacity -= 30;
@@ -185,16 +185,27 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
         return closestBuildingScript;
     }
 
-    public bool AddResource(ResourceScript.ResourceType resourceType, int resourceIndex, int amount = 1)
+    public void AddResource(ResourceScript.ResourceType resourceType, int resourceIndex, int amount = 1)
     {
-        int remainingAmount = inventoryScript.AddResource(resourceType, resourceIndex, amount);
+        int remainingAmount = amount;
+        if (resourceType == ResourceScript.ResourceType.Crop)
+        {
+            foreach (GardenScript gardenScript in constructionList)
+            {
+                if (gardenScript == null) continue;
+
+                remainingAmount = gardenScript.UseNewCrops((ResourceScript.CropType)resourceIndex, remainingAmount);
+
+                if (remainingAmount == 0) break;
+            }
+        }
+
+        remainingAmount = inventoryScript.AddResource(resourceType, resourceIndex, remainingAmount);
         if (remainingAmount > 0 && gameManager.isInIsland)
         {
-            remainingAmount = gameManager.shipScript.inventoryScript.AddResource(resourceType, resourceIndex, remainingAmount);
+            gameManager.shipScript.inventoryScript.AddResource(resourceType, resourceIndex, remainingAmount);
         }
         gameManager.canvasScript.UpdateInventoryRow(resourceType, resourceIndex);
-
-        return remainingAmount == 0;
     }
 
     public int GetResourceAmount(ResourceScript.ResourceType resourceType, int resourceIndex)
@@ -257,6 +268,7 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
         PeasantAdultScript peasantScript = item.peasantAdultScript;
         if (peasantScript != null) //Tenia un NPC vinculat
         {
+            peasantScript.task = null;
             item.peasantAdultScript = null;
             GetNextPendingTask(peasantScript);
         }
@@ -290,6 +302,10 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
 
             if (peasantScript != null)
             {
+                if(peasantScript.peasantType == PeasantScript.PeasantType.Adult)
+                {
+                    ((PeasantAdultScript)peasantScript).CancelTask();
+                }
                 peasantList.Remove(peasantScript);
                 constructionScript.AddPeasant(peasantScript);
                 peasantScript.UpdateTask();
@@ -318,6 +334,7 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
         {
             PeasantScript peasantScript = constructionScript.RemovePeasant();
             peasantList.Add(peasantScript);
+            peasantScript.gameObject.SetActive(true);
             if (peasantScript.peasantType == PeasantScript.PeasantType.Adult)
             {
                 GetNextPendingTask((PeasantAdultScript)peasantScript);
@@ -331,7 +348,6 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
         for (int i = shipScript.peasantList.Count - 1; i >= 0; i--)
         {
             PeasantScript peasantScript = shipScript.peasantList[i];
-            if (!peasantScript.gameObject.activeInHierarchy) continue;
 
             peasantList.Add(peasantScript);
             shipScript.peasantList.Remove(peasantScript);

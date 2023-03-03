@@ -1,16 +1,19 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using static PatchScript;
 using static ResourceScript;
 
 public class IslandEditor : MonoBehaviour
 {
-    [Header("NPCs")]
-    [SerializeField] private GameObject malePeasantPrefab;
-    [SerializeField] private GameObject femalePeasantPrefab;
-    [SerializeField] private GameObject childPeasantPrefab;
-    [SerializeField] private GameObject maleWarriorPrefab;
-    [SerializeField] private GameObject femaleWarriorPrefab;
+    [SerializeField] private Transform itemsTransform;
 
+    [Header("NPCs")]
+    [SerializeField] private PeasantScript malePeasantPrefab;
+    [SerializeField] private PeasantScript femalePeasantPrefab;
+    [SerializeField] private PeasantScript childPeasantPrefab;
+    /*[SerializeField] private GameObject maleWarriorPrefab;
+    [SerializeField] private GameObject femaleWarriorPrefab;*/
     [SerializeField] private Color[] skinColorsCaucassian;
     [SerializeField] private Color[] hairColors;
 
@@ -24,13 +27,12 @@ public class IslandEditor : MonoBehaviour
     public Material patchMaterial;
 
     [Header("Buildings")]
-    [SerializeField] private GameObject[] buildings;
+    [SerializeField] private BuildingScript[] buildings;
 
     [Header("Fences")]
-    public GameObject[] fences;
+    [SerializeField] private GameObject[] fences;
     public GameObject post;
-    public GameObject gateClosed;
-    public GameObject gateOpen;
+    public GameObject gate;
 
     [Header("Resources")]
     [SerializeField] private Sprite[] materialSprites;
@@ -39,38 +41,133 @@ public class IslandEditor : MonoBehaviour
     [SerializeField] private Sprite[] meatSprites;
 
     [Header("Crops")]
-    public GameObject[] onion;
-    public GameObject[] carrot;
-    public GameObject[] eggplant;
-    public GameObject[] cucumber;
-    public GameObject[] cabbage;
-
-    public GameObject[] potato;
-    public GameObject[] tomato;
-    public GameObject[] zucchini;
-    public GameObject[] pepper;
-    public GameObject[] corn;
-
-    public GameObject cropSprout;
+    [SerializeField] private GameObject[] onion;
+    [SerializeField] private GameObject[] carrot;
+    [SerializeField] private GameObject[] eggplant;
+    [SerializeField] private GameObject[] cucumber;
+    [SerializeField] private GameObject[] cabbage;
+    [SerializeField] private GameObject[] potato;
+    [SerializeField] private GameObject[] tomato;
+    [SerializeField] private GameObject[] zucchini;
+    [SerializeField] private GameObject[] pepper;
+    [SerializeField] private GameObject[] corn;
+    [SerializeField] private GameObject cropSprout;
 
     [Header("Animals")]
-    public GameObject[] animals;
+    [SerializeField] private AnimalScript[] animals;
 
     [Header("Recipes")]
     public Sprite[] cookedVegetableSprites;
     public Sprite[] cookedMeatSprites;
 
     [Header("Items")]
-    public GameObject[] beachItems;
-    public GameObject[] fieldItems;
-    public GameObject[] hillItems;
-    public GameObject[] mountainItems;
-
-    public GameObject treeSprout;
+    //public ItemScript[] beachItems;
+    [SerializeField] private ItemScript[] fieldItems;
+    [SerializeField] private ItemScript[] hillItems;
+    //public ItemScript[] mountainItems;
+    public ItemScript treeSprout;
 
     [Header("Others")]
     public GameObject coastObstacle;
     public GameObject enclosureCenter;
+
+    [Header("Pooling")]
+    [SerializeField] private Vector3 fieldItemsStartPos;
+    [SerializeField] private Vector3 hillItemsStartPos;
+    [SerializeField] private int itemSpacing;
+    private List<ItemScript>[] instantiatedFieldItems;
+    private List<ItemScript>[] instantiatedHillItems;
+    private int currentFieldIndex;
+    private int currentHillIndex;
+    private int lastFieldIndex;
+    private int lastHillIndex;
+
+    private void Start()
+    {
+        instantiatedFieldItems = new List<ItemScript>[fieldItems.Length];
+        instantiatedHillItems = new List<ItemScript>[hillItems.Length];
+        for(int i = 0; i < fieldItems.Length; i++)
+        {
+            instantiatedFieldItems[i] = new List<ItemScript>();
+        }
+        for (int i = 0; i < hillItems.Length; i++)
+        {
+            instantiatedHillItems[i] = new List<ItemScript>();
+        }
+        lastFieldIndex = fieldItems.Length;
+        lastHillIndex = hillItems.Length;
+
+        StartCoroutine(SpawnCoroutine());
+    }
+
+    private IEnumerator SpawnCoroutine()
+    {
+        while (true)
+        {
+            while(currentFieldIndex != lastFieldIndex && instantiatedFieldItems[currentFieldIndex].Count > 10)
+            {
+                currentFieldIndex = (currentFieldIndex + 1) % fieldItems.Length;
+            }
+            if(currentFieldIndex != lastFieldIndex)
+            {
+                ItemScript fieldItem = Instantiate(fieldItems[currentFieldIndex],
+                    fieldItemsStartPos + new Vector3(instantiatedFieldItems[currentFieldIndex].Count * itemSpacing, 0, currentFieldIndex * itemSpacing),
+                    Quaternion.identity, itemsTransform);
+                instantiatedFieldItems[currentFieldIndex].Add(fieldItem);
+                lastFieldIndex = currentFieldIndex;
+            }
+            currentFieldIndex = (currentFieldIndex + 1) % fieldItems.Length;
+
+            yield return new WaitForSeconds(0.1f);
+
+            while (currentHillIndex != lastHillIndex && instantiatedHillItems[currentHillIndex].Count > 10)
+            {
+                currentHillIndex = (currentHillIndex + 1) % hillItems.Length;
+            }
+            if(currentHillIndex != lastHillIndex)
+            {
+                ItemScript hillItem = Instantiate(hillItems[currentHillIndex],
+                    hillItemsStartPos + new Vector3(instantiatedHillItems[currentHillIndex].Count * itemSpacing, 0, currentHillIndex * itemSpacing),
+                    Quaternion.identity, itemsTransform);
+                instantiatedHillItems[currentHillIndex].Add(hillItem);
+                lastHillIndex = currentHillIndex;
+            }
+            currentHillIndex = (currentHillIndex + 1) % hillItems.Length;
+
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
+
+    private ItemScript GetInstantiatedItemPrefab(Terrain.TerrainType terrainType, int itemIndex)
+    {
+        ItemScript itemScript = null;
+        switch (terrainType)
+        {
+            case Terrain.TerrainType.Field:
+                if (instantiatedFieldItems == null || instantiatedFieldItems[itemIndex].Count == 0)
+                {
+                    itemScript = Instantiate(fieldItems[itemIndex], itemsTransform);
+                }
+                else
+                {
+                    itemScript = instantiatedFieldItems[itemIndex][instantiatedFieldItems[itemIndex].Count - 1];
+                    instantiatedFieldItems[itemIndex].RemoveAt(instantiatedFieldItems[itemIndex].Count - 1);
+                }
+                break;
+            case Terrain.TerrainType.Hill:
+                if (instantiatedHillItems == null || instantiatedHillItems[itemIndex].Count == 0)
+                {
+                    itemScript = Instantiate(hillItems[itemIndex], itemsTransform);
+                }
+                else
+                {
+                    itemScript = instantiatedHillItems[itemIndex][instantiatedHillItems[itemIndex].Count - 1];
+                    instantiatedHillItems[itemIndex].RemoveAt(instantiatedHillItems[itemIndex].Count - 1);
+                }
+                break;
+        }
+        return itemScript;
+    }
 
     public Sprite GetResourceSprite(ResourceType resourceType, int resourceIndex)
     {
@@ -84,28 +181,23 @@ public class IslandEditor : MonoBehaviour
         return null;
     }
 
-    public GameObject GetItemPrefab(Terrain.TerrainType terrainType, int itemIndex)
+    public ItemScript GetItemPrefab(Terrain.TerrainType terrainType, int itemIndex)
+    {
+        return GetInstantiatedItemPrefab(terrainType, itemIndex);
+    }
+
+    public ItemScript GetRandomItemPrefab(Terrain.TerrainType terrainType, out int itemIndex)
     {
         switch (terrainType)
         {
-            case Terrain.TerrainType.Field: return fieldItems[itemIndex];
-            case Terrain.TerrainType.Hill: return hillItems[itemIndex];
+            case Terrain.TerrainType.Field: itemIndex = Random.Range(0, fieldItems.Length); break;
+            case Terrain.TerrainType.Hill: itemIndex = Random.Range(0, hillItems.Length); break;
+            default: itemIndex = -1; break;
         }
-        return null;
+        return GetInstantiatedItemPrefab(terrainType, itemIndex);
     }
 
-    public GameObject GetRandomItemPrefab(Terrain.TerrainType terrainType, out int itemIndex)
-    {
-        switch (terrainType)
-        {
-            case Terrain.TerrainType.Field: itemIndex = Random.Range(0, fieldItems.Length); return fieldItems[itemIndex];
-            case Terrain.TerrainType.Hill: itemIndex = Random.Range(0, hillItems.Length); return hillItems[itemIndex];
-        }
-        itemIndex = -1;
-        return null;
-    }
-
-    public GameObject getRandomTreePrefab(Terrain.TerrainType terrainType, out int itemIndex)
+    public ItemScript GetRandomTreePrefab(Terrain.TerrainType terrainType, out int itemIndex)
     {
         switch (terrainType)
         {
@@ -114,6 +206,11 @@ public class IslandEditor : MonoBehaviour
         }
         itemIndex = -1;
         return null;
+    }
+
+    public GameObject GetRandomFencePrefab()
+    {
+        return fences[UnityEngine.Random.Range(0, fences.Length)];
     }
 
     public GameObject GetCropPrefab(CropType cropType, CropState cropState)
@@ -137,12 +234,12 @@ public class IslandEditor : MonoBehaviour
         return prefab;
     }
 
-    public GameObject GetAnimalPrefab(AnimalType animalType)
+    public AnimalScript GetAnimalPrefab(AnimalType animalType)
     {
         return animals[(int)animalType];
     }
 
-    public GameObject GetNPCPrefab(PeasantScript.PeasantType peasantType, PeasantScript.PeasantGender peasantGender)
+    public PeasantScript GetNPCPrefab(PeasantScript.PeasantType peasantType, PeasantScript.PeasantGender peasantGender)
     {
         switch (peasantType)
         {
@@ -162,12 +259,7 @@ public class IslandEditor : MonoBehaviour
         return hairColors[Random.Range(0, hairColors.Length)];
     }
 
-    private static Color normalizeColor(Color color)
-    {
-        return new Color(color.r / 256, color.g / 256, color.b / 256, color.a);
-    }
-
-    public GameObject GetBuilding(BuildingScript.BuildingType buildingType)
+    public BuildingScript GetBuilding(BuildingScript.BuildingType buildingType)
     {
         return buildings[(int)buildingType];
     }
@@ -188,5 +280,10 @@ public class IslandEditor : MonoBehaviour
             new Color(90, 56, 37),
             new Color(204, 153, 102),
             new Color(44, 22, 8)
-        };*/
+        };
+
+    private static Color normalizeColor(Color color)
+    {
+        return new Color(color.r / 256, color.g / 256, color.b / 256, color.a);
+    }*/
 }
