@@ -4,16 +4,10 @@ using UnityEngine;
 
 public class IslandSelectionScript : MonoBehaviour
 {
-    private GameManager gameManager;
     private PeasantScript hoveredPeasant;
     public PeasantScript selectedPeasant;
     private ConstructionScript hoveredConstruction;
     public ConstructionScript selectedConstruction;
-
-    private void Start()
-    {
-        gameManager = GetComponent<GameManager>();
-    }
 
     private void Update()
     {
@@ -104,7 +98,7 @@ public class IslandSelectionScript : MonoBehaviour
         selectedPeasant.outline.enabled = true;
         selectedPeasant.outline.OutlineWidth = 8;
 
-        gameManager.SelectPeasant(peasantScript);
+        GameManager.Instance.SelectPeasant(peasantScript);
     }
 
     public void UnselectPeasant()
@@ -133,7 +127,7 @@ public class IslandSelectionScript : MonoBehaviour
         selectedConstruction.outline.enabled = true;
         selectedConstruction.outline.OutlineWidth = 8;
 
-        gameManager.SelectConstruction(constructionScript);
+        GameManager.Instance.SelectConstruction(constructionScript);
     }
 
     public void UnselectConstruction()

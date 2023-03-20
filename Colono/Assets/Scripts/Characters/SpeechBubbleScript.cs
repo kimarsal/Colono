@@ -28,7 +28,7 @@ public class SpeechBubbleScript : MonoBehaviour
         {
             case ResourceScript.MaterialType.Wood: activeSprite = wood; break;
             case ResourceScript.MaterialType.Stone: activeSprite = stone; break;
-            case ResourceScript.MaterialType.Medicine: activeSprite = medicine; break;
+            //case ResourceScript.MaterialType.Medicine: activeSprite = medicine; break;
         }
         activeSprite.SetActive(true);
     }

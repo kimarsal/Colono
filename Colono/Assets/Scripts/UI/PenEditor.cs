@@ -3,11 +3,10 @@ using TMPro;
 using static ResourceScript;
 using UnityEngine.UI;
 
-public class PenEditor : MonoBehaviour
+public class PenEditor : EditorScript
 {
-    public IslandEditor islandEditor;
-    public PenScript penScript;
-    public PenScript shipScript;
+    private PenScript penScript;
+    public PenScript shipPenScript;
 
     public TextMeshProUGUI penAnimalsText;
     public TextMeshProUGUI shipAnimalsText;
@@ -17,8 +16,11 @@ public class PenEditor : MonoBehaviour
     public PenRowScript[] penRows;
     public GameObject penRowPrefab;
 
-    public void SetGrid()
+    public override void SetEditor(ConstructionScript constructionScript)
     {
+        penScript = (PenScript)constructionScript;
+        shipPenScript = ShipScript.Instance.shipInteriorPen;
+
         foreach (Transform row in rows)
         {
             Destroy(row.gameObject);
@@ -32,9 +34,9 @@ public class PenEditor : MonoBehaviour
             PenRowScript penRowScript = gridRow.GetComponent<PenRowScript>();
             penRowScript.penEditor = this;
             penRowScript.animalType = (AnimalType)i;
-            penRowScript.animalImage.sprite = islandEditor.GetResourceSprite(ResourceType.Animal, i);
+            penRowScript.animalImage.sprite = IslandEditor.Instance.GetResourceSprite(ResourceType.Animal, i);
             penRowScript.penAnimals = penScript.animals[i];
-            penRowScript.shipAnimals = shipScript.animals[i];
+            penRowScript.shipAnimals = shipPenScript.animals[i];
             penRowScript.desiredAmount = penScript.desiredAmounts[i];
             penRowScript.UpdateValues();
             penRows[i] = penRowScript;
@@ -50,7 +52,7 @@ public class PenEditor : MonoBehaviour
         {
             PenRowScript penRowScript = penRows[(int)animalType];
             penRowScript.penAnimals = penScript.animals[(int)animalType];
-            penRowScript.shipAnimals = shipScript.animals[(int)animalType];
+            penRowScript.shipAnimals = shipPenScript.animals[(int)animalType];
             penRowScript.UpdateValues();
             UpdatePenText();
         }
@@ -59,13 +61,13 @@ public class PenEditor : MonoBehaviour
     public void UpdatePenText()
     {
         penAnimalsText.text = penScript.animalList.Count + "/" + penScript.maxPeasants;
-        shipAnimalsText.text = shipScript.animalList.Count + "/" + shipScript.maxPeasants;
+        shipAnimalsText.text = shipPenScript.animalList.Count + "/" + shipPenScript.maxPeasants;
     }
 
     public void MoveAnimal(AnimalType animalType, bool toPen)
     {
-        PenScript origin = toPen ? shipScript : penScript;
-        PenScript destination = toPen ? penScript : shipScript;
+        PenScript origin = toPen ? shipPenScript : penScript;
+        PenScript destination = toPen ? penScript : shipPenScript;
         
         AnimalScript animalScript = origin.RemoveAnimal(animalType);
         if (animalScript == null) return;

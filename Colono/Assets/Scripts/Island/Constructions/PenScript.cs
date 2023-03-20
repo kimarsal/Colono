@@ -7,20 +7,19 @@ using static ResourceScript;
 public class PenScript : EnclosureScript
 {
     public Transform animalTransform;
-    private CanvasScript canvasScript;
     public int[] animals;
     public int[] desiredAmounts;
     public List<AnimalScript> animalList = new List<AnimalScript>();
     public List<AnimalScript>[] confortableAnimals;
     public int animalAmount;
 
-    [JsonIgnore] public override bool canManagePeasants { get { return false; } }
+    public override bool canManagePeasants { get { return false; } }
+
+    public override EditorScript editorScript { get { return CanvasScript.Instance.penEditor; } }
 
     private void Start()
     {
         if(animals == null || animals.Length == 0) InitializeLists();
-
-        canvasScript = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>().canvasScript;
     }
 
     private void InitializeLists()
@@ -57,11 +56,6 @@ public class PenScript : EnclosureScript
         }
     }
 
-    public override void EditConstruction()
-    {
-        islandScript.gameManager.canvasScript.ShowPenEditor();
-    }
-
     public void AddAnimal(AnimalScript animal)
     {
         AnimalScript animalScript = Instantiate(animal.gameObject, NPCManager.GetRandomPointWithinRange(minPos, maxPos),
@@ -95,7 +89,7 @@ public class PenScript : EnclosureScript
     public void AgeUpAnimal(AnimalScript animalScript)
     {
         AnimalType animalType = animalScript.animalType;
-        AnimalScript agedUpAnimalScript = Instantiate(islandScript.islandEditor.GetAnimalPrefab(animalType + 1),
+        AnimalScript agedUpAnimalScript = Instantiate(IslandEditor.Instance.GetAnimalPrefab(animalType + 1),
             animalScript.transform.position, animalScript.transform.rotation, animalTransform).GetComponent<AnimalScript>();
         animalList.Add(agedUpAnimalScript);
         animalList.Remove(animalScript);
@@ -104,8 +98,8 @@ public class PenScript : EnclosureScript
         animals[(int)animalType]--;
         animals[(int)animalType + 1]++;
 
-        canvasScript.UpdatePenRow(animalType);
-        canvasScript.UpdatePenRow(animalType + 1);
+        CanvasScript.Instance.UpdatePenRow(animalType);
+        CanvasScript.Instance.UpdatePenRow(animalType + 1);
 
         agedUpAnimalScript.penScript = this;
     }
@@ -116,12 +110,12 @@ public class PenScript : EnclosureScript
         animalScript2.EndPairing();
 
         AnimalType animalType = animalScript1.animalType - 1;
-        AnimalScript bornAnimalScript = Instantiate(islandScript.islandEditor.GetAnimalPrefab(animalType),
+        AnimalScript bornAnimalScript = Instantiate(IslandEditor.Instance.GetAnimalPrefab(animalType),
             animalScript1.transform.position, animalScript1.transform.rotation, transform).GetComponent<AnimalScript>();
         animalList.Add(bornAnimalScript);
 
         animals[(int)animalType]++;
-        canvasScript.UpdatePenRow(animalType);
+        CanvasScript.Instance.UpdatePenRow(animalType);
         bornAnimalScript.penScript = this;
     }
 
@@ -167,7 +161,7 @@ public class PenScript : EnclosureScript
         base.FinishUpBusiness();
         foreach (AnimalScript animalScript in animalList)
         {
-            islandScript.gameManager.shipScript.shipInteriorPen.AddAnimal(animalScript);
+            ShipScript.Instance.shipInteriorPen.AddAnimal(animalScript);
         }
     }
 }

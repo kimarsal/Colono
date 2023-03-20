@@ -6,9 +6,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 {
     public enum SelectFunction { PlantTrees, ClearItems, CancelItemClearing, CreateEnclosure, PlaceBuilding };
     public enum SelectMode { None, Selecting, Building };
-    public GameManager gameManager;
     private IslandGenerator islandGenerator;
-    public IslandEditor islandEditor { get { return gameManager.islandEditor; } }
     public IslandScript islandScript;
 
     private GameObject[,] cells;
@@ -56,15 +54,15 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             else if (Input.GetKeyDown(KeyCode.Escape))
             {
                 Destroy(selectedBuilding.gameObject); //Eliminar l'edifici
-                gameManager.canvasScript.ShowDefaultButtons();
-                gameManager.DisableIslandCellScript();
+                CanvasScript.Instance.ShowDefaultButtons();
+                GameManager.Instance.DisableIslandCellScript();
             }
         }
         else {
             if (Input.GetKeyDown(KeyCode.Escape))
             {
-                gameManager.canvasScript.ShowDefaultButtons();
-                gameManager.DisableIslandCellScript();
+                CanvasScript.Instance.ShowDefaultButtons();
+                GameManager.Instance.DisableIslandCellScript();
             }
         }
     }
@@ -95,7 +93,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             if (!isSelectionValid) //Si la posició no és vàlida
             {
                 Destroy(selectedBuilding.gameObject); //Eliminar l'edifici
-                gameManager.canvasScript.ShowDefaultButtons();
+                CanvasScript.Instance.ShowDefaultButtons();
             }
             else
             {
@@ -103,10 +101,10 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 selectedBuilding.cells = selectedCells;
                 selectedBuilding.position = selectedBuilding.transform.position;
                 islandScript.AddConstruction(selectedBuilding); //Col·locar edifici
-                gameManager.SelectConstruction(selectedBuilding);
+                GameManager.Instance.SelectConstruction(selectedBuilding);
 
             }
-            gameManager.DisableIslandCellScript();
+            GameManager.Instance.DisableIslandCellScript();
         }
 
         else
@@ -132,12 +130,12 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 }
                 else if (selectFunction != SelectFunction.PlantTrees) isSelectionValid = false;
 
-                cells[(int)selectedCell.x, (int)selectedCell.y].GetComponent<MeshRenderer>().material = islandEditor.selectingFirstCellMaterial;
+                cells[(int)selectedCell.x, (int)selectedCell.y].GetComponent<MeshRenderer>().material = IslandEditor.Instance.selectingFirstCellMaterial;
             }
             else
             {
-                gameManager.canvasScript.ShowDefaultButtons();
-                gameManager.DisableIslandCellScript();
+                CanvasScript.Instance.ShowDefaultButtons();
+                GameManager.Instance.DisableIslandCellScript();
             }
         }
     }
@@ -150,12 +148,12 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             {
                 EnclosureScript enclosureScript = islandScript.CreateEnclosure(selectedEnclosureType, selectedCells);
                 islandScript.AddConstruction(enclosureScript);
-                gameManager.SelectConstruction(enclosureScript);
+                GameManager.Instance.SelectConstruction(enclosureScript);
             }
             else if(selectFunction == SelectFunction.PlantTrees)
             {
                 islandScript.PlantTrees(selectedCells);
-                gameManager.canvasScript.ShowDefaultButtons();
+                CanvasScript.Instance.ShowDefaultButtons();
             }
             else
             {
@@ -163,15 +161,15 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 {
                     item.ChangeItemClearingState(selectFunction == SelectFunction.ClearItems);
                 }
-                gameManager.canvasScript.ShowDefaultButtons();
+                CanvasScript.Instance.ShowDefaultButtons();
             }
         }
         else
         {
-            gameManager.canvasScript.ShowDefaultButtons();
+            CanvasScript.Instance.ShowDefaultButtons();
         }
 
-        gameManager.DisableIslandCellScript();
+        GameManager.Instance.DisableIslandCellScript();
     }
 
     public void OnPointerMove(PointerEventData eventData)
@@ -190,7 +188,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 || islandGenerator.regions[islandScript.regionMap[x, y]].type == Terrain.TerrainType.Field
                 || islandGenerator.regions[islandScript.regionMap[x, y]].type == Terrain.TerrainType.Hill) //Si la cel·la és gespa
             {
-                CreateCell(hoveredCell, islandEditor.hoverMaterial);
+                CreateCell(hoveredCell, IslandEditor.Instance.hoverMaterial);
                 wasOtherCellHovered = true;
             }
             return;
@@ -285,9 +283,9 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
         foreach (Vector2 cell in selectedCells)
         {
-            CreateCell(cell, isSelectionValid ? islandEditor.selectingMaterial : islandEditor.invalidSelectionMaterial);
+            CreateCell(cell, isSelectionValid ? IslandEditor.Instance.selectingMaterial : IslandEditor.Instance.invalidSelectionMaterial);
         }
-        cells[(int)selectedCell.x, (int)selectedCell.y].GetComponent<MeshRenderer>().material = islandEditor.selectingFirstCellMaterial;
+        cells[(int)selectedCell.x, (int)selectedCell.y].GetComponent<MeshRenderer>().material = IslandEditor.Instance.selectingFirstCellMaterial;
     }
 
     private void CreateCell(Vector2 position, Material cellMaterial)
@@ -302,7 +300,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         Mesh mesh = cellMeshData.CreateMesh();
         meshFilter.mesh = mesh;
 
-        newCell.transform.parent = gameManager.cellsTransform;
+        newCell.transform.parent = GameManager.Instance.cellsTransform;
         newCell.transform.position = islandScript.transform.position;
 
         cells[(int)position.x, (int)position.y] = newCell;
@@ -336,7 +334,8 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     public void ChooseBuilding(BuildingScript.BuildingType buildingType)
     {
-        selectedBuilding = Instantiate(islandEditor.GetBuilding(buildingType), islandScript.transform.position, Quaternion.identity, islandScript.constructionsTransform.transform).GetComponent<BuildingScript>();
+        selectedBuilding = IslandEditor.Instance.GetBuilding(buildingType);
+        selectedBuilding.transform.parent = islandScript.constructionsTransform.transform;
         selectMode = SelectMode.Building;
         selectFunction = SelectFunction.PlaceBuilding;
     }

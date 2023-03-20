@@ -11,7 +11,6 @@ public class PeasantDetailsScript : MonoBehaviour
     public Slider exhaustionSlider;
     public GameObject resourcesList;
 
-    public GameManager gameManager;
     public PeasantScript peasantScript;
 
     public void SetPeasantDetails(PeasantScript newPeasantScript)

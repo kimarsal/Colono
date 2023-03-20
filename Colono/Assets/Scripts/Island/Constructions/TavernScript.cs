@@ -6,14 +6,11 @@ public class TavernScript : BuildingScript
 {
     public List<Recipe> recipeList = new List<Recipe>();
 
+    public override EditorScript editorScript { get { return CanvasScript.Instance.tavernEditor; } }
+
     private void Start()
     {
         recipeList.Add(new Recipe());
-    }
-
-    public override void EditConstruction()
-    {
-        islandScript.gameManager.canvasScript.ShowTavernEditor();
     }
 
     public override PeasantScript PeasantHasArrived(PeasantScript peasantScript)

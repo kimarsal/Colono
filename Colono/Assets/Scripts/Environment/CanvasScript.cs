@@ -6,50 +6,64 @@ using UnityEngine.UI;
 
 public class CanvasScript : MonoBehaviour
 {
-    public enum ButtonState { Idle, ItemButtons, BuildingButtons, EnclosureButtons, Editing, ConstructionDetails, PeasantDetails, PopUp };
-    [Header("Animations")]
-    public ButtonState buttonState = ButtonState.Idle;
-    private Animator canvasAnimator;
-    public Animator itemButtonsAnimator;
-    public Animator buildingButtonsAnimator;
-    public Animator enclosureButtonsAnimator;
-    public Animator constructionDetailsAnimator;
-    public Animator peasantDetailsAnimator;
-    public Animator gardenEditorAnimator;
-    public Animator penEditorAnimator;
-    public Animator tavernEditorAnimator;
-    public Animator inventoryEditorAnimator;
+    public static CanvasScript Instance { get; private set; }
+    private enum ButtonState { Idle, ItemButtons, BuildingButtons, EnclosureButtons, Editing, ConstructionDetails, PeasantDetails, PopUp };
+    private ButtonState buttonState = ButtonState.Idle;
+
+    [Header("BottomButtons")]
+    [SerializeField] private Animator fishButtonAnimator;
+    [SerializeField] private Animator tradeButtonAnimator;
+    [SerializeField] private Animator surrenderButtonAnimator;
+    [SerializeField] private Animator dockButtonAnimator;
+    [SerializeField] private Animator sailButtonAnimator;
+
+    [Header("Tabs")]
+    [SerializeField] private Animator itemButtonsAnimator;
+    [SerializeField] private Animator buildingButtonsAnimator;
+    [SerializeField] private Animator enclosureButtonsAnimator;
+
+    [Header("Details")]
+    [SerializeField] private ConstructionDetailsScript constructionDetailsScript;
+    [SerializeField] private Animator peasantDetailsAnimator;
 
     [Header("Editors")]
-    public ConstructionDetailsScript constructionDetailsScript;
-    public PeasantDetailsScript peasantDetailsScript;
+    [SerializeField] private PeasantDetailsScript peasantDetailsScript;
     public GardenEditor gardenEditor;
     public PenEditor penEditor;
     public TavernEditor tavernEditor;
     public InventoryEditor inventoryEditor;
+    [SerializeField] private ShopEditor shopEditor;
 
     [Header("Buttons")]
-    public Button boardIslandButton;
+    public Button dockButton;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     private void Start()
     {
-        canvasAnimator = GetComponent<Animator>();
+        constructionDetailsScript.gameObject.SetActive(true);
     }
 
     public void PlayerIsNearIsland(IslandScript islandScript)
     {
-        boardIslandButton.GetComponentInChildren<TextMeshProUGUI>().text = "Dock onto the island";
-        canvasAnimator.Play("GetCloseToIsland");
+        //TODO: Change button text to include island name
+        dockButton.GetComponentInChildren<TextMeshProUGUI>().text = "Dock onto the island";
+        dockButtonAnimator.Play("ShowBottomButton");
     }
 
     public void PlayerIsFarFromIsland()
     {
-        canvasAnimator.Play("GetFarFromIsland");
+        dockButtonAnimator.Play("HideBottomButton");
     }
 
-    public void BoardIsland()
+    public void DockOntoIsland()
     {
-        canvasAnimator.Play("BoardIsland");
+        dockButtonAnimator.Play("HideBottomButton");
+        sailButtonAnimator.Play("ShowBottomButton");
+
         itemButtonsAnimator.Play("ShowTabHeader");
         enclosureButtonsAnimator.Play("ShowTabHeader");
         buildingButtonsAnimator.Play("ShowTabHeader");
@@ -61,11 +75,11 @@ public class CanvasScript : MonoBehaviour
     {
         switch (buttonState)
         {
-            case ButtonState.ConstructionDetails: constructionDetailsAnimator.Play("HideDetails"); break;
+            case ButtonState.ConstructionDetails: constructionDetailsScript.HideDetails(); break;
             case ButtonState.PeasantDetails: peasantDetailsAnimator.Play("HideDetails"); break;
         }
 
-        canvasAnimator.Play("ShowLeaveIslandButton");
+        sailButtonAnimator.Play("ShowBottomButton");
         itemButtonsAnimator.Play("ShowTabHeader");
         enclosureButtonsAnimator.Play("ShowTabHeader");
         buildingButtonsAnimator.Play("ShowTabHeader");
@@ -103,10 +117,10 @@ public class CanvasScript : MonoBehaviour
     public void HideButtons()
     {
         HideTopButtons();
-        canvasAnimator.Play("HideLeaveIslandButton");
+        sailButtonAnimator.Play("HideBottomButton");
         switch (buttonState)
         {
-            case ButtonState.ConstructionDetails: constructionDetailsAnimator.Play("HideDetails"); break;
+            case ButtonState.ConstructionDetails: constructionDetailsScript.HideDetails(); break;
             case ButtonState.PeasantDetails: peasantDetailsAnimator.Play("HideDetails"); break;
         }
 
@@ -131,6 +145,11 @@ public class CanvasScript : MonoBehaviour
         }
     }
 
+    public void HideItemButtons()
+    {
+        itemButtonsAnimator.Play("HideWholeTab");
+    }
+
     public void OpenCloseEnclosureButtons()
     {
         if (buttonState == ButtonState.Idle)
@@ -151,7 +170,7 @@ public class CanvasScript : MonoBehaviour
 
     public void ChooseEnclosure()
     {
-        canvasAnimator.Play("HideLeaveIslandButton");
+        sailButtonAnimator.Play("HideBottomButton");
         enclosureButtonsAnimator.Play("HideWholeTab");
         buttonState = ButtonState.Editing;
     }
@@ -176,7 +195,7 @@ public class CanvasScript : MonoBehaviour
 
     public void ChooseBuilding()
     {
-        canvasAnimator.Play("HideLeaveIslandButton");
+        sailButtonAnimator.Play("HideBottomButton");
         buildingButtonsAnimator.Play("HideWholeTab");
         buttonState = ButtonState.Editing;
     }
@@ -189,11 +208,11 @@ public class CanvasScript : MonoBehaviour
         HideTopButtons();
         if (buttonState == ButtonState.ConstructionDetails)
         {
-            constructionDetailsAnimator.Play("HideDetails");
+            constructionDetailsScript.HideDetails();
         }
         else if(buttonState != ButtonState.PeasantDetails)
         {
-            canvasAnimator.Play("HideLeaveIslandButton");
+            sailButtonAnimator.Play("HideBottomButton");
             peasantDetailsAnimator.Play("ShowDetails");
         }
 
@@ -218,8 +237,8 @@ public class CanvasScript : MonoBehaviour
         }
         if(buttonState != ButtonState.ConstructionDetails)
         {
-            canvasAnimator.Play("HideLeaveIslandButton");
-            constructionDetailsAnimator.Play("ShowDetails");
+            sailButtonAnimator.Play("HideBottomButton");
+            constructionDetailsScript.ShowDetails();
         }
 
         buttonState = ButtonState.ConstructionDetails;
@@ -227,89 +246,9 @@ public class CanvasScript : MonoBehaviour
 
     public void HideConstructionDetails()
     {
-        constructionDetailsAnimator.Play("HideDetails");
+        constructionDetailsScript.HideDetails();
 
         ShowDefaultButtons();
-    }
-
-    public void ShowInventoryEditor()
-    {
-        constructionDetailsAnimator.Play("HideDetails");
-
-        inventoryEditor.gameObject.SetActive(true);
-        inventoryEditor.SetGrid();
-        inventoryEditorAnimator.Play("ShowPopUp");
-
-        buttonState = ButtonState.PopUp;
-    }
-
-    public void HideInventoryEditor()
-    {
-        inventoryEditorAnimator.Play("HidePopUp");
-        constructionDetailsAnimator.Play("ShowDetails");
-
-        buttonState = ButtonState.ConstructionDetails;
-        //ShowButtons();
-    }
-
-    public void ShowGardenEditor()
-    {
-        constructionDetailsAnimator.Play("HideDetails");
-
-        gardenEditor.gameObject.SetActive(true);
-        gardenEditor.gardenScript = (GardenScript)constructionDetailsScript.constructionScript;
-        gardenEditor.SetGrid();
-        gardenEditorAnimator.Play("ShowPopUp");
-
-        buttonState = ButtonState.PopUp;
-    }
-
-    public void HideGardenEditor()
-    {
-        gardenEditorAnimator.Play("HidePopUp");
-        constructionDetailsAnimator.Play("ShowDetails");
-
-        buttonState = ButtonState.ConstructionDetails;
-    }
-
-    public void ShowPenEditor()
-    {
-        constructionDetailsAnimator.Play("HideDetails");
-
-        penEditor.gameObject.SetActive(true);
-        penEditor.penScript = (PenScript)constructionDetailsScript.constructionScript;
-        penEditor.SetGrid();
-        penEditorAnimator.Play("ShowPopUp");
-
-        buttonState = ButtonState.PopUp;
-    }
-
-    public void HidePenEditor()
-    {
-        penEditorAnimator.Play("HidePopUp");
-        constructionDetailsAnimator.Play("ShowDetails");
-
-        buttonState = ButtonState.ConstructionDetails;
-    }
-
-    public void ShowTavernEditor()
-    {
-        constructionDetailsAnimator.Play("HideDetails");
-
-        tavernEditor.gameObject.SetActive(true);
-        tavernEditor.tavernScript = (TavernScript)constructionDetailsScript.constructionScript;
-        tavernEditor.SetList();
-        tavernEditorAnimator.Play("ShowPopUp");
-
-        buttonState = ButtonState.PopUp;
-    }
-
-    public void HideTavernEditor()
-    {
-        tavernEditorAnimator.Play("HidePopUp");
-        constructionDetailsAnimator.Play("ShowDetails");
-
-        buttonState = ButtonState.ConstructionDetails;
     }
 
     public void UpdateInventoryRow(ResourceScript.ResourceType resourceType, int resourceIndex)
@@ -322,11 +261,12 @@ public class CanvasScript : MonoBehaviour
         penEditor.UpdatePenRow(animalType);
     }
 
-    public void LeaveIsland()
+    public void Sail()
     {
         HideButtons();
 
-        canvasAnimator.Play("LeaveIsland");
+        dockButtonAnimator.Play("ShowBottomButton");
+        sailButtonAnimator.Play("HideBottomButton");
     }
 
 }

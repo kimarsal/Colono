@@ -16,7 +16,6 @@ public abstract class ConstructionScript : MonoBehaviour
 
     [JsonIgnore] public IslandScript islandScript;
     [JsonIgnore] public ConstructionDetailsScript constructionDetailsScript;
-    [JsonIgnore] public virtual IslandEditor islandEditor { get { return islandScript.islandEditor; } }
     [JsonIgnore] public Transform entry;
     [JsonIgnore] public Outline outline;
 
@@ -25,7 +24,7 @@ public abstract class ConstructionScript : MonoBehaviour
     [JsonIgnore] public virtual bool canBeRemoved { get { return true; } }
     [JsonIgnore] public virtual int peasantCount { get { return peasantList.Count; } }
 
-    public abstract void EditConstruction();
+    public abstract EditorScript editorScript { get; }
 
     public virtual void AddPeasant(PeasantScript peasantScript)
     {

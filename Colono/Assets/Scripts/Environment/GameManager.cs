@@ -5,66 +5,131 @@ using Newtonsoft.Json;
 
 public class GameManager : MonoBehaviour
 {
-    public ShipScript shipScript;
-    public CameraScript cameraScript;
-    public CanvasScript canvasScript;
+    public static GameManager Instance { get; private set; }
+    public Transform islandsTransform;
+    public List<IslandScript> islandList = new List<IslandScript>();
+
+    private IslandGenerator islandGenerator;
+    private CameraScript cameraScript;
     public InventoryEditor inventoryEditor;
 
     private bool isPlayerNearIsland = false;
     public bool isInIsland = false;
 
+    public float distanceToDock = 10f;
+    public float distanceToCheckIfCanDock = 50f;
+    public float distanceBetweenIslands = 200f;
+
     public Transform cellsTransform;
     public IslandScript closestIsland;
-    public IslandEditor islandEditor;
     private IslandSelectionScript islandSelectionScript;
     public IslandCellScript islandCellScript;
-    private IslandManager islandManager;
     public PenScript buildingInterior;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     private void Start()
     {
-        islandEditor = GetComponent<IslandEditor>();
-
         islandCellScript = GetComponent<IslandCellScript>();
-        islandCellScript.gameManager = this;
         islandCellScript.enabled = false;
 
         islandSelectionScript = GetComponent<IslandSelectionScript>();
         islandSelectionScript.enabled = false;
 
-        islandManager = GetComponent<IslandManager>();
+        islandGenerator = GetComponent<IslandGenerator>();
+        cameraScript = Camera.main.GetComponent<CameraScript>();
         //LoadGame();
         StartGame();
 
-        inventoryEditor.shipInventoryScript = shipScript.inventoryScript;
+        inventoryEditor.shipInventoryScript = ShipScript.Instance.inventoryScript;
     }
 
-    public void PlayerIsNearIsland()
+    private void Update()
+    {
+        Vector3 shipPosition = ShipScript.Instance.transform.position;
+
+        FindClosestIsland(shipPosition);
+
+        FindClosestPointInClosestIsland(shipPosition);
+    }
+
+    private void FindClosestIsland(Vector3 shipPosition)
+    {
+        float minDistanceToIsland = -1;
+        Vector3 nextIslandPosition = ShipScript.Instance.nextIslandTransform.position;
+        float minDistanceToNextIsland = -1;
+        IslandScript c = null;
+
+        foreach (IslandScript islandScript in islandList)
+        {
+            float distanceToIsland = Vector3.Distance(islandScript.transform.position, shipPosition);
+            if (c == null || distanceToIsland < minDistanceToIsland)
+            {
+                minDistanceToIsland = distanceToIsland;
+                c = islandScript;
+            }
+
+            float distanceToNextIsland = Vector3.Distance(islandScript.transform.position, nextIslandPosition);
+            if (minDistanceToNextIsland == -1 || distanceToNextIsland < minDistanceToNextIsland)
+            {
+                minDistanceToNextIsland = distanceToNextIsland;
+            }
+        }
+
+        if (minDistanceToNextIsland > distanceBetweenIslands)
+        {
+            islandGenerator.GenerateIsland(new Vector2(nextIslandPosition.x, nextIslandPosition.z));
+        }
+
+        closestIsland = c;
+    }
+
+    private void FindClosestPointInClosestIsland(Vector3 shipPosition)
+    {
+        if (closestIsland == null || Vector3.Distance(shipPosition, closestIsland.transform.position) > distanceToCheckIfCanDock)
+        {
+            PlayerIsFarFromIsland();
+            return;
+        }
+
+        if (ShipScript.Instance.FindEntryPosition(distanceToDock))
+        {
+            PlayerIsNearIsland();
+        }
+        else
+        {
+            PlayerIsFarFromIsland();
+        }
+    }
+
+    private void PlayerIsNearIsland()
     {
         if (!isPlayerNearIsland)
         {
             isPlayerNearIsland = true;
-            canvasScript.PlayerIsNearIsland(closestIsland);
+            CanvasScript.Instance.PlayerIsNearIsland(closestIsland);
         }
     }
 
-    public void PlayerIsFarFromIsland()
+    private void PlayerIsFarFromIsland()
     {
         if (isPlayerNearIsland)
         {
-            canvasScript.PlayerIsFarFromIsland();
+            CanvasScript.Instance.PlayerIsFarFromIsland();
             isPlayerNearIsland = false;
         }
     }
 
-    public void BoardIsland()
+    public void DockOntoIsland()
     {
-        //closestIsland.convexColliders.SetActive(false);
         cameraScript.SetIslandCamera(closestIsland.transform.position);
         inventoryEditor.islandInventoryScript = closestIsland.inventoryScript;
-        canvasScript.BoardIsland();
+        CanvasScript.Instance.DockOntoIsland();
 
-        shipScript.islandScript = closestIsland;
+        ShipScript.Instance.islandScript = closestIsland;
         islandCellScript.islandScript = closestIsland;
         islandSelectionScript.enabled = true;
     }
@@ -78,18 +143,18 @@ public class GameManager : MonoBehaviour
 
     public void SelectPeasant(PeasantScript peasantScript)
     {
-        canvasScript.ShowPeasantDetails(peasantScript);
+        CanvasScript.Instance.ShowPeasantDetails(peasantScript);
     }
 
     public void UnselectPeasant()
     {
         islandSelectionScript.UnselectPeasant();
-        canvasScript.HidePeasantDetails();
+        CanvasScript.Instance.HidePeasantDetails();
     }
 
     public void PlantTrees()
     {
-        canvasScript.itemButtonsAnimator.Play("HideWholeTab");
+        CanvasScript.Instance.HideItemButtons();
         islandCellScript.enabled = true;
         islandCellScript.selectFunction = IslandCellScript.SelectFunction.PlantTrees;
         islandCellScript.selectMode = IslandCellScript.SelectMode.None;
@@ -98,7 +163,7 @@ public class GameManager : MonoBehaviour
 
     public void ClearItems()
     {
-        canvasScript.itemButtonsAnimator.Play("HideWholeTab");
+        CanvasScript.Instance.HideItemButtons();
         islandCellScript.enabled = true;
         islandCellScript.selectFunction = IslandCellScript.SelectFunction.ClearItems;
         islandCellScript.selectMode = IslandCellScript.SelectMode.None;
@@ -107,7 +172,7 @@ public class GameManager : MonoBehaviour
 
     public void CancelItemClearing()
     {
-        canvasScript.itemButtonsAnimator.Play("HideWholeTab");
+        CanvasScript.Instance.HideItemButtons();
         islandCellScript.enabled = true;
         islandCellScript.selectFunction = IslandCellScript.SelectFunction.CancelItemClearing;
         islandCellScript.selectMode = IslandCellScript.SelectMode.None;
@@ -118,7 +183,7 @@ public class GameManager : MonoBehaviour
     {
         islandCellScript.enabled = true;
         islandCellScript.ChooseEnclosure((EnclosureScript.EnclosureType)enclosureType);
-        canvasScript.ChooseEnclosure();
+        CanvasScript.Instance.ChooseEnclosure();
         islandSelectionScript.enabled = false;
     }
 
@@ -126,7 +191,7 @@ public class GameManager : MonoBehaviour
     {
         islandCellScript.enabled = true;
         islandCellScript.ChooseBuilding((BuildingScript.BuildingType)buildingType);
-        canvasScript.ChooseBuilding();
+        CanvasScript.Instance.ChooseBuilding();
         islandSelectionScript.enabled = false;
     }
 
@@ -135,42 +200,39 @@ public class GameManager : MonoBehaviour
         ConstructionScript constructionScript = islandSelectionScript.selectedConstruction;
         constructionScript.FinishUpBusiness();
         closestIsland.RemoveConstruction(constructionScript);
-        canvasScript.HideConstructionDetails();
+        CanvasScript.Instance.HideConstructionDetails();
     }
 
     public void SelectConstruction(ConstructionScript constructionScript)
     {
         islandSelectionScript.selectedConstruction = constructionScript;
-        canvasScript.ShowConstructionDetails(constructionScript);
+        CanvasScript.Instance.ShowConstructionDetails(constructionScript);
     }
 
     public void UnselectConstrucion()
     {
         islandSelectionScript.UnselectConstruction();
-        canvasScript.HideConstructionDetails();
+        CanvasScript.Instance.HideConstructionDetails();
     }
 
-    public void LeaveIsland()
+    public void Sail()
     {
         cameraScript.ResetPlayerCamera();
-        canvasScript.LeaveIsland();
+        CanvasScript.Instance.Sail();
 
         islandSelectionScript.enabled = false;
         islandCellScript.enabled = false;
 
-        closestIsland.CancelAllTripsToShip(shipScript);
-        //closestIsland.convexColliders.SetActive(true);
+        closestIsland.CancelAllTripsToShip();
         islandSelectionScript.enabled = false;
     }
 
     public void SaveGame()
     {
-        IslandManager islandManager = GetComponent<IslandManager>();
-
         GameInfo gameInfo = new GameInfo();
-        gameInfo.seed = islandManager.seed;
-        gameInfo.shipScript = shipScript;
-        gameInfo.islandList = islandManager.islandList;
+        gameInfo.seed = islandGenerator.seed;
+        gameInfo.shipScript = ShipScript.Instance;
+        gameInfo.islandList = islandList;
 
         string json = JsonConvert.SerializeObject(gameInfo, Formatting.Indented, new JsonSerializerSettings
         {
@@ -188,17 +250,17 @@ public class GameManager : MonoBehaviour
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore
         });
 
-        shipScript.transform.position = gameInfo.shipScript.position;
-        shipScript.transform.rotation = Quaternion.Euler(0, gameInfo.shipScript.orientation, 0);
-        islandManager.seed = gameInfo.seed;
-        GetComponent<IslandGenerator>().LoadIslands(gameInfo.islandList);
+        ShipScript.Instance.transform.position = gameInfo.shipScript.position;
+        ShipScript.Instance.transform.rotation = Quaternion.Euler(0, gameInfo.shipScript.orientation, 0);
+        islandGenerator.seed = gameInfo.seed;
+        islandGenerator.LoadIslands(gameInfo.islandList);
     }
 
     private void StartGame()
     {
-        islandManager.GenerateIslandCoroutine(new Vector2(0, 20));
+        islandGenerator.GenerateIsland(new Vector2(0, 40));
 
-        shipScript.AddDefaultElements();
+        ShipScript.Instance.AddDefaultElements();
     }
 }
 

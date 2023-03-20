@@ -18,7 +18,7 @@ public class ResourceScript
     }
 
     public enum ResourceType { Material, Crop, Meat, Animal }
-    public enum MaterialType { Wood, Stone, Medicine };
+    public enum MaterialType { Wood, Stone, Flower, Mushroom, Gem };
     public enum CropType { Onion, Carrot, Eggplant, Cucumber, Cabbage, Potato, Tomato, Zucchini, Pepper, Corn }
     public enum MeatType { Cow, Pork, Mutton, Chicken, Fish }
 

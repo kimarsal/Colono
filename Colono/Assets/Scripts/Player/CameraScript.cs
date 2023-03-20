@@ -8,7 +8,6 @@ public class CameraScript : MonoBehaviour
     private Vector3 islandOffset = new Vector3(0, 8, -5);
     private Vector3 offset;
     private PlayerController playerController;
-    private GameManager gameManagerScript;
     private Vector3 targetPosition;
     private float speed = 25f;
 
@@ -30,8 +29,7 @@ public class CameraScript : MonoBehaviour
     void Start()
     {
         offset = navigationOffset;
-        playerController = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
-        gameManagerScript = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
+        playerController = ShipScript.Instance.GetComponent<PlayerController>();
 
         minX = playerController.xLeftBounds + xLeftMarginPlayer;
         maxX = playerController.xRightBounds - xRightMarginPlayer;
@@ -41,7 +39,7 @@ public class CameraScript : MonoBehaviour
 
     void LateUpdate()
     {
-        if (!gameManagerScript.isInIsland)
+        if (!GameManager.Instance.isInIsland)
         {
             //Es mou la càmera amb el jugador
             targetPosition = playerController.transform.position + offset;
@@ -97,12 +95,12 @@ public class CameraScript : MonoBehaviour
             speed = distance / 0.2f; //Fer zoom en 0.2 segons
             offset = islandOffset;
             yield return new WaitForSeconds(0.2f);
-            gameManagerScript.isInIsland = true;
+            GameManager.Instance.isInIsland = true;
             speed = previousSpeed;
         }
         else
         {
-            gameManagerScript.isInIsland = false;
+            GameManager.Instance.isInIsland = false;
             float previousSpeed = speed;
             targetPosition = playerController.transform.position + navigationOffset;
             float distance = Vector3.Distance(transform.position, targetPosition);

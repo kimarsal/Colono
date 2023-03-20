@@ -21,14 +21,14 @@ public class PatchScript : TaskScript
     public void InitializePatch(PatchInfo patchInfo)
     {
         orientation = patchInfo.orientation;
-        crop = Instantiate(((GardenScript)taskSourceScript).islandEditor.GetCropPrefab(cropType, patchInfo.cropState), center, Quaternion.Euler(0, orientation, 0), transform);
+        crop = Instantiate(IslandEditor.Instance.GetCropPrefab(cropType, patchInfo.cropState), center, Quaternion.Euler(0, orientation, 0), transform);
     }
 
     public void PlantCrop()
     {
         orientation = Random.Range(0, 359);
         cropState = CropState.Planted;
-        crop = Instantiate(((GardenScript)taskSourceScript).islandEditor.GetCropPrefab(cropType, cropState), center, Quaternion.Euler(0, orientation, 0), transform);
+        crop = Instantiate(IslandEditor.Instance.GetCropPrefab(cropType, cropState), center, Quaternion.Euler(0, orientation, 0), transform);
     }
 
     public override void TaskProgress()
@@ -57,7 +57,7 @@ public class PatchScript : TaskScript
                 cropState = CropState.Grown;
             }
             Destroy(crop);
-            crop = Instantiate(gardenScript.islandEditor.GetCropPrefab(cropType, cropState), center, Quaternion.Euler(0, orientation, 0), transform);
+            crop = Instantiate(IslandEditor.Instance.GetCropPrefab(cropType, cropState), center, Quaternion.Euler(0, orientation, 0), transform);
         }
 
         base.TaskProgress();

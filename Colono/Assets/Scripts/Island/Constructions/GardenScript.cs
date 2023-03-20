@@ -9,6 +9,8 @@ public class GardenScript : EnclosureScript
     public Dictionary<Vector2, ResourceScript.CropType> cropDictionary = new Dictionary<Vector2, ResourceScript.CropType>();
     private int lastWorkedOnPatch = -1;
 
+    public override EditorScript editorScript { get { return CanvasScript.Instance.gardenEditor; } }
+
     public override void InitializeEnclosure(EnclosureScript enclosureScript, IslandScript islandScript)
     {
         base.InitializeEnclosure(enclosureScript, islandScript);
@@ -94,7 +96,7 @@ public class GardenScript : EnclosureScript
         MeshRenderer meshRenderer = patch.AddComponent<MeshRenderer>();
         MeshFilter meshFilter = patch.AddComponent<MeshFilter>();
 
-        meshRenderer.material = islandEditor.patchMaterial;
+        meshRenderer.material = IslandEditor.Instance.patchMaterial;
 
         MeshData cellMeshData = MeshGenerator.GenerateCell(cell, 0.01f, islandScript.meshData);
         Mesh mesh = cellMeshData.CreateMesh();
@@ -111,11 +113,6 @@ public class GardenScript : EnclosureScript
 
         patchList.Add(patchScript);
         cropDictionary.Add(cell, cropType);
-    }
-
-    public override void EditConstruction()
-    {
-        islandScript.gameManager.canvasScript.ShowGardenEditor();
     }
 
     public override bool GetNextPendingTask(PeasantAdultScript peasantAdultScript)

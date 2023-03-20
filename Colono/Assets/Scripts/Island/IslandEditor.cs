@@ -6,6 +6,8 @@ using static ResourceScript;
 
 public class IslandEditor : MonoBehaviour
 {
+    public static IslandEditor Instance { get; private set; }
+
     [SerializeField] private Transform itemsTransform;
 
     [Header("NPCs")]
@@ -70,6 +72,8 @@ public class IslandEditor : MonoBehaviour
     [Header("Others")]
     public GameObject coastObstacle;
     public GameObject enclosureCenter;
+    public BoxScript box;
+
 
     [Header("Pooling")]
     [SerializeField] private Vector3 fieldItemsStartPos;
@@ -81,6 +85,11 @@ public class IslandEditor : MonoBehaviour
     private int currentHillIndex;
     private int lastFieldIndex;
     private int lastHillIndex;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     private void Start()
     {
@@ -118,7 +127,7 @@ public class IslandEditor : MonoBehaviour
             }
             currentFieldIndex = (currentFieldIndex + 1) % fieldItems.Length;
 
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(1f);
 
             while (currentHillIndex != lastHillIndex && instantiatedHillItems[currentHillIndex].Count > 10)
             {
@@ -134,7 +143,7 @@ public class IslandEditor : MonoBehaviour
             }
             currentHillIndex = (currentHillIndex + 1) % hillItems.Length;
 
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(1f);
         }
     }
 
@@ -241,12 +250,13 @@ public class IslandEditor : MonoBehaviour
 
     public PeasantScript GetNPCPrefab(PeasantScript.PeasantType peasantType, PeasantScript.PeasantGender peasantGender)
     {
+        PeasantScript prefab = null;
         switch (peasantType)
         {
-            case PeasantScript.PeasantType.Adult: return peasantGender == PeasantScript.PeasantGender.Male ? malePeasantPrefab : femalePeasantPrefab;
-            case PeasantScript.PeasantType.Child: return childPeasantPrefab;
+            case PeasantScript.PeasantType.Adult: prefab = peasantGender == PeasantScript.PeasantGender.Male ? malePeasantPrefab : femalePeasantPrefab; break;
+            case PeasantScript.PeasantType.Child: prefab = childPeasantPrefab; break;
         }
-        return null;
+        return prefab;
     }
 
     public Color GetRandomSkinColor()
@@ -261,7 +271,12 @@ public class IslandEditor : MonoBehaviour
 
     public BuildingScript GetBuilding(BuildingScript.BuildingType buildingType)
     {
-        return buildings[(int)buildingType];
+        return Instantiate(buildings[(int)buildingType]);
+    }
+
+    public GameObject GetCoastObstacle()
+    {
+        return coastObstacle;
     }
 
     /*private Color[] skinColorsCaucassian =

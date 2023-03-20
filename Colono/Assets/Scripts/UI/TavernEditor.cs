@@ -2,18 +2,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TavernEditor : MonoBehaviour
+public class TavernEditor : EditorScript
 {
-    public TavernScript tavernScript;
-    public Transform listTransform;
-    public GameObject rowPrefab;
-    public Transform addRecipeItemTransform;
+    private TavernScript tavernScript;
+    [SerializeField] private Transform listTransform;
+    [SerializeField] private GameObject rowPrefab;
+    [SerializeField] private Transform addRecipeItemTransform;
     public List<Dropdown.OptionData> introducedCropDropdownOptions;
     public List<Dropdown.OptionData> nativeCropDropdownOptions;
     public List<Dropdown.OptionData> meatDropdownOptions;
 
-    public void SetList()
+    public override void SetEditor(ConstructionScript constructionScript)
     {
+        tavernScript = (TavernScript)constructionScript;
+
         for (int i = 0; i < listTransform.childCount - 1; i++)
         {
             Destroy(listTransform.GetChild(i).gameObject);
@@ -26,19 +28,19 @@ public class TavernEditor : MonoBehaviour
         introducedCropDropdownOptions = new List<Dropdown.OptionData> { new Dropdown.OptionData() }; //S'afegeix una opció buida
         for (int i = 0; i < introducedCropTypes; i++)
         {
-            introducedCropDropdownOptions.Add(new Dropdown.OptionData(tavernScript.islandEditor.GetResourceSprite(ResourceScript.ResourceType.Crop, i)));
+            introducedCropDropdownOptions.Add(new Dropdown.OptionData(IslandEditor.Instance.GetResourceSprite(ResourceScript.ResourceType.Crop, i)));
         }
 
         nativeCropDropdownOptions = new List<Dropdown.OptionData> { new Dropdown.OptionData() }; //S'afegeix una opció buida
         for (int i = 0; i < nativeCropTypes; i++)
         {
-            nativeCropDropdownOptions.Add(new Dropdown.OptionData(tavernScript.islandEditor.GetResourceSprite(ResourceScript.ResourceType.Crop, introducedCropTypes + i)));
+            nativeCropDropdownOptions.Add(new Dropdown.OptionData(IslandEditor.Instance.GetResourceSprite(ResourceScript.ResourceType.Crop, introducedCropTypes + i)));
         }
 
         meatDropdownOptions = new List<Dropdown.OptionData> { new Dropdown.OptionData() }; //S'afegeix una opció buida
         for (int i = 0; i < meatTypes; i++)
         {
-            meatDropdownOptions.Add(new Dropdown.OptionData(tavernScript.islandEditor.GetResourceSprite(ResourceScript.ResourceType.Meat, i)));
+            meatDropdownOptions.Add(new Dropdown.OptionData(IslandEditor.Instance.GetResourceSprite(ResourceScript.ResourceType.Meat, i)));
         }
 
         foreach (Recipe recipe in tavernScript.recipeList)

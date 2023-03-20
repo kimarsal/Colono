@@ -11,7 +11,6 @@ public class ResourceDropdownScript : MonoBehaviour
 
     void Start()
     {
-        IslandEditor islandEditor = GameObject.FindGameObjectWithTag("GameController").GetComponent<IslandEditor>();
         dropdown = GetComponent<Dropdown>();
         dropdown.options.Add(new Dropdown.OptionData());
 
@@ -23,7 +22,7 @@ public class ResourceDropdownScript : MonoBehaviour
                 if (i < length / 2 && !displayIntroducedCrops || i >= length / 2 && !displayNativeCrops) continue;
             }
 
-            dropdown.options.Add(new Dropdown.OptionData(islandEditor.GetResourceSprite(resourceType, i)));
+            dropdown.options.Add(new Dropdown.OptionData(IslandEditor.Instance.GetResourceSprite(resourceType, i)));
         }
         dropdown.value = 0;
 

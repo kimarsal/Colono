@@ -7,6 +7,6 @@ public class RightCannonballScript : CannonballScript
     void Start()
     {
         Setup();
-        rb.velocity = speed * (-player.transform.right + new Vector3(0, -0.2f, 0)) * -1;
+        rb.velocity = speed * (-shipController.transform.right + new Vector3(0, -0.2f, 0)) * -1;
     }
 }

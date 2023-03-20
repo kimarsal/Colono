@@ -4,10 +4,7 @@ using UnityEngine;
 
 public class CabinScript : BuildingScript
 {
-    public override void EditConstruction()
-    {
-        throw new NotImplementedException();
-    }
+    public override EditorScript editorScript { get { return null; } }
 
     public override PeasantScript PeasantHasArrived(PeasantScript peasantScript)
     {

@@ -1,27 +1,8 @@
 using System.Collections;
 using UnityEngine;
 
-[RequireComponent(typeof(FloatObjectScript))]
-public class PlayerController : MonoBehaviour
+public class PlayerController : ShipController
 {
-	public Vector3 COM;
-	[Space(15)]
-	public float speed = 1.0f;
-	public float steerSpeed = 5.0f;
-	public float movementThresold = 5.0f;
-
-	private Transform m_COM;
-	private float verticalInput;
-	private float movementFactor;
-	private float horizontalInput;
-	private float steerFactor;
-
-	public ParticleSystem MovingWaves;
-	public ParticleSystem StillWaves;
-	public AudioSource WavesSound;
-	private bool isStopped = true;
-
-	private GameManager gameManagerScript;
 
 	//Distància màxima amb les vores
 	private float xLeftMargin = 20f;
@@ -37,8 +18,6 @@ public class PlayerController : MonoBehaviour
 
 	private void Start()
 	{
-		gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
-
 		//S'obtenen les mides del mar
 		GameObject sea = GameObject.Find("Sea");
 		Bounds seaBounds = sea.GetComponent<Renderer>().bounds;
@@ -48,37 +27,27 @@ public class PlayerController : MonoBehaviour
 		xRightBounds = sea.transform.position.x + seaBounds.size.x / 2 - xRightMargin;
 		zLowerBounds = sea.transform.position.z - seaBounds.size.z / 2 + zLowerMargin;
 		zUpperBounds = sea.transform.position.z + seaBounds.size.z / 2 - zUpperMargin;
-	}
+	}    
 
-    // Update is called once per frame
-    void Update()
-	{
-        if (!gameManagerScript.isInIsland)
+    protected override void ManageInput()
+    {
+        if (!GameManager.Instance.isInIsland)
+        {
+            verticalInput = Mathf.Clamp01(Input.GetAxis("Vertical"));
+			horizontalInput = Input.GetAxis("Horizontal");
+			tryToShoot = Input.GetKeyDown(KeyCode.Space);
+        }
+		else
 		{
-			Balance();
-			Movement();
-			Steer();
-			//SoundAndParticles();
+			verticalInput = 0;
+			horizontalInput = 0;
+			tryToShoot = false;
 		}
-	}
+    }
 
-	void Balance()
+	protected override void Movement()
 	{
-		if (!m_COM)
-		{
-			m_COM = new GameObject("COM").transform;
-			m_COM.SetParent(transform);
-		}
-
-		m_COM.position = COM;
-		GetComponent<Rigidbody>().centerOfMass = m_COM.position;
-	}
-
-	void Movement()
-	{
-		verticalInput = Input.GetAxis("Vertical");
-        movementFactor = Mathf.Lerp(movementFactor, verticalInput, Time.deltaTime / movementThresold);
-		transform.Translate(0.0f, 0.0f, movementFactor * speed);
+		base.Movement();
 
 		//Es manté el jugador dins els marges
 		if (transform.position.x < xLeftBounds)
@@ -90,50 +59,5 @@ public class PlayerController : MonoBehaviour
 			transform.position = new Vector3(transform.position.x, transform.position.y, zLowerBounds);
 		else if (transform.position.z > zUpperBounds)
 			transform.position = new Vector3(transform.position.x, transform.position.y, zUpperBounds);
-	}
-
-	void Steer()
-	{
-		horizontalInput = Input.GetAxis("Horizontal");
-		steerFactor = Mathf.Lerp(steerFactor, horizontalInput * verticalInput, Time.deltaTime / movementThresold);
-		transform.Rotate(0.0f, steerFactor * steerSpeed, 0.0f);
-	}
-
-	void SoundAndParticles()
-    {
-		if (Input.GetKey(KeyCode.W))
-		{
-			MovingWaves.Play();
-			StillWaves.Stop();
-			if (isStopped)
-			{
-				isStopped = false;
-				StartCoroutine(StartFade(WavesSound, 0.5f, 0.15f));
-			}
-
-		}
-		else
-		{
-			MovingWaves.Stop();
-			StillWaves.Play();
-			if (!isStopped)
-			{
-				isStopped = true;
-				StartCoroutine(StartFade(WavesSound, 1.5f, 0f));
-			}
-		}
-	}
-
-	public static IEnumerator StartFade(AudioSource audioSource, float duration, float targetVolume)
-	{
-		float currentTime = 0;
-		float start = audioSource.volume;
-		while (currentTime < duration)
-		{
-			currentTime += Time.deltaTime;
-			audioSource.volume = Mathf.Lerp(start, targetVolume, currentTime / duration);
-			yield return null;
-		}
-		yield break;
 	}
 }

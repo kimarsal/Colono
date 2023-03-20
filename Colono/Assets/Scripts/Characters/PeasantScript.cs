@@ -51,7 +51,6 @@ public abstract class PeasantScript : MonoBehaviour
     [JsonIgnore] public PeasantDetailsScript peasantDetailsScript;
     [JsonIgnore] public CabinScript cabin;
     [JsonIgnore] public TavernScript tavern;
-    [JsonIgnore] private GameManager gameManager;
 
     [JsonIgnore] public Outline outline;
     [JsonIgnore] protected Animator animator;
@@ -59,7 +58,6 @@ public abstract class PeasantScript : MonoBehaviour
 
     private void Start()
     {
-        gameManager = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameManager>();
         outline = GetComponent<Outline>();
         animator = GetComponent<Animator>();
         navMeshAgent = GetComponent<NavMeshAgent>();

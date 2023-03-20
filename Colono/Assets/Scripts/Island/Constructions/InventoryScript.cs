@@ -3,36 +3,49 @@ using System;
 [System.Serializable]
 public class InventoryScript
 {
-    public int capacity;
-    public int usage;
-    public int[][] resources;
+    private InventoryCategory[] inventoryCategories = null;
 
     private void InitializeResources()
     {
-        resources = new int[Enum.GetValues(typeof(ResourceScript.ResourceType)).Length][];
-        resources[0] = new int[Enum.GetValues(typeof(ResourceScript.MaterialType)).Length];
-        resources[1] = new int[Enum.GetValues(typeof(ResourceScript.CropType)).Length];
-        resources[2] = new int[Enum.GetValues(typeof(ResourceScript.MeatType)).Length];
+        inventoryCategories = new InventoryCategory[3];
+        inventoryCategories[0] = new InventoryCategory(Enum.GetValues(typeof(ResourceScript.MaterialType)).Length);
+        inventoryCategories[1] = new InventoryCategory(Enum.GetValues(typeof(ResourceScript.CropType)).Length);
+        inventoryCategories[2] = new InventoryCategory(Enum.GetValues(typeof(ResourceScript.MeatType)).Length);
+    }
+
+    public string GetUsedCapacity()
+    {
+        if (inventoryCategories == null) InitializeResources();
+
+        int usage = 0;
+        int capacity = 0;
+        for (int i = 0; i < inventoryCategories.Length; i++)
+        {
+            usage += inventoryCategories[i].usage;
+            capacity += inventoryCategories[i].capacity;
+        }
+        return usage + "/" + capacity;
     }
 
     public int GetResourceAmount(ResourceScript.ResourceType resourceType, int resourceIndex)
     {
-        if (resources == null) InitializeResources();
-        return resources[(int)resourceType][resourceIndex];
+        if (inventoryCategories == null) InitializeResources();
+        return inventoryCategories[(int)resourceType].resources[resourceIndex];
     }
 
     public int AddResource(ResourceScript.ResourceType resourceType, int resourceIndex, int amount = 1)
     {
-        if (resources == null) InitializeResources();
+        if (inventoryCategories == null) InitializeResources();
 
         int originalAmount = amount;
-        if(capacity - usage < originalAmount)
+        InventoryCategory inventoryCategory = inventoryCategories[(int)resourceType];
+        if (inventoryCategory.capacity - inventoryCategory.usage < originalAmount)
         {
-            amount = capacity - usage;
+            amount = inventoryCategory.capacity - inventoryCategory.usage;
         }
-        
-        resources[(int)resourceType][resourceIndex] += amount;
-        usage += amount;
+
+        inventoryCategory.resources[resourceIndex] += amount;
+        inventoryCategory.usage += amount;
 
         return originalAmount - amount;
 
@@ -41,14 +54,43 @@ public class InventoryScript
     public int RemoveResource(ResourceScript.ResourceType resourceType, int resourceIndex, int amount = 1)
     {
         int originalAmount = amount;
-        if(GetResourceAmount(resourceType, resourceIndex) < amount)
+        InventoryCategory inventoryCategory = inventoryCategories[(int)resourceType];
+        if (GetResourceAmount(resourceType, resourceIndex) < amount)
         {
-            amount = resources[(int)resourceType][resourceIndex];
+            amount = inventoryCategory.resources[resourceIndex];
         }
 
-        resources[(int)resourceType][resourceIndex] -= amount;
-        usage -= amount;
+        inventoryCategory.resources[resourceIndex] -= amount;
+        inventoryCategory.usage -= amount;
 
         return originalAmount - amount;
+    }
+
+    public void AddCapacityToAllCategories(int extraCapacity)
+    {
+        if (inventoryCategories == null) InitializeResources();
+
+        for (int i = 0; i < inventoryCategories.Length; i++)
+        {
+            inventoryCategories[i].capacity += extraCapacity;
+        }
+    }
+
+    public void AddCapacityToCategory(ResourceScript.ResourceType resourceType, int extraCapacity)
+    {
+        inventoryCategories[(int)resourceType].capacity += extraCapacity;
+    }
+}
+
+public class InventoryCategory
+{
+    public int capacity;
+    public int usage;
+    public int[] resources;
+
+    public InventoryCategory(int resourceTypeAmount)
+    {
+        capacity = 30;
+        resources = new int[resourceTypeAmount];
     }
 }

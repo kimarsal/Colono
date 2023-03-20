@@ -16,8 +16,8 @@ public abstract class BuildingScript : ConstructionScript
         base.PeasantHasArrived(peasantScript);
 
         PeasantScript newPeasantScript = Instantiate(peasantScript.gameObject,
-            islandScript.gameManager.buildingInterior.transform.position, Quaternion.identity,
-            islandScript.gameManager.buildingInterior.transform).GetComponent<PeasantScript>();
+            GameManager.Instance.buildingInterior.transform.position, Quaternion.identity,
+            GameManager.Instance.buildingInterior.transform).GetComponent<PeasantScript>();
         newPeasantScript.isInBuilding = true;
         //newPeasantScript.InitializePeasant(peasantScript);
         Destroy(peasantScript.gameObject);

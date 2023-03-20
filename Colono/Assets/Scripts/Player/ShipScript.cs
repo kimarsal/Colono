@@ -7,8 +7,7 @@ using Random = UnityEngine.Random;
 
 public class ShipScript : ConstructionScript
 {
-    [JsonIgnore] public GameManager gameManager;
-    [JsonIgnore] public override IslandEditor islandEditor { get { return gameManager.islandEditor; } }
+    public static ShipScript Instance { get; private set; }
 
     public Vector3 position;
     public int orientation;
@@ -17,10 +16,16 @@ public class ShipScript : ConstructionScript
 
     public InventoryScript inventoryScript;
 
-    [JsonIgnore] public float distanceToBoardIsland = 2f;
-    [JsonIgnore] public override bool canBeRemoved { get { return false; } }
+    [JsonIgnore] public Transform nextIslandTransform;
+    public override bool canBeRemoved { get { return false; } }
+    public override int peasantCount { get { return peasantList.Count + shipInterior.peasantList.Count; } }
 
-    [JsonIgnore] public override int peasantCount { get { return peasantList.Count + shipInterior.peasantList.Count; } }
+    public override EditorScript editorScript { get { return CanvasScript.Instance.inventoryEditor; } }
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     public void AddDefaultElements()
     {
@@ -28,14 +33,14 @@ public class ShipScript : ConstructionScript
         {
             PeasantScript.PeasantType peasantType = (PeasantScript.PeasantType)Random.Range(0, 2);
             PeasantScript.PeasantGender peasantGender = (PeasantScript.PeasantGender)Random.Range(0, 2);
-            PeasantScript peasantScript = Instantiate(islandEditor.GetNPCPrefab(peasantType, peasantGender),
-                shipInteriorPen.transform.position, Quaternion.identity, shipInterior.npcsTransform).GetComponent<PeasantScript>();
+            PeasantScript peasantScript = Instantiate(IslandEditor.Instance.GetNPCPrefab(peasantType, peasantGender),
+            shipInteriorPen.transform.position, Quaternion.identity, shipInterior.npcsTransform);
             
             peasantScript.islandScript = shipInterior;
             peasantScript.isNative = false;
             peasantScript.headType = Random.Range(0, 2);
-            peasantScript._SKINCOLOR = islandEditor.GetRandomSkinColor();
-            peasantScript._HAIRCOLOR = islandEditor.GetRandomHairColor();
+            peasantScript._SKINCOLOR = IslandEditor.Instance.GetRandomSkinColor();
+            peasantScript._HAIRCOLOR = IslandEditor.Instance.GetRandomHairColor();
             peasantScript._CLOTH3COLOR = Random.ColorHSV();
             peasantScript._CLOTH4COLOR = Random.ColorHSV();
             peasantScript._OTHERCOLOR = Random.ColorHSV();
@@ -46,12 +51,11 @@ public class ShipScript : ConstructionScript
         int animalTypes = Enum.GetValues(typeof(AnimalType)).Length;
         for (int i = 0; i < animalTypes; i++)
         {
-            AnimalScript animalScript = Instantiate(islandEditor.GetAnimalPrefab((AnimalType)i),
+            AnimalScript animalScript = Instantiate(IslandEditor.Instance.GetAnimalPrefab((AnimalType)i),
                 shipInteriorPen.transform.position, Quaternion.identity, shipInteriorPen.animalTransform).GetComponent<AnimalScript>();
             shipInteriorPen.AddAnimal(animalScript);
         }
 
-        inventoryScript.capacity = 30;
         inventoryScript.AddResource(ResourceType.Crop, (int)CropType.Onion, 2);
         inventoryScript.AddResource(ResourceType.Crop, (int)CropType.Carrot, 2);
         inventoryScript.AddResource(ResourceType.Crop, (int)CropType.Cucumber, 2);
@@ -60,53 +64,18 @@ public class ShipScript : ConstructionScript
     void Update()
     {
         position = transform.position;
-        orientation = (int)transform.rotation.y % 360;
-
-        if (gameManager.closestIsland == null)
-        {
-            gameManager.PlayerIsFarFromIsland();
-            return;
-        }
-
-        float minDistance = 10;
-
-        /*
-        bool closeToIsland = false;
-        Vector3 colliderClosestPoint = new Vector3();
-        foreach (MeshCollider meshCollider in gameManager.closestIsland.convexColliders.GetComponentsInChildren<MeshCollider>())
-        {
-            colliderClosestPoint = Physics.ClosestPoint(transform.position, meshCollider, gameManager.closestIsland.transform.position, gameManager.closestIsland.transform.rotation);
-            float distanceToClosestPoint = Vector3.Distance(transform.position, colliderClosestPoint);
-            if (distanceToClosestPoint < minDistance)
-            {
-                minDistance = distanceToClosestPoint;
-            }
-            if (distanceToClosestPoint < distanceToBoardIsland)
-            {
-                closeToIsland = true;
-                break;
-            }
-
-        }*/
-
-        if (Vector3.Distance(transform.position, gameManager.closestIsland.transform.position) < minDistance)
-        {
-            NavMeshHit hit;
-            if (NavMesh.SamplePosition(transform.position, out hit, 15, NavMesh.AllAreas))
-            {
-                entry.position = hit.position;
-            }
-            gameManager.PlayerIsNearIsland();
-        }
-        else
-        {
-            gameManager.PlayerIsFarFromIsland();
-        }
+        orientation = (int)transform.rotation.eulerAngles.y % 360;
     }
 
-    public override void EditConstruction()
+    public bool FindEntryPosition(float distanceToDock)
     {
-        gameManager.canvasScript.ShowInventoryEditor();
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(transform.position, out hit, distanceToDock, NavMesh.AllAreas))
+        {
+            entry.position = hit.position;
+            return true;
+        }
+        return false;
     }
 
     public override PeasantScript RemovePeasant()
@@ -123,8 +92,8 @@ public class ShipScript : ConstructionScript
             PeasantScript peasantInShip = shipInterior.peasantList[0];
             shipInterior.peasantList.RemoveAt(0);
 
-            peasantScript = Instantiate(peasantInShip.gameObject, entry.position, Quaternion.identity, gameManager.closestIsland.npcsTransform).GetComponent<PeasantScript>();
-            peasantScript.islandScript = gameManager.closestIsland;
+            peasantScript = Instantiate(peasantInShip.gameObject, entry.position, Quaternion.identity, GameManager.Instance.closestIsland.npcsTransform).GetComponent<PeasantScript>();
+            peasantScript.islandScript = GameManager.Instance.closestIsland;
             peasantScript.InitializePeasant(peasantInShip);
 
             Destroy(peasantInShip.gameObject);
@@ -153,5 +122,21 @@ public class ShipScript : ConstructionScript
     public override void FinishUpBusiness()
     {
         return;
+    }
+
+    public void CollectBooty(InventoryScript boxInventoryScript)
+    {
+        for(int i = 0; i < Enum.GetValues(typeof(MaterialType)).Length; i++)
+        {
+            inventoryScript.AddResource(ResourceType.Material, i, boxInventoryScript.GetResourceAmount(ResourceType.Material, i));
+        }
+        for (int i = 0; i < Enum.GetValues(typeof(CropType)).Length; i++)
+        {
+            inventoryScript.AddResource(ResourceType.Crop, i, boxInventoryScript.GetResourceAmount(ResourceType.Crop, i));
+        }
+        for (int i = 0; i < Enum.GetValues(typeof(MeatType)).Length; i++)
+        {
+            inventoryScript.AddResource(ResourceType.Meat, i, boxInventoryScript.GetResourceAmount(ResourceType.Meat, i));
+        }
     }
 }

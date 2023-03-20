@@ -1,8 +1,5 @@
 
 public class AlchemistScript : BuildingScript
 {
-    public override void EditConstruction()
-    {
-        throw new System.NotImplementedException();
-    }
+    public override EditorScript editorScript { get { return null; } }
 }

@@ -5,19 +5,18 @@ using UnityEngine;
 public class CannonballScript : MonoBehaviour
 {
     protected float speed = 15;
-    protected GameObject player;
+    public ShipController shipController;
     protected Rigidbody rb;
     private CannonballMissScript script;
     private bool isBeingDestroyed = false;
 
     protected void Setup()
     {
-        player = GameObject.Find("Player");
         script = GameObject.Find("Sea").GetComponent<CannonballMissScript>();
         rb = GetComponent<Rigidbody>();
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider collision)
     {
         if (collision.gameObject.CompareTag("Sea") && !isBeingDestroyed)
         {

@@ -5,7 +5,6 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 using static Terrain;
-using static UnityEngine.Rendering.DebugUI.Table;
 
 public class IslandScript : MonoBehaviour, TaskSourceInterface
 {
@@ -14,12 +13,11 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
     public bool hasBeenDiscovered;
     [JsonIgnore] public MeshData meshData;
     [JsonIgnore] public int[,] regionMap;
-    
-    public IslandEditor islandEditor { get { return gameManager.islandEditor; } }
+    [JsonIgnore] public NavMeshSurface navMeshSurface;
+    //[JsonIgnore] public GameObject convexColliders;
+    //[JsonIgnore] public List<MeshCollider> convexCollidersList;
     public InventoryScript inventoryScript;
 
-    [JsonIgnore] public GameManager gameManager;
-    //[JsonIgnore] public GameObject convexColliders;
     [JsonIgnore] public Transform itemsTransform;
     [JsonIgnore] public Transform constructionsTransform;
     [JsonIgnore] public Transform npcsTransform;
@@ -28,12 +26,6 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
     public List<ItemScript> itemsToClear = new List<ItemScript>();
     public List<ConstructionScript> constructionList = new List<ConstructionScript>();
     public List<PeasantScript> peasantList = new List<PeasantScript>();
-
-
-    private void Start()
-    {
-        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
-    }
 
     public bool isCellTaken(Vector2 cell)
     {
@@ -62,9 +54,10 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
         {
             Vector3 itemPos = transform.position + MeshGenerator.GetCellCenter(cell, meshData);
             int orientation = Random.Range(0, 360);
-            TerrainType terrainType = gameManager.GetComponent<IslandGenerator>().regions[regionMap[(int)cell.x, (int)cell.y]].type;
+            TerrainType terrainType = GameManager.Instance.GetComponent<IslandGenerator>().regions[regionMap[(int)cell.x, (int)cell.y]].type;
 
-            TreeSproutScript treeSproutScript = Instantiate(islandEditor.treeSprout, itemPos, Quaternion.Euler(0, orientation, 0), itemsTransform.transform).GetComponent<TreeSproutScript>();
+            TreeSproutScript treeSproutScript = Instantiate(IslandEditor.Instance.treeSprout, itemPos,
+                Quaternion.Euler(0, orientation, 0), itemsTransform.transform).GetComponent<TreeSproutScript>();
             treeSproutScript.terrainType = terrainType;
             treeSproutScript.itemIndex = -1;
             treeSproutScript.itemCell = cell;
@@ -82,7 +75,7 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
             
             if(((BuildingScript)constructionScript).buildingType == BuildingScript.BuildingType.Warehouse)
             {
-                inventoryScript.capacity += 30;
+                inventoryScript.AddCapacityToAllCategories(30);
             }
         }
         constructionScript.islandScript = this;
@@ -102,7 +95,6 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
         {
             case EnclosureScript.EnclosureType.Garden: enclosureScript = enclosure.AddComponent<GardenScript>(); break;
             case EnclosureScript.EnclosureType.Pen: enclosureScript = enclosure.AddComponent<PenScript>(); break;
-            case EnclosureScript.EnclosureType.Training: enclosureScript = enclosure.AddComponent<TrainingScript>(); break;
         }
         enclosureScript.enclosureType = enclosureType;
         enclosureScript.cells = selectedCells;
@@ -116,7 +108,7 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
         SendAllPeasantsBack(constructionScript);
         if (constructionScript.constructionType == ConstructionScript.ConstructionType.Building && ((BuildingScript)constructionScript).buildingType == BuildingScript.BuildingType.Warehouse)
         {
-            inventoryScript.capacity -= 30;
+            inventoryScript.AddCapacityToAllCategories(-30);
         }
         InvertRegions(constructionScript.cells);
         constructionList.Remove(constructionScript);
@@ -146,7 +138,7 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
 
     public void RebakeNavMesh()
     {
-        GetComponent<NavMeshSurface>().UpdateNavMesh(GetComponent<NavMeshSurface>().navMeshData);
+        navMeshSurface.UpdateNavMesh(navMeshSurface.navMeshData);
 
     }
 
@@ -201,17 +193,17 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
         }
 
         remainingAmount = inventoryScript.AddResource(resourceType, resourceIndex, remainingAmount);
-        if (remainingAmount > 0 && gameManager.isInIsland)
+        if (remainingAmount > 0 && GameManager.Instance.isInIsland)
         {
-            gameManager.shipScript.inventoryScript.AddResource(resourceType, resourceIndex, remainingAmount);
+            ShipScript.Instance.inventoryScript.AddResource(resourceType, resourceIndex, remainingAmount);
         }
-        gameManager.canvasScript.UpdateInventoryRow(resourceType, resourceIndex);
+        CanvasScript.Instance.UpdateInventoryRow(resourceType, resourceIndex);
     }
 
     public int GetResourceAmount(ResourceScript.ResourceType resourceType, int resourceIndex)
     {
         int amount = inventoryScript.GetResourceAmount(resourceType, resourceIndex);
-        if (gameManager.isInIsland) amount += gameManager.shipScript.inventoryScript.GetResourceAmount(resourceType, resourceIndex);
+        if (GameManager.Instance.isInIsland) amount += ShipScript.Instance.inventoryScript.GetResourceAmount(resourceType, resourceIndex);
         return amount;
     }
 
@@ -222,7 +214,7 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
         int remainingAmount = inventoryScript.RemoveResource(resourceType, resourceIndex, amount);
         if(remainingAmount > 0)
         {
-            gameManager.shipScript.inventoryScript.RemoveResource(resourceType, resourceIndex, remainingAmount);
+            ShipScript.Instance.inventoryScript.RemoveResource(resourceType, resourceIndex, remainingAmount);
         }
         return true;
     }
@@ -343,19 +335,19 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
         }
     }
 
-    public void CancelAllTripsToShip(ShipScript shipScript)
+    public void CancelAllTripsToShip()
     {
-        for (int i = shipScript.peasantList.Count - 1; i >= 0; i--)
+        for (int i = ShipScript.Instance.peasantList.Count - 1; i >= 0; i--)
         {
-            PeasantScript peasantScript = shipScript.peasantList[i];
+            PeasantScript peasantScript = ShipScript.Instance.peasantList[i];
 
             peasantList.Add(peasantScript);
-            shipScript.peasantList.Remove(peasantScript);
+            ShipScript.Instance.peasantList.Remove(peasantScript);
             peasantScript.constructionScript = null;
             if (peasantScript.peasantType == PeasantScript.PeasantType.Adult) GetNextPendingTask((PeasantAdultScript)peasantScript);
             else peasantScript.UpdateTask();
         }
-        shipScript.peasantsOnTheirWay = 0;
+        ShipScript.Instance.peasantsOnTheirWay = 0;
     }
 
 }

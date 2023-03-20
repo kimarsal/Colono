@@ -4,8 +4,5 @@ using UnityEngine;
 
 public class WarehouseScript : BuildingScript
 {
-    public override void EditConstruction()
-    {
-        islandScript.gameManager.canvasScript.ShowInventoryEditor();
-    }
+    public override EditorScript editorScript { get { return CanvasScript.Instance.inventoryEditor; } }
 }

@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,10 +12,79 @@ public class ConstructionDetailsScript : MonoBehaviour
     public Button minusButton;
     public Button plusButton;
 
+    public Button editConstructionButton;
     public Button removeConstructionButton;
 
-    public GameManager gameManager;
     public ConstructionScript constructionScript;
+
+    public enum ConstructionDetailsState { Closed, Details, Editor };
+    public ConstructionDetailsState state;
+    private RectTransform rectTransform;
+    private RectTransform canvasRectTransform;
+
+    void Start()
+    {
+        rectTransform = GetComponent<RectTransform>();
+        canvasRectTransform = CanvasScript.Instance.GetComponent<RectTransform>();
+        rectTransform.anchoredPosition = new Vector2(0, -canvasRectTransform.rect.height);
+        rectTransform.anchoredPosition = new Vector2(0, -canvasRectTransform.rect.height);
+    }
+
+    public void ShowDetails()
+    {
+        state = ConstructionDetailsState.Details;
+        StartCoroutine(ChangeStateCoroutine());
+    }
+
+    public void EditConstruction()
+    {
+        if(state == ConstructionDetailsState.Details)
+        {
+            constructionScript.editorScript.gameObject.SetActive(true);
+            constructionScript.editorScript.SetEditor(constructionScript);
+        }
+        else
+        {
+            StartCoroutine(HideEditor());
+        }
+
+        state = state == ConstructionDetailsState.Details ? ConstructionDetailsState.Editor : ConstructionDetailsState.Details;
+        StartCoroutine(ChangeStateCoroutine());
+    }
+
+    private IEnumerator HideEditor()
+    {
+        yield return new WaitForSeconds(0.3f);
+        if(constructionScript.editorScript != null) constructionScript.editorScript.gameObject.SetActive(false);
+    }
+
+    public void HideDetails()
+    {
+        state = ConstructionDetailsState.Closed;
+        StartCoroutine(ChangeStateCoroutine());
+        StartCoroutine(HideEditor());
+    }
+
+    private IEnumerator ChangeStateCoroutine()
+    {
+        float duration = 0.3f;
+        float currentTime = 0;
+        float startPos = rectTransform.anchoredPosition.y;
+        float targetPos = 0;
+        switch (state)
+        {
+            case ConstructionDetailsState.Closed: targetPos = -canvasRectTransform.rect.height; break;
+            case ConstructionDetailsState.Details: targetPos = -canvasRectTransform.rect.height + 100; break;
+        }
+
+        while (currentTime < duration)
+        {
+            currentTime += Time.deltaTime;
+            rectTransform.anchoredPosition = new Vector2(0, Mathf.Lerp(startPos, targetPos, currentTime / duration));
+            yield return null;
+        }
+        yield break;
+    }
 
     public void SetConstructionDetails(ConstructionScript newConstructionScript)
     {
@@ -37,12 +105,8 @@ public class ConstructionDetailsScript : MonoBehaviour
         }
         UpdatePeasantNum();
 
-        removeConstructionButton.gameObject.SetActive(constructionScript.canBeRemoved);
-    }
-
-    public void EditConstruction()
-    {
-        constructionScript.EditConstruction();
+        removeConstructionButton.enabled = constructionScript.canBeRemoved;
+        editConstructionButton.enabled = constructionScript.editorScript != null;
     }
 
     public void ManagePeasants(bool adding)

@@ -11,7 +11,7 @@ public class TreeSproutScript : ItemScript
         if(growth > 1)
         {
             int index;
-            ItemScript itemScript = Instantiate(islandScript.islandEditor.GetRandomTreePrefab(terrainType, out index), transform.position, transform.rotation, transform.parent).GetComponent<ItemScript>();
+            ItemScript itemScript = Instantiate(IslandEditor.Instance.GetRandomTreePrefab(terrainType, out index), transform.position, transform.rotation, transform.parent).GetComponent<ItemScript>();
             itemScript.islandScript = islandScript;
             itemScript.terrainType = terrainType;
             itemScript.itemIndex = index;

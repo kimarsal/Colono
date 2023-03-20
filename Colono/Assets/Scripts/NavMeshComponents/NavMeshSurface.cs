@@ -269,7 +269,7 @@ namespace UnityEngine.AI
             }
         }
 
-        List<NavMeshBuildSource> CollectSources()
+        public List<NavMeshBuildSource> CollectSources()
         {
             var sources = new List<NavMeshBuildSource>();
             var markups = new List<NavMeshBuildMarkup>();
@@ -366,7 +366,7 @@ namespace UnityEngine.AI
             return new Bounds(worldPosition, worldSize);
         }
 
-        Bounds CalculateWorldBounds(List<NavMeshBuildSource> sources)
+        public Bounds CalculateWorldBounds(List<NavMeshBuildSource> sources)
         {
             // Use the unscaled matrix for the NavMeshSurface
             Matrix4x4 worldToLocal = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one);

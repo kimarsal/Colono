@@ -1,41 +1,37 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using static ResourceScript;
 using UnityEngine.UI;
 
-public class InventoryEditor : MonoBehaviour
+public class InventoryEditor : EditorScript
 {
-    public IslandEditor islandEditor;
     public InventoryScript shipInventoryScript;
     public InventoryScript islandInventoryScript;
 
-    public TextMeshProUGUI shipInventoryText;
-    public TextMeshProUGUI islandInventoryText;
+    [SerializeField] private TextMeshProUGUI shipInventoryText;
+    [SerializeField] private TextMeshProUGUI islandInventoryText;
 
-    public Transform rows;
-    public ScrollRect scrollRect;
-    public InventoryRowScript[][] inventoryRows;
-    public GameObject inventoryRowPrefab;
+    [SerializeField] private Transform rows;
+    [SerializeField] private ScrollRect scrollRect;
+    [SerializeField] private InventoryRowScript[][] inventoryRows;
+    [SerializeField] private InventoryRowScript inventoryRowPrefab;
 
     public Button[] tabButtons;
 
     private void SetRow(ResourceType resourceType, int resourceIndex)
     {
-        GameObject gridRow = Instantiate(inventoryRowPrefab, rows);
-        InventoryRowScript gridRowScript = gridRow.GetComponent<InventoryRowScript>();
+        InventoryRowScript gridRowScript = Instantiate(inventoryRowPrefab, rows);
         gridRowScript.inventoryEditor = this;
         gridRowScript.resourceType = resourceType;
         gridRowScript.resourceIndex = resourceIndex;
-        gridRowScript.resourceImage.sprite = islandEditor.GetResourceSprite(resourceType, resourceIndex);
+        gridRowScript.resourceImage.sprite = IslandEditor.Instance.GetResourceSprite(resourceType, resourceIndex);
         gridRowScript.shipResources = shipInventoryScript.GetResourceAmount(resourceType, resourceIndex);
         gridRowScript.islandResources = islandInventoryScript.GetResourceAmount(resourceType, resourceIndex);
         gridRowScript.UpdateValues();
         inventoryRows[(int)resourceType][resourceIndex] = gridRowScript;
     }
 
-    public void SetGrid()
+    public override void SetEditor(ConstructionScript constructionScript)
     {
         foreach (Transform row in rows)
         {
@@ -100,8 +96,8 @@ public class InventoryEditor : MonoBehaviour
 
     public void UpdateInventoryText()
     {
-        shipInventoryText.text = shipInventoryScript.usage + "/" + shipInventoryScript.capacity;
-        islandInventoryText.text = islandInventoryScript.usage + "/" + islandInventoryScript.capacity;
+        shipInventoryText.text = shipInventoryScript.GetUsedCapacity();
+        islandInventoryText.text = islandInventoryScript.GetUsedCapacity();
     }
 
     public bool MoveResource(ResourceType resourceType, int resourceIndex, int difference)
