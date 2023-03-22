@@ -127,7 +127,7 @@ public class GameManager : MonoBehaviour
     {
         cameraScript.SetIslandCamera(closestIsland.transform.position);
         inventoryEditor.islandInventoryScript = closestIsland.inventoryScript;
-        CanvasScript.Instance.DockOntoIsland();
+        CanvasScript.Instance.Dock();
 
         ShipScript.Instance.islandScript = closestIsland;
         islandCellScript.islandScript = closestIsland;
@@ -154,7 +154,6 @@ public class GameManager : MonoBehaviour
 
     public void PlantTrees()
     {
-        CanvasScript.Instance.HideItemButtons();
         islandCellScript.enabled = true;
         islandCellScript.selectFunction = IslandCellScript.SelectFunction.PlantTrees;
         islandCellScript.selectMode = IslandCellScript.SelectMode.None;
@@ -163,7 +162,6 @@ public class GameManager : MonoBehaviour
 
     public void ClearItems()
     {
-        CanvasScript.Instance.HideItemButtons();
         islandCellScript.enabled = true;
         islandCellScript.selectFunction = IslandCellScript.SelectFunction.ClearItems;
         islandCellScript.selectMode = IslandCellScript.SelectMode.None;
@@ -172,7 +170,6 @@ public class GameManager : MonoBehaviour
 
     public void CancelItemClearing()
     {
-        CanvasScript.Instance.HideItemButtons();
         islandCellScript.enabled = true;
         islandCellScript.selectFunction = IslandCellScript.SelectFunction.CancelItemClearing;
         islandCellScript.selectMode = IslandCellScript.SelectMode.None;
@@ -183,7 +180,6 @@ public class GameManager : MonoBehaviour
     {
         islandCellScript.enabled = true;
         islandCellScript.ChooseEnclosure((EnclosureScript.EnclosureType)enclosureType);
-        CanvasScript.Instance.ChooseEnclosure();
         islandSelectionScript.enabled = false;
     }
 
@@ -191,7 +187,6 @@ public class GameManager : MonoBehaviour
     {
         islandCellScript.enabled = true;
         islandCellScript.ChooseBuilding((BuildingScript.BuildingType)buildingType);
-        CanvasScript.Instance.ChooseBuilding();
         islandSelectionScript.enabled = false;
     }
 

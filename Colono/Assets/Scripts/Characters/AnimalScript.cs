@@ -72,7 +72,7 @@ public class AnimalScript : MonoBehaviour
 
         if (confortLevel < 1)
         {
-            confortLevel += Time.deltaTime * confortSpeed;
+            confortLevel += Time.deltaTime * confortSpeed * penScript.level;
         }
         else if (!isConfortable)
         {
@@ -123,7 +123,7 @@ public class AnimalScript : MonoBehaviour
         navMeshAgent.isStopped = true;
         animator.SetTrigger("Death");
         yield return new WaitForSeconds(animator.GetCurrentAnimatorClipInfo(0)[0].clip.length);
-        penScript.islandScript.AddResource(ResourceScript.ResourceType.Meat, (int)animalType / 2, meatAmount);
+        penScript.islandScript.AddResource(ResourceScript.ResourceType.Meat, (int)animalType / 2, meatAmount + penScript.level);
         Destroy(gameObject);
     }
 

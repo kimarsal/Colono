@@ -3,6 +3,10 @@ using System;
 [System.Serializable]
 public class InventoryScript
 {
+    private const int materialCapacity = 50;
+    private const int cropCapacity = 20;
+    private const int meatCapacity = 20;
+    private const int maxLevel = 10;
     private InventoryCategory[] inventoryCategories = null;
 
     private void InitializeResources()
@@ -13,18 +17,11 @@ public class InventoryScript
         inventoryCategories[2] = new InventoryCategory(Enum.GetValues(typeof(ResourceScript.MeatType)).Length);
     }
 
-    public string GetUsedCapacity()
+    public string GetUsedCapacity(int type)
     {
         if (inventoryCategories == null) InitializeResources();
 
-        int usage = 0;
-        int capacity = 0;
-        for (int i = 0; i < inventoryCategories.Length; i++)
-        {
-            usage += inventoryCategories[i].usage;
-            capacity += inventoryCategories[i].capacity;
-        }
-        return usage + "/" + capacity;
+        return inventoryCategories[type].usage + "/" + inventoryCategories[type].capacity;
     }
 
     public int GetResourceAmount(ResourceScript.ResourceType resourceType, int resourceIndex)
@@ -66,31 +63,51 @@ public class InventoryScript
         return originalAmount - amount;
     }
 
-    public void AddCapacityToAllCategories(int extraCapacity)
+    public void AddCapacityToAllCategories()
     {
         if (inventoryCategories == null) InitializeResources();
 
-        for (int i = 0; i < inventoryCategories.Length; i++)
-        {
-            inventoryCategories[i].capacity += extraCapacity;
-        }
+        inventoryCategories[0].AddCapacity(materialCapacity);
+        inventoryCategories[1].AddCapacity(cropCapacity);
+        inventoryCategories[2].AddCapacity(meatCapacity);
     }
 
-    public void AddCapacityToCategory(ResourceScript.ResourceType resourceType, int extraCapacity)
+    public void RemoveCapacityFromAllCategories()
     {
-        inventoryCategories[(int)resourceType].capacity += extraCapacity;
+        if (inventoryCategories == null) InitializeResources();
+
+        inventoryCategories[0].AddCapacity(-materialCapacity);
+        inventoryCategories[1].AddCapacity(-cropCapacity);
+        inventoryCategories[2].AddCapacity(-meatCapacity);
+    }
+
+    public bool CanLevelUpCategory(int type)
+    {
+        return inventoryCategories[type].capacity > 0 && inventoryCategories[type].level < maxLevel;
+    }
+
+    public void LevelUpInventoryCategory(int type)
+    {
+        inventoryCategories[type].level++;
     }
 }
 
 public class InventoryCategory
 {
-    public int capacity;
+    public int level;
+    private int baseCapacity;
+    public int capacity { get { return baseCapacity * level; } }
     public int usage;
     public int[] resources;
 
     public InventoryCategory(int resourceTypeAmount)
     {
-        capacity = 30;
+        level = 1;
         resources = new int[resourceTypeAmount];
+    }
+
+    public void AddCapacity(int extraCapacity)
+    {
+        baseCapacity += extraCapacity;
     }
 }

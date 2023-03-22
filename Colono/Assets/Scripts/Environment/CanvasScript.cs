@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class CanvasScript : MonoBehaviour
 {
     public static CanvasScript Instance { get; private set; }
-    private enum ButtonState { Idle, ItemButtons, BuildingButtons, EnclosureButtons, Editing, ConstructionDetails, PeasantDetails, PopUp };
+    private enum ButtonState { Idle, ServiceButtons, WorkButtons, ItemButtons, Editing, ConstructionDetails, PeasantDetails, PopUp };
     private ButtonState buttonState = ButtonState.Idle;
 
     [Header("BottomButtons")]
@@ -18,12 +18,12 @@ public class CanvasScript : MonoBehaviour
     [SerializeField] private Animator sailButtonAnimator;
 
     [Header("Tabs")]
+    [SerializeField] private Animator serviceButtonsAnimator;
+    [SerializeField] private Animator workButtonsAnimator;
     [SerializeField] private Animator itemButtonsAnimator;
-    [SerializeField] private Animator buildingButtonsAnimator;
-    [SerializeField] private Animator enclosureButtonsAnimator;
 
     [Header("Details")]
-    [SerializeField] private ConstructionDetailsScript constructionDetailsScript;
+    public ConstructionDetailsScript constructionDetailsScript;
     [SerializeField] private Animator peasantDetailsAnimator;
 
     [Header("Editors")]
@@ -59,30 +59,18 @@ public class CanvasScript : MonoBehaviour
         dockButtonAnimator.Play("HideBottomButton");
     }
 
-    public void DockOntoIsland()
+    public void Dock()
     {
         dockButtonAnimator.Play("HideBottomButton");
-        sailButtonAnimator.Play("ShowBottomButton");
-
-        itemButtonsAnimator.Play("ShowTabHeader");
-        enclosureButtonsAnimator.Play("ShowTabHeader");
-        buildingButtonsAnimator.Play("ShowTabHeader");
-
-        buttonState = ButtonState.Idle;
+        ShowDefaultButtons();
     }
 
     public void ShowDefaultButtons()
     {
-        switch (buttonState)
-        {
-            case ButtonState.ConstructionDetails: constructionDetailsScript.HideDetails(); break;
-            case ButtonState.PeasantDetails: peasantDetailsAnimator.Play("HideDetails"); break;
-        }
-
         sailButtonAnimator.Play("ShowBottomButton");
         itemButtonsAnimator.Play("ShowTabHeader");
-        enclosureButtonsAnimator.Play("ShowTabHeader");
-        buildingButtonsAnimator.Play("ShowTabHeader");
+        workButtonsAnimator.Play("ShowTabHeader");
+        serviceButtonsAnimator.Play("ShowTabHeader");
 
         buttonState = ButtonState.Idle;
     }
@@ -92,111 +80,80 @@ public class CanvasScript : MonoBehaviour
         switch (buttonState)
         {
             case ButtonState.Idle:
+                serviceButtonsAnimator.Play("HideTabHeader");
+                workButtonsAnimator.Play("HideTabHeader");
                 itemButtonsAnimator.Play("HideTabHeader");
-                enclosureButtonsAnimator.Play("HideTabHeader");
-                buildingButtonsAnimator.Play("HideTabHeader");
+                break;
+            case ButtonState.ServiceButtons:
+                serviceButtonsAnimator.Play("HideWholeTab");
+                break;
+            case ButtonState.WorkButtons:
+                workButtonsAnimator.Play("HideWholeTab");
                 break;
             case ButtonState.ItemButtons:
                 itemButtonsAnimator.Play("HideWholeTab");
-                enclosureButtonsAnimator.Play("HideTabHeader");
-                buildingButtonsAnimator.Play("HideTabHeader");
-                break;
-            case ButtonState.EnclosureButtons:
-                itemButtonsAnimator.Play("HideWholeTab");
-                enclosureButtonsAnimator.Play("HideWholeTab");
-                buildingButtonsAnimator.Play("HideTabHeader");
-                break;
-            case ButtonState.BuildingButtons:
-                itemButtonsAnimator.Play("HideTabHeader");
-                enclosureButtonsAnimator.Play("HideTabHeader");
-                buildingButtonsAnimator.Play("HideWholeTab");
                 break;
         }
     }
 
-    public void HideButtons()
-    {
-        HideTopButtons();
-        sailButtonAnimator.Play("HideBottomButton");
-        switch (buttonState)
-        {
-            case ButtonState.ConstructionDetails: constructionDetailsScript.HideDetails(); break;
-            case ButtonState.PeasantDetails: peasantDetailsAnimator.Play("HideDetails"); break;
-        }
-
-        buttonState = ButtonState.Idle;
-    }
-
-    public void OpenCloseItemButtons()
+    public void ToggleServiceButtons()
     {
         if (buttonState == ButtonState.Idle)
         {
+            serviceButtonsAnimator.Play("ShowTabContent");
+            workButtonsAnimator.Play("HideTabHeader");
+            itemButtonsAnimator.Play("HideTabHeader");
+            buttonState = ButtonState.ServiceButtons;
+        }
+        else
+        {
+            serviceButtonsAnimator.Play("HideTabContent");
+            workButtonsAnimator.Play("ShowTabHeader");
+            itemButtonsAnimator.Play("ShowTabHeader");
+            buttonState = ButtonState.Idle;
+        }
+    }
+
+    public void ToggleWorkButtons()
+    {
+        if (buttonState == ButtonState.Idle)
+        {
+            serviceButtonsAnimator.Play("HideTabHeader");
+            workButtonsAnimator.Play("ShowTabContent");
+            itemButtonsAnimator.Play("HideTabHeader");
+            buttonState = ButtonState.WorkButtons;
+        }
+        else
+        {
+            serviceButtonsAnimator.Play("ShowTabHeader");
+            workButtonsAnimator.Play("HideTabContent");
+            itemButtonsAnimator.Play("ShowTabHeader");
+            buttonState = ButtonState.Idle;
+        }
+    }
+
+    public void ToggleItemButtons()
+    {
+        if (buttonState == ButtonState.Idle)
+        {
+            serviceButtonsAnimator.Play("HideTabHeader");
+            workButtonsAnimator.Play("HideTabHeader");
             itemButtonsAnimator.Play("ShowTabContent");
-            enclosureButtonsAnimator.Play("HideTabHeader");
-            buildingButtonsAnimator.Play("HideTabHeader");
             buttonState = ButtonState.ItemButtons;
         }
         else
         {
+            serviceButtonsAnimator.Play("ShowTabHeader");
+            workButtonsAnimator.Play("ShowTabHeader");
             itemButtonsAnimator.Play("HideTabContent");
-            enclosureButtonsAnimator.Play("ShowTabHeader");
-            buildingButtonsAnimator.Play("ShowTabHeader");
             buttonState = ButtonState.Idle;
         }
     }
 
-    public void HideItemButtons()
+    public void ChooseTopButton()
     {
-        itemButtonsAnimator.Play("HideWholeTab");
-    }
-
-    public void OpenCloseEnclosureButtons()
-    {
-        if (buttonState == ButtonState.Idle)
-        {
-            itemButtonsAnimator.Play("HideTabHeader");
-            enclosureButtonsAnimator.Play("ShowTabContent");
-            buildingButtonsAnimator.Play("HideTabHeader");
-            buttonState = ButtonState.EnclosureButtons;
-        }
-        else
-        {
-            itemButtonsAnimator.Play("ShowTabHeader");
-            enclosureButtonsAnimator.Play("HideTabContent");
-            buildingButtonsAnimator.Play("ShowTabHeader");
-            buttonState = ButtonState.Idle;
-        }
-    }
-
-    public void ChooseEnclosure()
-    {
+        HideTopButtons();
         sailButtonAnimator.Play("HideBottomButton");
-        enclosureButtonsAnimator.Play("HideWholeTab");
-        buttonState = ButtonState.Editing;
-    }
-
-    public void OpenCloseBuildingButtons()
-    {
-        if (buttonState == ButtonState.Idle)
-        {
-            itemButtonsAnimator.Play("HideTabHeader");
-            enclosureButtonsAnimator.Play("HideTabHeader");
-            buildingButtonsAnimator.Play("ShowTabContent");
-            buttonState = ButtonState.BuildingButtons;
-        }
-        else
-        {
-            itemButtonsAnimator.Play("ShowTabHeader");
-            enclosureButtonsAnimator.Play("ShowTabHeader");
-            buildingButtonsAnimator.Play("HideTabContent");
-            buttonState = ButtonState.Idle;
-        }
-    }
-
-    public void ChooseBuilding()
-    {
-        sailButtonAnimator.Play("HideBottomButton");
-        buildingButtonsAnimator.Play("HideWholeTab");
         buttonState = ButtonState.Editing;
     }
 
@@ -263,10 +220,11 @@ public class CanvasScript : MonoBehaviour
 
     public void Sail()
     {
-        HideButtons();
-
-        dockButtonAnimator.Play("ShowBottomButton");
+        HideTopButtons();
         sailButtonAnimator.Play("HideBottomButton");
+        dockButtonAnimator.Play("ShowBottomButton");
+
+        buttonState = ButtonState.Idle;
     }
 
 }

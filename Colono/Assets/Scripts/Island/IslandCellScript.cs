@@ -258,7 +258,11 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         // Es comprova la validesa de la selecció segons la funció
         if(selectFunction == SelectFunction.PlantTrees)
         {
-            if (selectedItems.Count > 0) isSelectionValid = false;
+            int availableSprouts = islandScript.GetResourceAmount(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Sprout);
+            if (selectedItems.Count > 0 || availableSprouts < selectedCells.Length)
+            {
+                isSelectionValid = false;
+            }
         }
         if (selectFunction == SelectFunction.ClearItems || selectFunction == SelectFunction.CancelItemClearing)
         {
@@ -266,7 +270,9 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         }
         else if (selectFunction == SelectFunction.CreateEnclosure)
         {
-            if (selectedItems.Count > 0 || endCell.x - startCell.x < 2 || endCell.y - startCell.y < 2)
+            int availableWood = islandScript.GetResourceAmount(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Wood);
+            if (selectedItems.Count > 0 || endCell.x - startCell.x < 2 || endCell.y - startCell.y < 2
+                || availableWood < (endCell.x - startCell.x) * 2 + (endCell.y - startCell.y) * 2)
             {
                 isSelectionValid = false;
             }

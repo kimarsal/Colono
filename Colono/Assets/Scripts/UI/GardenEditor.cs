@@ -16,6 +16,8 @@ public class GardenEditor : EditorScript
 
     public override void SetEditor(ConstructionScript constructionScript)
     {
+        base.SetEditor(constructionScript);
+
         gardenScript = (GardenScript)constructionScript;
 
         foreach (Transform cropButton in gridTransform)

@@ -100,7 +100,7 @@ public class PeasantAdultScript : PeasantScript
         UpdateTask();
     }
 
-    public override void ArrivedAtDestination()
+    protected override void ArrivedAtDestination()
     {
         if (tavern != null) //Si ha anat a menjar
         {
@@ -146,6 +146,7 @@ public class PeasantAdultScript : PeasantScript
         else if (task.taskType == TaskScript.TaskType.Patch)
         {
             PatchScript patchScript = (PatchScript)task;
+            patchScript.isBeingTakenCareOf = true;
             if (patchScript.cropState != PatchScript.CropState.Barren &&
                 patchScript.cropType != ((GardenScript)patchScript.taskSourceScript).cropDictionary[patchScript.cell]) //S'ha d'arrencar l'anterior planta
             {

@@ -10,13 +10,16 @@ public class InventoryEditor : EditorScript
 
     [SerializeField] private TextMeshProUGUI shipInventoryText;
     [SerializeField] private TextMeshProUGUI islandInventoryText;
+    [SerializeField] private Button upgradeShipInventoryCategoryButton;
+    [SerializeField] private Button upgradeIslandInventoryCategoryButton;
 
     [SerializeField] private Transform rows;
     [SerializeField] private ScrollRect scrollRect;
     [SerializeField] private InventoryRowScript[][] inventoryRows;
     [SerializeField] private InventoryRowScript inventoryRowPrefab;
 
-    public Button[] tabButtons;
+    [SerializeField] private Button[] tabButtons;
+    private int selectedTab;
 
     private void SetRow(ResourceType resourceType, int resourceIndex)
     {
@@ -58,13 +61,14 @@ public class InventoryEditor : EditorScript
             SetRow(ResourceType.Meat, i);
         }
 
-        SelectTab(-1);
-        UpdateInventoryText();
+        SelectTab(0);
 
     }
 
     public void SelectTab(int tabIndex)
     {
+        selectedTab = tabIndex;
+
         for(int i = 0; i < inventoryRows.Length; i++)
         {
             tabButtons[i].interactable = tabIndex != i;
@@ -72,12 +76,28 @@ public class InventoryEditor : EditorScript
             foreach(InventoryRowScript row in inventoryRows[i])
             {
                 // TODO: Si ha estat descobert
-                row.gameObject.SetActive(tabIndex == -1 || tabIndex == i);
+                row.gameObject.SetActive(tabIndex == i);
             }
         }
-        tabButtons[inventoryRows.Length].interactable = tabIndex != -1;
 
+        upgradeShipInventoryCategoryButton.interactable = shipInventoryScript.CanLevelUpCategory(selectedTab);
+        upgradeIslandInventoryCategoryButton.interactable = islandInventoryScript.CanLevelUpCategory(selectedTab);
+        UpdateInventoryText();
         scrollRect.normalizedPosition = new Vector2(0, 1);
+    }
+
+    public void UpgradeShipInventoryCategory()
+    {
+        shipInventoryScript.LevelUpInventoryCategory(selectedTab);
+        upgradeShipInventoryCategoryButton.interactable = shipInventoryScript.CanLevelUpCategory(selectedTab);
+        shipInventoryText.text = shipInventoryScript.GetUsedCapacity(selectedTab);
+    }
+
+    public void UpgradeIslandInventoryCategory()
+    {
+        islandInventoryScript.LevelUpInventoryCategory(selectedTab);
+        upgradeIslandInventoryCategoryButton.interactable = islandInventoryScript.CanLevelUpCategory(selectedTab);
+        islandInventoryText.text = islandInventoryScript.GetUsedCapacity(selectedTab);
     }
 
     public void UpdateInventoryRow(ResourceType resourceType, int resourceIndex)
@@ -96,23 +116,23 @@ public class InventoryEditor : EditorScript
 
     public void UpdateInventoryText()
     {
-        shipInventoryText.text = shipInventoryScript.GetUsedCapacity();
-        islandInventoryText.text = islandInventoryScript.GetUsedCapacity();
+        shipInventoryText.text = shipInventoryScript.GetUsedCapacity(selectedTab);
+        islandInventoryText.text = islandInventoryScript.GetUsedCapacity(selectedTab);
     }
 
     public bool MoveResource(ResourceType resourceType, int resourceIndex, int difference)
     {
-        if(difference > 0) // island -> ship
+        if(difference < 0) // island -> ship
         {
-            if(shipInventoryScript.AddResource(resourceType, resourceIndex, difference) > 0)
+            difference = -difference;
+            if (shipInventoryScript.AddResource(resourceType, resourceIndex, difference) > 0)
             {
                 return false;
             }
             islandInventoryScript.RemoveResource(resourceType, resourceIndex, difference);
         }
-        else if(difference < 0) // ship -> island
+        else if(difference > 0) // ship -> island
         {
-            difference = -difference;
             if (islandInventoryScript.AddResource(resourceType, resourceIndex, difference) > 0)
             {
                 return false;

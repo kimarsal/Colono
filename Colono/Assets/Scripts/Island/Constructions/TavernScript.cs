@@ -13,6 +13,13 @@ public class TavernScript : BuildingScript
         recipeList.Add(new Recipe());
     }
 
+    public override void AddPeasant(PeasantScript peasantScript)
+    {
+        peasantList.Add(peasantScript);
+        peasantsOnTheirWay++;
+        UpdateConstructionDetails();
+    }
+
     public override PeasantScript PeasantHasArrived(PeasantScript peasantScript)
     {
         PeasantScript newPeasantScript = base.PeasantHasArrived(peasantScript);
@@ -24,14 +31,8 @@ public class TavernScript : BuildingScript
     {
         yield return new WaitForSeconds(5);
 
-        PeasantScript newPeasantScript = Instantiate(peasantScript.gameObject,
-                entry.position, Quaternion.identity,
-                islandScript.npcsTransform).GetComponent<PeasantScript>();
-        newPeasantScript.InitializePeasant(peasantScript);
-        Destroy(peasantScript.gameObject);
-
         int hungerPoints = 0;
-        foreach(Recipe recipe in recipeList)
+        foreach (Recipe recipe in recipeList)
         {
             if ((recipe.introducedCrop == -1 || islandScript.GetResourceAmount(ResourceScript.ResourceType.Crop, recipe.introducedCrop) > 0)
                 && (recipe.nativeCrop == -1 || islandScript.GetResourceAmount(ResourceScript.ResourceType.Crop, recipe.nativeCrop) > 0)
@@ -45,14 +46,17 @@ public class TavernScript : BuildingScript
             }
         }
 
-        newPeasantScript.hunger =- hungerPoints;
-        newPeasantScript.tavern = null;
-        if (newPeasantScript.peasantType == PeasantScript.PeasantType.Adult)
+        peasantScript.transform.parent = islandScript.npcsTransform;
+        peasantScript.navMeshAgent.Warp(entry.position);
+        peasantScript.hunger =- hungerPoints;
+        peasantScript.tavern = null;
+
+        if (peasantScript.peasantType == PeasantScript.PeasantType.Adult)
         {
-            PeasantAdultScript peasantAdultScript = (PeasantAdultScript)newPeasantScript;
+            PeasantAdultScript peasantAdultScript = (PeasantAdultScript)peasantScript;
             peasantAdultScript.taskSourceInterface.GetNextPendingTask(peasantAdultScript);
         }
-        else newPeasantScript.UpdateTask();
+        else peasantScript.UpdateTask();
     }
 
     public override PeasantScript RemovePeasant()

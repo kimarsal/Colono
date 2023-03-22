@@ -21,6 +21,7 @@ public class ConstructionDetailsScript : MonoBehaviour
     public ConstructionDetailsState state;
     private RectTransform rectTransform;
     private RectTransform canvasRectTransform;
+    private EditorScript editorScript;
 
     void Start()
     {
@@ -40,8 +41,9 @@ public class ConstructionDetailsScript : MonoBehaviour
     {
         if(state == ConstructionDetailsState.Details)
         {
-            constructionScript.editorScript.gameObject.SetActive(true);
-            constructionScript.editorScript.SetEditor(constructionScript);
+            editorScript = constructionScript.editorScript;
+            editorScript.gameObject.SetActive(true);
+            editorScript.SetEditor(constructionScript);
         }
         else
         {
@@ -133,6 +135,18 @@ public class ConstructionDetailsScript : MonoBehaviour
         peasantNumText.text = (peasantCount - constructionScript.peasantsOnTheirWay).ToString() + "/" + constructionScript.maxPeasants;
         minusButton.interactable = peasantCount > 0;
         plusButton.interactable = peasantCount < constructionScript.maxPeasants;
+    }
+
+    public void UpdateUpgradeButton()
+    {
+        if (editorScript != null) editorScript.UpdateUpgradeButton();
+    }
+
+    public void UpgradeConstruction()
+    {
+        constructionScript.islandScript.UseResource(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Gem, constructionScript.level);
+        constructionScript.level++;
+        editorScript.UpdateUpgradeButton();
     }
 
 }

@@ -10,6 +10,7 @@ public abstract class ConstructionScript : MonoBehaviour
     public int length;
     public int width;
 
+    public int level = 1;
     public int maxPeasants;
     public List<PeasantScript> peasantList = new List<PeasantScript>();
     public int peasantsOnTheirWay;

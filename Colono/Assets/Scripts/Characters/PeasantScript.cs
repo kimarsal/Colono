@@ -54,7 +54,7 @@ public abstract class PeasantScript : MonoBehaviour
 
     [JsonIgnore] public Outline outline;
     [JsonIgnore] protected Animator animator;
-    [JsonIgnore] protected NavMeshAgent navMeshAgent;
+    [JsonIgnore] public NavMeshAgent navMeshAgent;
 
     private void Start()
     {
@@ -87,7 +87,7 @@ public abstract class PeasantScript : MonoBehaviour
         exhaustion = peasantScript.exhaustion;
     }
 
-    public void SetAppearence()
+    private void SetAppearence()
     {
         GameObject head, lower, upper;
         if (headType == 0)
@@ -155,9 +155,7 @@ public abstract class PeasantScript : MonoBehaviour
             tavern = (TavernScript)islandScript.GetAvailableBuilding(BuildingScript.BuildingType.Tavern, this);
             if (tavern != null)
             {
-                tavern.peasantList.Add(this);
-                tavern.peasantsOnTheirWay++;
-                tavern.UpdateConstructionDetails();
+                tavern.AddPeasant(this);
                 UpdateTask();
             }
         }
@@ -172,9 +170,7 @@ public abstract class PeasantScript : MonoBehaviour
             cabin = (CabinScript)islandScript.GetAvailableBuilding(BuildingScript.BuildingType.Cabin, this);
             if (cabin != null)
             {
-                cabin.peasantList.Add(this);
-                cabin.peasantsOnTheirWay++;
-                cabin.UpdateConstructionDetails();
+                cabin.AddPeasant(this);
                 UpdateTask();
             }
         }
@@ -219,7 +215,7 @@ public abstract class PeasantScript : MonoBehaviour
         SetDestination(NPCManager.GetRandomPoint(transform.position));
     }
 
-    public void SetDestination(Vector3 destination)
+    protected void SetDestination(Vector3 destination)
     {
         navMeshAgent.SetDestination(destination);
         if (animator.GetCurrentAnimatorClipInfo(0)[0].clip.name == "Peasant_Idle"
@@ -229,5 +225,5 @@ public abstract class PeasantScript : MonoBehaviour
 
     public abstract void UpdateTask();
 
-    public abstract void ArrivedAtDestination();
+    protected abstract void ArrivedAtDestination();
 }

@@ -18,6 +18,8 @@ public class PenEditor : EditorScript
 
     public override void SetEditor(ConstructionScript constructionScript)
     {
+        base.SetEditor(constructionScript);
+
         penScript = (PenScript)constructionScript;
         shipPenScript = ShipScript.Instance.shipInteriorPen;
 

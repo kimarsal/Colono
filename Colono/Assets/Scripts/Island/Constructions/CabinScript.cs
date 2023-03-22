@@ -6,6 +6,13 @@ public class CabinScript : BuildingScript
 {
     public override EditorScript editorScript { get { return null; } }
 
+    public override void AddPeasant(PeasantScript peasantScript)
+    {
+        peasantList.Add(peasantScript);
+        peasantsOnTheirWay++;
+        UpdateConstructionDetails();
+    }
+
     public override PeasantScript PeasantHasArrived(PeasantScript peasantScript)
     {
         PeasantScript newPeasantScript = base.PeasantHasArrived(peasantScript);
@@ -17,20 +24,17 @@ public class CabinScript : BuildingScript
     {
         yield return new WaitForSeconds(5);
 
-        PeasantScript newPeasantScript = Instantiate(peasantScript.gameObject,
-                entry.position, Quaternion.identity,
-                islandScript.npcsTransform).GetComponent<PeasantScript>();
-        newPeasantScript.InitializePeasant(peasantScript);
-        Destroy(peasantScript.gameObject);
+        peasantScript.transform.parent = islandScript.npcsTransform;
+        peasantScript.navMeshAgent.Warp(entry.position);
+        peasantScript.exhaustion = 0;
+        peasantScript.cabin = null;
 
-        newPeasantScript.exhaustion = 0;
-        newPeasantScript.cabin = null;
-        if (newPeasantScript.peasantType == PeasantScript.PeasantType.Adult)
+        if (peasantScript.peasantType == PeasantScript.PeasantType.Adult)
         {
-            PeasantAdultScript peasantAdultScript = (PeasantAdultScript)newPeasantScript;
+            PeasantAdultScript peasantAdultScript = (PeasantAdultScript)peasantScript;
             peasantAdultScript.taskSourceInterface.GetNextPendingTask(peasantAdultScript);
         }
-        else newPeasantScript.UpdateTask();
+        else peasantScript.UpdateTask();
     }
 
     public override PeasantScript RemovePeasant()

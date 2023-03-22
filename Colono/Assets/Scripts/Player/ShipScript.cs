@@ -29,7 +29,7 @@ public class ShipScript : ConstructionScript
 
     public void AddDefaultElements()
     {
-        for (int i = 0; i < 1; i++)
+        for (int i = 0; i < 15; i++)
         {
             PeasantScript.PeasantType peasantType = (PeasantScript.PeasantType)Random.Range(0, 2);
             PeasantScript.PeasantGender peasantGender = (PeasantScript.PeasantGender)Random.Range(0, 2);
@@ -56,9 +56,11 @@ public class ShipScript : ConstructionScript
             shipInteriorPen.AddAnimal(animalScript);
         }
 
+        inventoryScript.AddCapacityToAllCategories();
         inventoryScript.AddResource(ResourceType.Crop, (int)CropType.Onion, 2);
         inventoryScript.AddResource(ResourceType.Crop, (int)CropType.Carrot, 2);
         inventoryScript.AddResource(ResourceType.Crop, (int)CropType.Cucumber, 2);
+        inventoryScript.AddResource(ResourceType.Material, (int)MaterialType.Wood, 10);
     }
 
     void Update()
@@ -89,14 +91,12 @@ public class ShipScript : ConstructionScript
         }
         else
         {
-            PeasantScript peasantInShip = shipInterior.peasantList[0];
+            peasantScript = shipInterior.peasantList[0];
             shipInterior.peasantList.RemoveAt(0);
 
-            peasantScript = Instantiate(peasantInShip.gameObject, entry.position, Quaternion.identity, GameManager.Instance.closestIsland.npcsTransform).GetComponent<PeasantScript>();
+            peasantScript.transform.parent = GameManager.Instance.closestIsland.npcsTransform;
+            peasantScript.navMeshAgent.Warp(entry.position);
             peasantScript.islandScript = GameManager.Instance.closestIsland;
-            peasantScript.InitializePeasant(peasantInShip);
-
-            Destroy(peasantInShip.gameObject);
         }
 
         return peasantScript;
@@ -106,17 +106,14 @@ public class ShipScript : ConstructionScript
     {
         peasantList.Remove(peasantScript);
 
-        PeasantScript peasantInShip = Instantiate(peasantScript.gameObject, shipInteriorPen.transform.position,
-            Quaternion.identity, shipInterior.npcsTransform).GetComponent<PeasantScript>();
-        peasantInShip.islandScript = shipInterior;
-        peasantInShip.constructionScript = shipInteriorPen;
-        peasantInShip.InitializePeasant(peasantInShip);
+        peasantScript.transform.parent = shipInterior.npcsTransform;
+        peasantScript.navMeshAgent.Warp(shipInteriorPen.transform.position);
+        peasantScript.islandScript = shipInterior;
+        peasantScript.constructionScript = shipInteriorPen;
 
-        shipInterior.peasantList.Add(peasantInShip);
+        shipInterior.peasantList.Add(peasantScript);
 
-        Destroy(peasantScript.gameObject);
-
-        return base.PeasantHasArrived(peasantInShip);
+        return base.PeasantHasArrived(peasantScript);
     }
 
     public override void FinishUpBusiness()

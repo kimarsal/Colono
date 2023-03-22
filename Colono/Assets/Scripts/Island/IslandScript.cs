@@ -75,7 +75,7 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
             
             if(((BuildingScript)constructionScript).buildingType == BuildingScript.BuildingType.Warehouse)
             {
-                inventoryScript.AddCapacityToAllCategories(30);
+                inventoryScript.AddCapacityToAllCategories();
             }
         }
         constructionScript.islandScript = this;
@@ -108,7 +108,7 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
         SendAllPeasantsBack(constructionScript);
         if (constructionScript.constructionType == ConstructionScript.ConstructionType.Building && ((BuildingScript)constructionScript).buildingType == BuildingScript.BuildingType.Warehouse)
         {
-            inventoryScript.AddCapacityToAllCategories(-30);
+            inventoryScript.RemoveCapacityFromAllCategories();
         }
         InvertRegions(constructionScript.cells);
         constructionList.Remove(constructionScript);
@@ -190,6 +190,10 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
 
                 if (remainingAmount == 0) break;
             }
+        }
+        else if(resourceType == ResourceScript.ResourceType.Material && resourceIndex == (int)ResourceScript.MaterialType.Gem)
+        {
+            CanvasScript.Instance.constructionDetailsScript.UpdateUpgradeButton();
         }
 
         remainingAmount = inventoryScript.AddResource(resourceType, resourceIndex, remainingAmount);

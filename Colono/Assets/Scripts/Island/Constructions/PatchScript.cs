@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using static PatchScript;
 
@@ -7,16 +5,18 @@ public class PatchScript : TaskScript
 {
     public enum CropState { Planted, Grown, Blossomed, Dead, Barren }
 
+    private GardenScript gardenScript;
     public Vector2 cell;
     private int orientation;
     public GameObject crop;
     public ResourceScript.CropType cropType;
     public CropState cropState = CropState.Barren;
 
-    private void Start()
-    {
-        taskType = TaskType.Patch;
-    }
+    public bool isBeingTakenCareOf;
+    private float timeSinceLastStateChange;
+    private float timeSinceLastTakenCareOf;
+    private const float timeBetweenStates = 60f;
+    private const float maxUnattendedTime = 30f;
 
     public void InitializePatch(PatchInfo patchInfo)
     {
@@ -24,17 +24,45 @@ public class PatchScript : TaskScript
         crop = Instantiate(IslandEditor.Instance.GetCropPrefab(cropType, patchInfo.cropState), center, Quaternion.Euler(0, orientation, 0), transform);
     }
 
-    public void PlantCrop()
+    private void Start()
     {
-        orientation = Random.Range(0, 359);
-        cropState = CropState.Planted;
-        crop = Instantiate(IslandEditor.Instance.GetCropPrefab(cropType, cropState), center, Quaternion.Euler(0, orientation, 0), transform);
+        gardenScript = (GardenScript)taskSourceScript;
+        taskType = TaskType.Patch;
+    }
+
+    private void Update()
+    {
+        timeSinceLastStateChange += Time.deltaTime * gardenScript.level;
+        timeSinceLastTakenCareOf += Time.deltaTime / gardenScript.level;
+
+        if (!isBeingTakenCareOf)
+        {
+            if(timeSinceLastTakenCareOf > maxUnattendedTime)
+            {
+                cropState = CropState.Dead;
+                ChangeCropState();
+            }
+            else if(timeSinceLastStateChange > timeBetweenStates && cropState < CropState.Blossomed)
+            {
+                cropState++;
+                ChangeCropState();
+            }
+        }
+    }
+
+    private void ChangeCropState()
+    {
+        Destroy(crop);
+        if(cropState < CropState.Barren)
+        {
+            crop = Instantiate(IslandEditor.Instance.GetCropPrefab(cropType, cropState), center, Quaternion.Euler(0, orientation, 0), transform);
+        }
+        timeSinceLastStateChange = 0;
     }
 
     public override void TaskProgress()
     {
-        GardenScript gardenScript = (GardenScript)taskSourceScript;
-        if (cropType != gardenScript.cropDictionary[cell]) // S'arrenca l'anterior planta
+        if (cropState == CropState.Dead || cropType != gardenScript.cropDictionary[cell]) // S'arrenca l'anterior planta
         {
             cropState = CropState.Barren;
             cropType = gardenScript.cropDictionary[cell];
@@ -43,28 +71,24 @@ public class PatchScript : TaskScript
         else if (cropState == CropState.Barren) // Es planta una llavor
         {
             cropType = gardenScript.cropDictionary[cell];
-            PlantCrop();
-        }
-        else
-        {
-            if (cropState < CropState.Blossomed) // Es rega la planta
-            {
-                cropState++;
-            }
-            else // Es cullen els fruits
-            {
-                gardenScript.islandScript.AddResource(ResourceScript.ResourceType.Crop, (int)cropType, 3);
-                cropState = CropState.Grown;
-            }
-            Destroy(crop);
+            orientation = Random.Range(0, 359);
+            cropState = CropState.Planted;
             crop = Instantiate(IslandEditor.Instance.GetCropPrefab(cropType, cropState), center, Quaternion.Euler(0, orientation, 0), transform);
         }
+        else if (cropState == CropState.Blossomed) // Es cullen els fruits
+        {
+            gardenScript.islandScript.AddResource(ResourceScript.ResourceType.Crop, (int)cropType, 3);
+            cropState = CropState.Grown;
+            ChangeCropState();
+        }
+        timeSinceLastTakenCareOf = 0;
 
         base.TaskProgress();
     }
 
     public override void CancelTask()
     {
+        isBeingTakenCareOf = false;
         if (cropState == CropState.Barren)
         {
             ((GardenScript)taskSourceScript).islandScript.AddResource(ResourceScript.ResourceType.Crop, (int)cropType);

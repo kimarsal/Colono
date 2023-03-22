@@ -29,7 +29,7 @@ public class PeasantChildScript : PeasantScript
         }
     }
 
-    public override void ArrivedAtDestination()
+    protected override void ArrivedAtDestination()
     {
         if (tavern != null) //Si ha anat a menjar
         {

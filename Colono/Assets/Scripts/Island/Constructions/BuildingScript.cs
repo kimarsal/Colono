@@ -15,13 +15,10 @@ public abstract class BuildingScript : ConstructionScript
     {
         base.PeasantHasArrived(peasantScript);
 
-        PeasantScript newPeasantScript = Instantiate(peasantScript.gameObject,
-            GameManager.Instance.buildingInterior.transform.position, Quaternion.identity,
-            GameManager.Instance.buildingInterior.transform).GetComponent<PeasantScript>();
-        newPeasantScript.isInBuilding = true;
-        //newPeasantScript.InitializePeasant(peasantScript);
-        Destroy(peasantScript.gameObject);
-        return newPeasantScript;
+        peasantScript.transform.parent = GameManager.Instance.buildingInterior.transform;
+        peasantScript.navMeshAgent.Warp(GameManager.Instance.buildingInterior.transform.position);
+        peasantScript.isInBuilding = true;
+        return peasantScript;
     }
 
     public override PeasantScript RemovePeasant()
@@ -29,13 +26,9 @@ public abstract class BuildingScript : ConstructionScript
         PeasantScript peasantScript = base.RemovePeasant();
         if (peasantScript.isInBuilding)
         {
-            PeasantScript newPeasantScript = Instantiate(peasantScript.gameObject,
-                entry.position, Quaternion.identity,
-                islandScript.npcsTransform).GetComponent<PeasantScript>();
-            //newPeasantScript.InitializePeasant(peasantScript);
-            newPeasantScript.isInBuilding = false;
-            Destroy(peasantScript.gameObject);
-            return newPeasantScript;
+            peasantScript.transform.parent = islandScript.npcsTransform;
+            peasantScript.navMeshAgent.Warp(entry.position);
+            peasantScript.isInBuilding = false;
         }
         return peasantScript;
     }

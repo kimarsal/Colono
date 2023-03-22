@@ -50,6 +50,7 @@ MonoBehaviour:
   cells: []
   length: 3
   width: 3
+  level: 1
   maxPeasants: 10
   peasantList: []
   peasantsOnTheirWay: 0
@@ -60,7 +61,7 @@ MonoBehaviour:
   buildingType: 3
   position: {x: 0, y: 0, z: 0}
   orientation: 0
-  extractionSpeed: 0.2
+  extractionSpeed: 0.1
 --- !u!1001 &7678167474654502313
 PrefabInstance:
   m_ObjectHideFlags: 0

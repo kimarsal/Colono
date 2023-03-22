@@ -1,15 +1,10 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 public class ResourceScript
 {
     public static int GetEnumLength(ResourceType resourceType)
     {
         switch (resourceType)
         {
-            case ResourceType.Material: return System.Enum.GetValues(typeof(Material)).Length;
+            case ResourceType.Material: return System.Enum.GetValues(typeof(MaterialType)).Length;
             case ResourceType.Crop: return System.Enum.GetValues(typeof(CropType)).Length;
             case ResourceType.Meat: return System.Enum.GetValues(typeof(MeatType)).Length;
             case ResourceType.Animal: return System.Enum.GetValues(typeof(AnimalType)).Length;
@@ -18,7 +13,7 @@ public class ResourceScript
     }
 
     public enum ResourceType { Material, Crop, Meat, Animal }
-    public enum MaterialType { Wood, Stone, Flower, Mushroom, Gem };
+    public enum MaterialType { Wood, Stone, Flower, Mushroom, Sprout, Gem };
     public enum CropType { Onion, Carrot, Eggplant, Cucumber, Cabbage, Potato, Tomato, Zucchini, Pepper, Corn }
     public enum MeatType { Cow, Pork, Mutton, Chicken, Fish }
 

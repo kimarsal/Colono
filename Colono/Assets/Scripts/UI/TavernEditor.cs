@@ -14,6 +14,8 @@ public class TavernEditor : EditorScript
 
     public override void SetEditor(ConstructionScript constructionScript)
     {
+        base.SetEditor(constructionScript);
+
         tavernScript = (TavernScript)constructionScript;
 
         for (int i = 0; i < listTransform.childCount - 1; i++)

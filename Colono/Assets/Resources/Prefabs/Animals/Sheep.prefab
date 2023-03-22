@@ -165,10 +165,8 @@ MonoBehaviour:
   orientation: 0
   penScript: {fileID: 0}
   walkSpeed: 1
-  meatAmount: 5
-  ageSpeed: 0.1
+  meatAmount: 4
   age: 1
-  confortSpeed: 0.05
   confortLevel: 0
   isInPlaceForPairing: 0
 --- !u!1 &976879079219044894
