@@ -54,7 +54,8 @@ public class TavernScript : BuildingScript
         if (peasantScript.peasantType == PeasantScript.PeasantType.Adult)
         {
             PeasantAdultScript peasantAdultScript = (PeasantAdultScript)peasantScript;
-            peasantAdultScript.taskSourceInterface.GetNextPendingTask(peasantAdultScript);
+            if (peasantAdultScript.task == null) peasantAdultScript.taskSourceInterface.GetNextPendingTask(peasantAdultScript);
+            else peasantScript.UpdateTask();
         }
         else peasantScript.UpdateTask();
     }

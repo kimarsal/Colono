@@ -21,18 +21,6 @@ public abstract class BuildingScript : ConstructionScript
         return peasantScript;
     }
 
-    public override PeasantScript RemovePeasant()
-    {
-        PeasantScript peasantScript = base.RemovePeasant();
-        if (peasantScript.isInBuilding)
-        {
-            peasantScript.transform.parent = islandScript.npcsTransform;
-            peasantScript.navMeshAgent.Warp(entry.position);
-            peasantScript.isInBuilding = false;
-        }
-        return peasantScript;
-    }
-
     public override void FinishUpBusiness()
     {
         return;

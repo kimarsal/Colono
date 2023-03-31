@@ -4,15 +4,16 @@ using UnityEngine.EventSystems;
 
 public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerMoveHandler
 {
-    public enum SelectFunction { PlantTrees, ClearItems, CancelItemClearing, CreateEnclosure, PlaceBuilding };
-    public enum SelectMode { None, Selecting, Building };
+    private enum SelectFunction { PlantTrees, ClearItems, CancelItemClearing, CreateEnclosure, PlaceBuilding };
+    private enum SelectMode { None, Selecting, Building };
     private IslandGenerator islandGenerator;
     public IslandScript islandScript;
 
+    [SerializeField] private Transform cellsTransform;
     private GameObject[,] cells;
 
-    public SelectFunction selectFunction;
-    public SelectMode selectMode;
+    private SelectFunction selectFunction;
+    private SelectMode selectMode;
     private Vector2 hoveredCell;
     private Vector2 selectedCell;
     private Vector2[] selectedCells = new Vector2[0];
@@ -306,7 +307,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         Mesh mesh = cellMeshData.CreateMesh();
         meshFilter.mesh = mesh;
 
-        newCell.transform.parent = GameManager.Instance.cellsTransform;
+        newCell.transform.parent = cellsTransform;
         newCell.transform.position = islandScript.transform.position;
 
         cells[(int)position.x, (int)position.y] = newCell;
@@ -352,6 +353,14 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         {
             buildingPieceRenderer.material.color = color;
         }
+    }
+
+    //
+
+    public void ManageItems(int selectFunction)
+    {
+        this.selectFunction = (SelectFunction)selectFunction;
+        selectMode = SelectMode.None;
     }
 
 }

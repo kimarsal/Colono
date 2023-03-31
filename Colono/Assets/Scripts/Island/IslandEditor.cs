@@ -67,13 +67,13 @@ public class IslandEditor : MonoBehaviour
     [SerializeField] private ItemScript[] fieldItems;
     [SerializeField] private ItemScript[] hillItems;
     //public ItemScript[] mountainItems;
-    public ItemScript treeSprout;
+    public TreeSproutScript treeSprout;
 
     [Header("Others")]
+    public GameObject islandMapIcon;
     public GameObject coastObstacle;
     public GameObject enclosureCenter;
     public BoxScript box;
-
 
     [Header("Pooling")]
     [SerializeField] private Vector3 fieldItemsStartPos;
@@ -103,8 +103,8 @@ public class IslandEditor : MonoBehaviour
         {
             instantiatedHillItems[i] = new List<ItemScript>();
         }
-        lastFieldIndex = fieldItems.Length;
-        lastHillIndex = hillItems.Length;
+        lastFieldIndex = -1;
+        lastHillIndex = -1;
 
         StartCoroutine(SpawnCoroutine());
     }
@@ -115,7 +115,7 @@ public class IslandEditor : MonoBehaviour
         {
             while(currentFieldIndex != lastFieldIndex && instantiatedFieldItems[currentFieldIndex].Count > 10)
             {
-                currentFieldIndex = (currentFieldIndex + 1) % fieldItems.Length;
+                currentFieldIndex = (currentFieldIndex + 1) % (fieldItems.Length - 2);
             }
             if(currentFieldIndex != lastFieldIndex)
             {
@@ -125,13 +125,13 @@ public class IslandEditor : MonoBehaviour
                 instantiatedFieldItems[currentFieldIndex].Add(fieldItem);
                 lastFieldIndex = currentFieldIndex;
             }
-            currentFieldIndex = (currentFieldIndex + 1) % fieldItems.Length;
+            currentFieldIndex = (currentFieldIndex + 1) % (fieldItems.Length - 2);
 
             yield return new WaitForSeconds(1f);
 
             while (currentHillIndex != lastHillIndex && instantiatedHillItems[currentHillIndex].Count > 10)
             {
-                currentHillIndex = (currentHillIndex + 1) % hillItems.Length;
+                currentHillIndex = (currentHillIndex + 1) % (hillItems.Length - 2);
             }
             if(currentHillIndex != lastHillIndex)
             {
@@ -141,7 +141,7 @@ public class IslandEditor : MonoBehaviour
                 instantiatedHillItems[currentHillIndex].Add(hillItem);
                 lastHillIndex = currentHillIndex;
             }
-            currentHillIndex = (currentHillIndex + 1) % hillItems.Length;
+            currentHillIndex = (currentHillIndex + 1) % (hillItems.Length - 2);
 
             yield return new WaitForSeconds(1f);
         }

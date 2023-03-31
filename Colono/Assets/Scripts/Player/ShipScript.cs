@@ -29,9 +29,9 @@ public class ShipScript : ConstructionScript
 
     public void AddDefaultElements()
     {
-        for (int i = 0; i < 15; i++)
+        for (int i = 0; i < 50; i++)
         {
-            PeasantScript.PeasantType peasantType = (PeasantScript.PeasantType)Random.Range(0, 2);
+            PeasantScript.PeasantType peasantType = (PeasantScript.PeasantType)Random.Range(0, 2);//PeasantScript.PeasantType.Adult
             PeasantScript.PeasantGender peasantGender = (PeasantScript.PeasantGender)Random.Range(0, 2);
             PeasantScript peasantScript = Instantiate(IslandEditor.Instance.GetNPCPrefab(peasantType, peasantGender),
             shipInteriorPen.transform.position, Quaternion.identity, shipInterior.npcsTransform);
@@ -51,16 +51,19 @@ public class ShipScript : ConstructionScript
         int animalTypes = Enum.GetValues(typeof(AnimalType)).Length;
         for (int i = 0; i < animalTypes; i++)
         {
-            AnimalScript animalScript = Instantiate(IslandEditor.Instance.GetAnimalPrefab((AnimalType)i),
-                shipInteriorPen.transform.position, Quaternion.identity, shipInteriorPen.animalTransform).GetComponent<AnimalScript>();
-            shipInteriorPen.AddAnimal(animalScript);
+            for(int j = 0; j < 5; j++)
+            {
+                AnimalScript animalScript = Instantiate(IslandEditor.Instance.GetAnimalPrefab((AnimalType)i),
+                    shipInteriorPen.transform.position, Quaternion.identity, shipInteriorPen.animalTransform).GetComponent<AnimalScript>();
+                shipInteriorPen.AddAnimal(animalScript);
+            }
         }
 
         inventoryScript.AddCapacityToAllCategories();
         inventoryScript.AddResource(ResourceType.Crop, (int)CropType.Onion, 2);
         inventoryScript.AddResource(ResourceType.Crop, (int)CropType.Carrot, 2);
         inventoryScript.AddResource(ResourceType.Crop, (int)CropType.Cucumber, 2);
-        inventoryScript.AddResource(ResourceType.Material, (int)MaterialType.Wood, 10);
+        inventoryScript.AddResource(ResourceType.Material, (int)MaterialType.Wood, 100);
     }
 
     void Update()
@@ -83,7 +86,7 @@ public class ShipScript : ConstructionScript
     public override PeasantScript RemovePeasant()
     {
         PeasantScript peasantScript;
-        if (peasantList.Count != 0)
+        if (peasantList.Count > 0) //Encara hi ha NPCs a l'illa
         {
             peasantScript = peasantList[0];
             peasantList.RemoveAt(0);
@@ -94,10 +97,11 @@ public class ShipScript : ConstructionScript
             peasantScript = shipInterior.peasantList[0];
             shipInterior.peasantList.RemoveAt(0);
 
-            peasantScript.transform.parent = GameManager.Instance.closestIsland.npcsTransform;
+            peasantScript.transform.parent = islandScript.npcsTransform;
             peasantScript.navMeshAgent.Warp(entry.position);
-            peasantScript.islandScript = GameManager.Instance.closestIsland;
+            peasantScript.islandScript = islandScript;
         }
+        peasantScript.constructionScript = null;
 
         return peasantScript;
     }
@@ -105,13 +109,13 @@ public class ShipScript : ConstructionScript
     public override PeasantScript PeasantHasArrived(PeasantScript peasantScript)
     {
         peasantList.Remove(peasantScript);
+        islandScript.peasantList.Remove(peasantScript);
+        shipInterior.peasantList.Add(peasantScript);
 
         peasantScript.transform.parent = shipInterior.npcsTransform;
         peasantScript.navMeshAgent.Warp(shipInteriorPen.transform.position);
         peasantScript.islandScript = shipInterior;
         peasantScript.constructionScript = shipInteriorPen;
-
-        shipInterior.peasantList.Add(peasantScript);
 
         return base.PeasantHasArrived(peasantScript);
     }

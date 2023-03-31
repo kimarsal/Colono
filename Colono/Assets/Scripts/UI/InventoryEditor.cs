@@ -75,8 +75,9 @@ public class InventoryEditor : EditorScript
 
             foreach(InventoryRowScript row in inventoryRows[i])
             {
-                // TODO: Si ha estat descobert
-                row.gameObject.SetActive(tabIndex == i);
+                bool shouldBeActive = tabIndex == i;
+                if (shouldBeActive && tabIndex == 1) shouldBeActive = GameManager.Instance.discoveredCrops[i]; 
+                row.gameObject.SetActive(shouldBeActive);
             }
         }
 

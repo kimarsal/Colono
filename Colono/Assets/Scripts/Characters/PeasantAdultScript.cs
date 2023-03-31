@@ -133,6 +133,7 @@ public class PeasantAdultScript : PeasantScript
 
     public void DoTask()
     {
+        task.isBeingTakenCareOf = true;
         if (task.taskType == TaskScript.TaskType.Item)
         {
             switch (((ItemScript)task).actionType)
@@ -146,7 +147,6 @@ public class PeasantAdultScript : PeasantScript
         else if (task.taskType == TaskScript.TaskType.Patch)
         {
             PatchScript patchScript = (PatchScript)task;
-            patchScript.isBeingTakenCareOf = true;
             if (patchScript.cropState != PatchScript.CropState.Barren &&
                 patchScript.cropType != ((GardenScript)patchScript.taskSourceScript).cropDictionary[patchScript.cell]) //S'ha d'arrencar l'anterior planta
             {
@@ -161,10 +161,6 @@ public class PeasantAdultScript : PeasantScript
                     case PatchScript.CropState.Blossomed: animator.SetInteger("Pick", 1); animator.SetInteger("State", (int)PeasantAction.Gathering); break;
                 }
             }
-        }
-        else
-        {
-            //Fight
         }
         //transform.LookAt(task.center);
         //StartCoroutine(PointTowardsTaskCenter());

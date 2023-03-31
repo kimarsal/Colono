@@ -7,7 +7,7 @@ using static UnityEditor.Progress;
 
 public class ItemScript : TaskScript
 {
-    public enum ActionType { None, Chop, Dig, Pull, Pick }
+    public enum ActionType { Chop, Dig, Pull, Pick }
     [JsonIgnore] public ActionType actionType;
     public Vector2 itemCell;
     public int orientation;
@@ -53,10 +53,5 @@ public class ItemScript : TaskScript
             islandScript.RemoveItemAtCell(itemCell);
             Destroy(gameObject);
         }
-    }
-
-    public override void CancelTask()
-    {
-        return;
     }
 }

@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.AI;
-using Random = UnityEngine.Random;
-using static Terrain;
 using static BuildingScript;
 using System.Collections;
 
@@ -58,34 +56,37 @@ public class IslandGenerator : MonoBehaviour
         MeshRenderer meshRenderer = island.AddComponent<MeshRenderer>();
         MeshFilter meshFilter = island.AddComponent<MeshFilter>();
         MeshCollider meshCollider = island.AddComponent<MeshCollider>();
-        meshRenderer.material = IslandGenerator.Instance.islandMaterial;
+        meshRenderer.material = islandMaterial;
 
-        // Part 2: Es genera el soroll a partir del seed i l'offset
-        MapData mapData = GenerateMapData(seed, offset);
-        Texture2D colorTexture = TextureGenerator.TextureFromColourMap(mapData.colourMap, mapChunkSize, mapChunkSize);
-        meshRenderer.material.mainTexture = colorTexture;
-
-        // Part 3: Es genera el mesh a partir del heightMap
-        MeshData meshData = MeshGenerator.GenerateTerrainMesh(mapData.heightMap, meshHeightMultiplier, IslandGenerator.Instance.meshHeightCurve);
-        Mesh mesh = meshData.CreateMesh();
-        meshFilter.mesh = mesh;
-        meshCollider.sharedMesh = mesh;
-
-        // Part 4: S'afegeix el script
+        // Part 2: S'afegeix el script
         IslandScript islandScript = island.AddComponent<IslandScript>();
         islandScript.offset = offset;
-        islandScript.regionMap = mapData.regionMap;
-        islandScript.meshData = meshData;
 
-        // Part 6: Es calcula la navegació
+        // Part 3: Es calcula la navegació
         GameObject coastObstacle = Instantiate(IslandEditor.Instance.GetCoastObstacle());
         coastObstacle.transform.parent = island.transform;
-        coastObstacle.transform.localPosition = new Vector3(0, -3f, 0);
+        coastObstacle.transform.localPosition = new Vector3(0, -3.5f, 0);
 
         islandScript.navMeshSurface = island.AddComponent<NavMeshSurface>();
         islandScript.navMeshSurface.collectObjects = CollectObjects.Children;
         //StartCoroutine(BuildNavMeshAsync(islandScript));
         islandScript.navMeshSurface.BuildNavMesh();
+
+        // Part 4: Es genera el soroll a partir del seed i l'offset
+        MapData mapData = GenerateMapData(seed, offset);
+        Texture2D colorTexture = TextureGenerator.TextureFromColourMap(mapData.colourMap, mapChunkSize, mapChunkSize);
+        meshRenderer.material.mainTexture = colorTexture;
+        islandScript.regionMap = mapData.regionMap;
+
+        // Part 5: Es genera el mesh a partir del heightMap
+        MeshData meshData = MeshGenerator.GenerateTerrainMesh(mapData.heightMap, meshHeightMultiplier, meshHeightCurve);
+        Mesh mesh = meshData.CreateMesh();
+        meshFilter.mesh = mesh;
+        meshCollider.sharedMesh = mesh;
+        islandScript.meshData = meshData;
+
+        // Part 6: Es recalcula la navegació
+        islandScript.navMeshSurface.UpdateNavMesh(islandScript.navMeshSurface.navMeshData);
 
         // Part 7: S'afegeixen els fills
         islandScript.itemsTransform = new GameObject("Items").transform;
@@ -99,15 +100,20 @@ public class IslandGenerator : MonoBehaviour
         islandScript.npcsTransform = new GameObject("NPCs").transform;
         islandScript.npcsTransform.parent = island.transform;
         islandScript.npcsTransform.localPosition = Vector3.zero;
+
+        Instantiate(IslandEditor.Instance.islandMapIcon, island.transform);
         
         // Part 8: S'afegeixen els elements de joc
         if (islandInfo == null)
         {
+            islandScript.inventoryScript = new InventoryScript();
+
+            
             int row = 0, col = 0;
             while (row < mapChunkSize)
             {
                 int itemIndex;
-                TerrainType terrainType = regions[islandScript.regionMap[col, row]].type;
+                Terrain.TerrainType terrainType = regions[islandScript.regionMap[col, row]].type;
                 ItemScript itemScript = IslandEditor.Instance.GetRandomItemPrefab(terrainType, out itemIndex);
 
                 if (itemScript != null)
@@ -132,8 +138,8 @@ public class IslandGenerator : MonoBehaviour
                     col = col - mapChunkSize;
                 }
             }
+            
 
-            islandScript.inventoryScript = new InventoryScript();
         }
         else
         {
@@ -148,6 +154,7 @@ public class IslandGenerator : MonoBehaviour
                 itemScript.itemIndex = pair.Value.itemIndex;
                 itemScript.itemCell = pair.Key;
                 itemScript.orientation = pair.Value.orientation;
+                itemScript.materialAmount = pair.Value.materialAmount;
                 islandScript.AddItem(itemScript);
             }
 
@@ -195,19 +202,23 @@ public class IslandGenerator : MonoBehaviour
 
     private IEnumerator BuildNavMesh(IslandScript islandScript)
     {
-        /*islandScript.navMeshSurface = islandScript.gameObject.AddComponent<NavMeshSurface>();
-        islandScript.navMeshSurface.BuildNavMesh();
-        yield return null;*/
-
         var buildSources = islandScript.navMeshSurface.CollectSources();
 
         var islandBounds = islandScript.navMeshSurface.CalculateWorldBounds(buildSources);
 
         var buildSettings = islandScript.navMeshSurface.GetBuildSettings();
 
-        yield return null;
+        NavMeshData navMeshData = new NavMeshData();
 
-        islandScript.navMeshSurface.BuildNavMesh();
+        AsyncOperation buildOp = NavMeshBuilder.UpdateNavMeshDataAsync(navMeshData, buildSettings, buildSources, islandBounds);
+
+        while (!buildOp.isDone) yield return null;
+
+        NavMesh.AddNavMeshData(navMeshData);
+
+        islandScript.navMeshSurface.navMeshData = navMeshData;
+
+        //islandScript.RebakeNavMesh();
 
         yield return null;
     }
@@ -239,8 +250,6 @@ public class IslandGenerator : MonoBehaviour
         NavMesh.AddNavMeshData(navMeshData);
 
         islandScript.navMeshSurface.navMeshData = navMeshData;
-
-        //islandScript.RebakeNavMesh();
 
         yield return null;
     }

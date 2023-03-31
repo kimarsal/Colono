@@ -117,7 +117,11 @@ public class GardenScript : EnclosureScript
 
     public override bool GetNextPendingTask(PeasantAdultScript peasantAdultScript)
     {
-        if(!peasantAdultScript.CanBeAsignedTask()) return false;
+        if (!peasantAdultScript.CanBeAsignedTask())
+        {
+            peasantAdultScript.UpdateTask();
+            return false;
+        }
 
         PatchScript nextPatchScript = null;
         int index = (lastWorkedOnPatch + 1) % patchList.Count;
@@ -141,6 +145,13 @@ public class GardenScript : EnclosureScript
 
         peasantAdultScript.AssignTask(nextPatchScript);
         return nextPatchScript != null;
+    }
+
+    public override PeasantScript RemovePeasant()
+    {
+        PeasantScript peasantScript = base.RemovePeasant();
+        peasantScript.constructionScript = null;
+        return peasantScript;
     }
 
     public int UseNewCrops(ResourceScript.CropType cropType, int remainingAmount)

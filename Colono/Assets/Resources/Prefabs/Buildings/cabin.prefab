@@ -50,6 +50,7 @@ MonoBehaviour:
   cells: []
   length: 2
   width: 2
+  level: 1
   maxPeasants: 10
   peasantList: []
   peasantsOnTheirWay: 0
@@ -85,7 +86,7 @@ PrefabInstance:
     - target: {fileID: 2606578299843778768, guid: 34b7e0ee1989fe24390e94b452610abd,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.000000007450581
+      value: -0.15
       objectReference: {fileID: 0}
     - target: {fileID: 2606578299843778768, guid: 34b7e0ee1989fe24390e94b452610abd,
         type: 3}

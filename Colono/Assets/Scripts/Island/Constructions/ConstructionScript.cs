@@ -38,7 +38,17 @@ public abstract class ConstructionScript : MonoBehaviour
     {
         PeasantScript peasantScript = peasantList[0];
         peasantList.RemoveAt(0);
-        if(!peasantScript.isInBuilding) peasantsOnTheirWay--;
+
+        if (!peasantScript.isInBuilding)
+        {
+            peasantsOnTheirWay--;
+        }
+        else
+        {
+            peasantScript.transform.parent = islandScript.npcsTransform;
+            peasantScript.navMeshAgent.Warp(entry.position);
+            peasantScript.isInBuilding = false;
+        }
 
         return peasantScript;
     }
@@ -48,6 +58,21 @@ public abstract class ConstructionScript : MonoBehaviour
         peasantsOnTheirWay--;
         UpdateConstructionDetails();
         return peasantScript;
+    }
+
+    public virtual void SendAllPeasantsBack()
+    {
+        while(peasantList.Count > 0)
+        {
+            PeasantScript peasantScript = RemovePeasant();
+            islandScript.peasantList.Add(peasantScript);
+            if (peasantScript.peasantType == PeasantScript.PeasantType.Adult)
+            {
+                PeasantAdultScript peasantAdultScript = (PeasantAdultScript)peasantScript;
+                peasantAdultScript.taskSourceInterface.GetNextPendingTask(peasantAdultScript);
+            }
+            else peasantScript.UpdateTask();
+        }
     }
 
     public abstract void FinishUpBusiness();

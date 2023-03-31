@@ -12,11 +12,10 @@ public class PatchScript : TaskScript
     public ResourceScript.CropType cropType;
     public CropState cropState = CropState.Barren;
 
-    public bool isBeingTakenCareOf;
     private float timeSinceLastStateChange;
     private float timeSinceLastTakenCareOf;
     private const float timeBetweenStates = 60f;
-    private const float maxUnattendedTime = 30f;
+    private const float maxUnattendedTime = 60f;
 
     public void InitializePatch(PatchInfo patchInfo)
     {
@@ -37,7 +36,7 @@ public class PatchScript : TaskScript
 
         if (!isBeingTakenCareOf)
         {
-            if(timeSinceLastTakenCareOf > maxUnattendedTime)
+            if(timeSinceLastTakenCareOf > maxUnattendedTime && cropState != CropState.Barren)
             {
                 cropState = CropState.Dead;
                 ChangeCropState();
@@ -81,6 +80,7 @@ public class PatchScript : TaskScript
             cropState = CropState.Grown;
             ChangeCropState();
         }
+        isBeingTakenCareOf = false;
         timeSinceLastTakenCareOf = 0;
 
         base.TaskProgress();
@@ -88,7 +88,7 @@ public class PatchScript : TaskScript
 
     public override void CancelTask()
     {
-        isBeingTakenCareOf = false;
+        base.CancelTask();
         if (cropState == CropState.Barren)
         {
             ((GardenScript)taskSourceScript).islandScript.AddResource(ResourceScript.ResourceType.Crop, (int)cropType);

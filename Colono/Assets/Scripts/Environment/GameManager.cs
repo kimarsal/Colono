@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using Newtonsoft.Json;
+using System;
 
 public class GameManager : MonoBehaviour
 {
@@ -20,7 +21,8 @@ public class GameManager : MonoBehaviour
     public float distanceToCheckIfCanDock = 50f;
     public float distanceBetweenIslands = 200f;
 
-    public Transform cellsTransform;
+    public bool[] discoveredCrops;
+    
     public IslandScript closestIsland;
     private IslandSelectionScript islandSelectionScript;
     public IslandCellScript islandCellScript;
@@ -152,28 +154,22 @@ public class GameManager : MonoBehaviour
         CanvasScript.Instance.HidePeasantDetails();
     }
 
-    public void PlantTrees()
+    public void ManageItems(int selectFunction)
     {
         islandCellScript.enabled = true;
-        islandCellScript.selectFunction = IslandCellScript.SelectFunction.PlantTrees;
-        islandCellScript.selectMode = IslandCellScript.SelectMode.None;
+        islandCellScript.ManageItems(selectFunction);
         islandSelectionScript.enabled = false;
     }
 
-    public void ClearItems()
+    public bool CheckIfCropIsNew(int cropType)
     {
-        islandCellScript.enabled = true;
-        islandCellScript.selectFunction = IslandCellScript.SelectFunction.ClearItems;
-        islandCellScript.selectMode = IslandCellScript.SelectMode.None;
-        islandSelectionScript.enabled = false;
-    }
+        if (discoveredCrops[cropType]) return false;
 
-    public void CancelItemClearing()
-    {
-        islandCellScript.enabled = true;
-        islandCellScript.selectFunction = IslandCellScript.SelectFunction.CancelItemClearing;
-        islandCellScript.selectMode = IslandCellScript.SelectMode.None;
-        islandSelectionScript.enabled = false;
+        discoveredCrops[cropType] = true;
+
+        CanvasScript.Instance.CropIsDiscovered(cropType);
+
+        return true;
     }
 
     public void ChooseEnclosure(int enclosureType)
@@ -218,7 +214,7 @@ public class GameManager : MonoBehaviour
         islandSelectionScript.enabled = false;
         islandCellScript.enabled = false;
 
-        closestIsland.CancelAllTripsToShip();
+        ShipScript.Instance.SendAllPeasantsBack();
         islandSelectionScript.enabled = false;
     }
 
@@ -254,6 +250,12 @@ public class GameManager : MonoBehaviour
     private void StartGame()
     {
         islandGenerator.GenerateIsland(new Vector2(0, 40));
+
+        discoveredCrops = new bool[Enum.GetValues(typeof(ResourceScript.CropType)).Length];
+        for (int i = 0; i < discoveredCrops.Length/2; i++)
+        {
+            discoveredCrops[i] = true;
+        }
 
         ShipScript.Instance.AddDefaultElements();
     }

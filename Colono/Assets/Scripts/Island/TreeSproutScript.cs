@@ -8,18 +8,22 @@ public class TreeSproutScript : ItemScript
     void Update()
     {
         growth += Time.deltaTime * growthSpeed;
-        if(growth > 1)
+
+        if (!isBeingTakenCareOf)
         {
-            int index;
-            ItemScript itemScript = Instantiate(IslandEditor.Instance.GetRandomTreePrefab(terrainType, out index), transform.position, transform.rotation, transform.parent).GetComponent<ItemScript>();
-            itemScript.islandScript = islandScript;
-            itemScript.terrainType = terrainType;
-            itemScript.itemIndex = index;
-            itemScript.itemCell = itemCell;
-            itemScript.orientation = orientation;
-            islandScript.RemoveItemAtCell(itemCell);
-            islandScript.AddItem(itemScript);
-            Destroy(gameObject);
+            if (growth > 1)
+            {
+                int index;
+                ItemScript itemScript = Instantiate(IslandEditor.Instance.GetRandomTreePrefab(terrainType, out index), transform.position, transform.rotation, transform.parent).GetComponent<ItemScript>();
+                itemScript.islandScript = islandScript;
+                itemScript.terrainType = terrainType;
+                itemScript.itemIndex = index;
+                itemScript.itemCell = itemCell;
+                itemScript.orientation = orientation;
+                islandScript.RemoveItemAtCell(itemCell);
+                islandScript.AddItem(itemScript);
+                Destroy(gameObject);
+            }
         }
     }
 }

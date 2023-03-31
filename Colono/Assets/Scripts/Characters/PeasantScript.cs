@@ -149,7 +149,7 @@ public abstract class PeasantScript : MonoBehaviour
         {
             hunger += Time.deltaTime * hungerSpeed;
         }
-        else if (!isInBuilding && tavern == null)
+        else if (tavern == null)
         {
             hunger = 1;
             tavern = (TavernScript)islandScript.GetAvailableBuilding(BuildingScript.BuildingType.Tavern, this);
@@ -164,7 +164,7 @@ public abstract class PeasantScript : MonoBehaviour
         {
             exhaustion += Time.deltaTime * exhaustionSpeed;
         }
-        else if (!isInBuilding && cabin == null)
+        else if (cabin == null)
         {
             exhaustion = 1;
             cabin = (CabinScript)islandScript.GetAvailableBuilding(BuildingScript.BuildingType.Cabin, this);
@@ -180,7 +180,7 @@ public abstract class PeasantScript : MonoBehaviour
 
     protected void CheckIfArrivedAtDestination()
     {
-        if (!navMeshAgent.pathPending
+        if (!isInBuilding && !navMeshAgent.pathPending
             && navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance
             && (!navMeshAgent.hasPath || navMeshAgent.velocity.sqrMagnitude == 0f))
         {

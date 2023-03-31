@@ -72,11 +72,6 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
         {
             constructionScript.outline = constructionScript.AddComponent<Outline>();
             constructionScript.outline.enabled = false;
-            
-            if(((BuildingScript)constructionScript).buildingType == BuildingScript.BuildingType.Warehouse)
-            {
-                inventoryScript.AddCapacityToAllCategories();
-            }
         }
         constructionScript.islandScript = this;
         constructionList.Add(constructionScript);
@@ -105,11 +100,9 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
 
     public void RemoveConstruction(ConstructionScript constructionScript)
     {
-        SendAllPeasantsBack(constructionScript);
-        if (constructionScript.constructionType == ConstructionScript.ConstructionType.Building && ((BuildingScript)constructionScript).buildingType == BuildingScript.BuildingType.Warehouse)
-        {
-            inventoryScript.RemoveCapacityFromAllCategories();
-        }
+        constructionScript.SendAllPeasantsBack();
+        constructionScript.FinishUpBusiness();
+
         InvertRegions(constructionScript.cells);
         constructionList.Remove(constructionScript);
         Destroy(constructionScript.gameObject);
@@ -182,13 +175,16 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
         int remainingAmount = amount;
         if (resourceType == ResourceScript.ResourceType.Crop)
         {
-            foreach (GardenScript gardenScript in constructionList)
+            if (!GameManager.Instance.CheckIfCropIsNew(resourceIndex))
             {
-                if (gardenScript == null) continue;
+                foreach (GardenScript gardenScript in constructionList)
+                {
+                    if (gardenScript == null) continue;
 
-                remainingAmount = gardenScript.UseNewCrops((ResourceScript.CropType)resourceIndex, remainingAmount);
+                    remainingAmount = gardenScript.UseNewCrops((ResourceScript.CropType)resourceIndex, remainingAmount);
 
-                if (remainingAmount == 0) break;
+                    if (remainingAmount == 0) break;
+                }
             }
         }
         else if(resourceType == ResourceScript.ResourceType.Material && resourceIndex == (int)ResourceScript.MaterialType.Gem)
@@ -245,7 +241,7 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
             PeasantScript newPeasantScript = peasantList[i];
             if (!mustBeAvailableAdult //Si pot ser qualsevol
                 || (newPeasantScript.peasantType == PeasantScript.PeasantType.Adult //Si és un adult
-                && ((PeasantAdultScript)newPeasantScript).CanBeAsignedTask())) //Si és un adult disponible
+                && ((PeasantAdultScript)newPeasantScript).task == null)) //Si és un adult disponible
             {
                 float distance;
                 if (NPCManager.CheckIfClosest(position, newPeasantScript.GetComponent<NavMeshAgent>(), minDistance, out distance))
@@ -272,7 +268,11 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
 
     public bool GetNextPendingTask(PeasantAdultScript peasantAdultScript)
     {
-        if (!peasantAdultScript.CanBeAsignedTask()) return false;
+        if (!peasantAdultScript.CanBeAsignedTask())
+        {
+            peasantAdultScript.UpdateTask();
+            return false;
+        }
 
         ItemScript closestItemScript = null;
         float minDistance = -1;
@@ -312,7 +312,6 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
         else // Desvincular de la construcció
         {
             PeasantScript peasantScript = constructionScript.RemovePeasant();
-            peasantScript.constructionScript = null;
             peasantList.Add(peasantScript);
 
             if (peasantScript.peasantType == PeasantScript.PeasantType.Adult)
@@ -322,36 +321,6 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
             else peasantScript.UpdateTask();
             return true;
         }
-    }
-
-    public void SendAllPeasantsBack(ConstructionScript constructionScript)
-    {
-        for (int i = 0; i < constructionScript.peasantList.Count; i++)
-        {
-            PeasantScript peasantScript = constructionScript.RemovePeasant();
-            peasantList.Add(peasantScript);
-            peasantScript.gameObject.SetActive(true);
-            if (peasantScript.peasantType == PeasantScript.PeasantType.Adult)
-            {
-                GetNextPendingTask((PeasantAdultScript)peasantScript);
-            }
-            else peasantScript.UpdateTask();
-        }
-    }
-
-    public void CancelAllTripsToShip()
-    {
-        for (int i = ShipScript.Instance.peasantList.Count - 1; i >= 0; i--)
-        {
-            PeasantScript peasantScript = ShipScript.Instance.peasantList[i];
-
-            peasantList.Add(peasantScript);
-            ShipScript.Instance.peasantList.Remove(peasantScript);
-            peasantScript.constructionScript = null;
-            if (peasantScript.peasantType == PeasantScript.PeasantType.Adult) GetNextPendingTask((PeasantAdultScript)peasantScript);
-            else peasantScript.UpdateTask();
-        }
-        ShipScript.Instance.peasantsOnTheirWay = 0;
     }
 
 }

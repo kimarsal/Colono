@@ -100,7 +100,8 @@ MonoBehaviour:
   center: {x: 0, y: 0, z: 0}
   taskType: 0
   peasantAdultScript: {fileID: 0}
-  actionType: 3
+  isBeingTakenCareOf: 0
+  actionType: 2
   itemCell: {x: 0, y: 0}
   orientation: 0
   materialType: 0

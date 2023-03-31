@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -34,7 +32,8 @@ public class CanvasScript : MonoBehaviour
     public InventoryEditor inventoryEditor;
     [SerializeField] private ShopEditor shopEditor;
 
-    [Header("Buttons")]
+    [Header("Others")]
+    [SerializeField] private NewCropPopUpScript newCropPopUpScript;
     public Button dockButton;
 
     private void Awake()
@@ -206,6 +205,12 @@ public class CanvasScript : MonoBehaviour
         constructionDetailsScript.HideDetails();
 
         ShowDefaultButtons();
+    }
+
+    public void CropIsDiscovered(int cropType)
+    {
+        newCropPopUpScript.gameObject.SetActive(true);
+        newCropPopUpScript.ShowNewCrop(cropType);
     }
 
     public void UpdateInventoryRow(ResourceScript.ResourceType resourceType, int resourceIndex)

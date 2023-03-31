@@ -26,4 +26,11 @@ public class MineScript : BuildingScript
             }
         }
     }
+
+    public override PeasantScript RemovePeasant()
+    {
+        PeasantScript peasantScript = base.RemovePeasant();
+        peasantScript.constructionScript = null;
+        return peasantScript;
+    }
 }

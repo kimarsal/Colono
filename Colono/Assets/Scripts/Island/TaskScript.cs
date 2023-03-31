@@ -10,6 +10,7 @@ public abstract class TaskScript : MonoBehaviour
     public TaskType taskType;
 
     public PeasantAdultScript peasantAdultScript;
+    public bool isBeingTakenCareOf;
 
     public virtual void TaskProgress()
     {
@@ -18,5 +19,8 @@ public abstract class TaskScript : MonoBehaviour
         peasantAdultScript = null;
     }
 
-    public abstract void CancelTask();
+    public virtual void CancelTask()
+    {
+        isBeingTakenCareOf = false;
+    }
 }
