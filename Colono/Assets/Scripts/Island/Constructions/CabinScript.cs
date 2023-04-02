@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CabinScript : BuildingScript
 {
-    public override EditorScript editorScript { get { return null; } }
+    public override EditorScript editorScript { get { return CanvasScript.Instance.cabinEditor; } }
 
     public override void AddPeasant(PeasantScript peasantScript)
     {

@@ -26,18 +26,18 @@ public abstract class EnclosureScript : ConstructionScript, TaskSourceInterface
         MeshGenerator.GetFencePositions(cells, islandScript.meshData, out positions, out rotations);
         for (int i = 0; i < positions.Length - 1; i++)
         {
-            GameObject fence = Instantiate(IslandEditor.Instance.GetRandomFencePrefab(), transform.position + positions[i], rotations[i], fences.transform);
+            GameObject fence = Instantiate(ResourceScript.Instance.GetRandomFencePrefab(), transform.position + positions[i], rotations[i], fences.transform);
             if (i == 0) minPos = fence.transform.localPosition;
             else if (i == positions.Length - 2) maxPos = fence.transform.localPosition - new Vector3(0, 0, 1);
         }
 
         if (enclosureType == EnclosureType.Pen)
         {
-            GameObject closedGate = Instantiate(IslandEditor.Instance.gate, transform.position + positions[positions.Length - 1], rotations[rotations.Length - 1], fences.transform);
+            GameObject closedGate = Instantiate(ResourceScript.Instance.gate, transform.position + positions[positions.Length - 1], rotations[rotations.Length - 1], fences.transform);
         }
         else
         {
-            GameObject post = Instantiate(IslandEditor.Instance.post, transform.position + positions[positions.Length - 1], rotations[rotations.Length - 1], fences.transform);
+            GameObject post = Instantiate(ResourceScript.Instance.post, transform.position + positions[positions.Length - 1], rotations[rotations.Length - 1], fences.transform);
         }
         outline = fences.AddComponent<Outline>();
         outline.enabled = false;
@@ -52,7 +52,7 @@ public abstract class EnclosureScript : ConstructionScript, TaskSourceInterface
         minPos += transform.position;
         maxPos += transform.position;
 
-        entry = Instantiate(IslandEditor.Instance.enclosureCenter, transform.position + boxCollider.center, Quaternion.identity, transform).transform;
+        entry = Instantiate(ResourceScript.Instance.enclosureCenter, transform.position + boxCollider.center, Quaternion.identity, transform).transform;
     }
 
     public virtual bool GetNextPendingTask(PeasantAdultScript peasantAdultScript)

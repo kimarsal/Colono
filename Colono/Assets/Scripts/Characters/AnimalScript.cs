@@ -19,7 +19,7 @@ public class AnimalScript : MonoBehaviour
     [JsonIgnore] private float ageSpeed = 0.01f;
     public float age;
 
-    [JsonIgnore] private float confortSpeed = 0.01f;
+    [JsonIgnore] private float confortSpeed = 0.05f;
     public float confortLevel;
     private bool isConfortable;
     public bool isInPlaceForPairing;
@@ -70,7 +70,7 @@ public class AnimalScript : MonoBehaviour
             penScript.AgeUpAnimal(this);
         }
 
-        if (confortLevel < 1)
+        if ((int)animalType % 2 == 1 && confortLevel < 1)
         {
             confortLevel += Time.deltaTime * confortSpeed * penScript.level;
         }

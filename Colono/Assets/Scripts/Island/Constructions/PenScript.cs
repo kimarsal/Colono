@@ -89,7 +89,7 @@ public class PenScript : EnclosureScript
     public void AgeUpAnimal(AnimalScript animalScript)
     {
         AnimalType animalType = animalScript.animalType;
-        AnimalScript agedUpAnimalScript = Instantiate(IslandEditor.Instance.GetAnimalPrefab(animalType + 1),
+        AnimalScript agedUpAnimalScript = Instantiate(ResourceScript.Instance.GetAnimalPrefab(animalType + 1),
             animalScript.transform.position, animalScript.transform.rotation, animalTransform).GetComponent<AnimalScript>();
         animalList.Add(agedUpAnimalScript);
         animalList.Remove(animalScript);
@@ -110,7 +110,7 @@ public class PenScript : EnclosureScript
         animalScript2.EndPairing();
 
         AnimalType animalType = animalScript1.animalType - 1;
-        AnimalScript bornAnimalScript = Instantiate(IslandEditor.Instance.GetAnimalPrefab(animalType),
+        AnimalScript bornAnimalScript = Instantiate(ResourceScript.Instance.GetAnimalPrefab(animalType),
             animalScript1.transform.position, animalScript1.transform.rotation, transform).GetComponent<AnimalScript>();
         animalList.Add(bornAnimalScript);
 

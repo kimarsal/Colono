@@ -22,7 +22,7 @@ public class ResourceDropdownScript : MonoBehaviour
                 if (i < length / 2 && !displayIntroducedCrops || i >= length / 2 && !displayNativeCrops) continue;
             }
 
-            dropdown.options.Add(new Dropdown.OptionData(IslandEditor.Instance.GetResourceSprite(resourceType, i)));
+            dropdown.options.Add(new Dropdown.OptionData(ResourceScript.Instance.GetResourceSprite(resourceType, i)));
         }
         dropdown.value = 0;
 

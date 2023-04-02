@@ -24,6 +24,22 @@ public class InventoryScript
         return inventoryCategories[type].usage + "/" + inventoryCategories[type].capacity;
     }
 
+    public bool IsFull()
+    {
+        if (inventoryCategories == null) InitializeResources();
+
+        int usage = 0;
+        int capacity = 0;
+
+        for(int i = 0; i < inventoryCategories.Length; i++)
+        {
+            usage += inventoryCategories[i].usage;
+            capacity += inventoryCategories[i].capacity;
+        }
+        return usage == capacity;
+
+    }
+
     public int GetResourceAmount(ResourceScript.ResourceType resourceType, int resourceIndex)
     {
         if (inventoryCategories == null) InitializeResources();

@@ -41,9 +41,9 @@ public class OfferButtonScript : MonoBehaviour
             receivedResourceAmount = price;
         }
 
-        givenResourceImage.sprite = IslandEditor.Instance.GetResourceSprite(givenResourceType, givenResourceIndex);
+        givenResourceImage.sprite = ResourceScript.Instance.GetResourceSprite(givenResourceType, givenResourceIndex);
         givenResourceAmountText.text = givenResourceAmount.ToString();
-        receivedResourceImage.sprite = IslandEditor.Instance.GetResourceSprite(receivedResourceType, receivedResourceIndex);
+        receivedResourceImage.sprite = ResourceScript.Instance.GetResourceSprite(receivedResourceType, receivedResourceIndex);
         receivedResourceAmountText.text = receivedResourceAmount.ToString();
     }
 }

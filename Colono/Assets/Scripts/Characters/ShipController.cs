@@ -5,19 +5,15 @@ public abstract class ShipController : MonoBehaviour
 {
     public float health = 1;
     public float healthLossOnImpact = 0.1f;
-    public Vector3 COM;
     public float speed = 1.0f;
     public float steerSpeed = 5.0f;
-    public float movementThresold = 5.0f;
+    private float currentTime;
 
-    protected Transform m_COM;
     protected float verticalInput;
     protected float horizontalInput;
-    protected float movementFactor;
-    protected float steerFactor;
 
     public ParticleSystem MovingWaves;
-    public ParticleSystem StillWaves;
+    //public ParticleSystem StillWaves;
     public AudioSource WavesSound;
     private bool isStopped = true;
     public AudioClip[] cannonballHitSounds;
@@ -32,6 +28,7 @@ public abstract class ShipController : MonoBehaviour
     public ParticleSystem smokePrefab;
     private float timeTillLastShot = 0f;
     private float timeBetweenShots = 2f;
+    protected Rigidbody rb;
 
     private void Update()
     {
@@ -39,7 +36,7 @@ public abstract class ShipController : MonoBehaviour
         Balance();
         Movement();
         Steer();
-        //SoundAndParticles();
+        SoundAndParticles();
         Shoot();
     }
 
@@ -47,26 +44,18 @@ public abstract class ShipController : MonoBehaviour
 
     private void Balance()
     {
-        if (!m_COM)
-        {
-            m_COM = new GameObject("COM").transform;
-            m_COM.SetParent(transform);
-        }
-
-        m_COM.position = COM;
-        GetComponent<Rigidbody>().centerOfMass = m_COM.position;
+        currentTime = (currentTime + Time.deltaTime) % (Mathf.PI * 2);
+        transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, Mathf.Sin(currentTime) * 5f);
     }
 
     protected virtual void Movement()
     {
-        movementFactor = Mathf.Lerp(movementFactor, verticalInput, Time.deltaTime / movementThresold);
-        transform.Translate(0.0f, 0.0f, movementFactor * speed);
+        rb.AddForce(transform.forward * speed * verticalInput);
     }
 
     private void Steer()
     {
-        steerFactor = Mathf.Lerp(steerFactor, horizontalInput * verticalInput, Time.deltaTime / movementThresold);
-        transform.Rotate(0.0f, steerFactor * steerSpeed, 0.0f);
+        rb.AddTorque(transform.up * steerSpeed * horizontalInput * verticalInput);
     }
 
     void SoundAndParticles()
@@ -74,7 +63,7 @@ public abstract class ShipController : MonoBehaviour
         if (verticalInput > 0)
         {
             MovingWaves.Play();
-            StillWaves.Stop();
+            //StillWaves.Stop();
             if (isStopped)
             {
                 isStopped = false;
@@ -85,7 +74,7 @@ public abstract class ShipController : MonoBehaviour
         else
         {
             MovingWaves.Stop();
-            StillWaves.Play();
+            //StillWaves.Play();
             if (!isStopped)
             {
                 isStopped = true;
@@ -118,6 +107,19 @@ public abstract class ShipController : MonoBehaviour
         }
     }
 
+    private IEnumerator FireCannonballs()
+    {
+        yield return new WaitForSeconds(0.1f);
+        for (int i = 0; i < 5; i++)
+        {
+            Instantiate(leftCannonball, leftCannons[i].transform.position, leftCannonball.transform.rotation).shipController = this;
+            Instantiate(smokePrefab, leftCannons[i].transform.position, Quaternion.Euler(new Vector3(0, transform.eulerAngles.y - 90, 0)));
+            Instantiate(rightCannonball, rightCannons[i].transform.position, rightCannonball.transform.rotation).shipController = this;
+            Instantiate(smokePrefab, rightCannons[i].transform.position, Quaternion.Euler(new Vector3(0, transform.eulerAngles.y + 90, 0)));
+            yield return new WaitForSeconds(0.2f);
+        }
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Cannonball"))
@@ -146,24 +148,11 @@ public abstract class ShipController : MonoBehaviour
 
     private IEnumerator Sink()
     {
-        GetComponent<FloatObjectScript>().enabled = false;
+        rb.constraints = RigidbodyConstraints.FreezeRotation;
+        rb.useGravity = true;
         yield return new WaitForSeconds(1);
-        Instantiate(IslandEditor.Instance.box, transform.position, Quaternion.identity, transform.parent)
-            .inventoryScript = GetComponent<ShipScript>().inventoryScript;
+        Instantiate(ResourceScript.Instance.box, transform.position, Quaternion.identity, transform.parent).inventoryScript = GetComponent<EnemyShipScript>().inventoryScript;
         Destroy(gameObject);
 
-    }
-
-    private IEnumerator FireCannonballs()
-    {
-        yield return new WaitForSeconds(0.1f);
-        for (int i = 0; i < 5; i++)
-        {
-            Instantiate(leftCannonball, leftCannons[i].transform.position, leftCannonball.transform.rotation).shipController = this;
-            Instantiate(smokePrefab, leftCannons[i].transform.position, Quaternion.Euler(new Vector3(0, transform.eulerAngles.y - 90, 0)));
-            Instantiate(rightCannonball, rightCannons[i].transform.position, rightCannonball.transform.rotation).shipController = this;
-            Instantiate(smokePrefab, rightCannons[i].transform.position, Quaternion.Euler(new Vector3(0, transform.eulerAngles.y + 90, 0)));
-            yield return new WaitForSeconds(0.2f);
-        }
     }
 }

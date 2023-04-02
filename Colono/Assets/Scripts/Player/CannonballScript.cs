@@ -7,32 +7,31 @@ public class CannonballScript : MonoBehaviour
     protected float speed = 15;
     public ShipController shipController;
     protected Rigidbody rb;
-    private CannonballMissScript script;
     private bool isBeingDestroyed = false;
+    [SerializeField] private AudioSource splashAudioSource;
+    [SerializeField] private ParticleSystem splashPrefab;
 
     protected void Setup()
     {
-        script = GameObject.Find("Sea").GetComponent<CannonballMissScript>();
         rb = GetComponent<Rigidbody>();
     }
 
-    private void OnTriggerEnter(Collider collision)
+    private void Update()
     {
-        if (collision.gameObject.CompareTag("Sea") && !isBeingDestroyed)
+        if (transform.position.y <= -0.5 && !isBeingDestroyed)
         {
             isBeingDestroyed = true;
-            GetComponent<MeshRenderer>().enabled = false;
+            //GetComponent<MeshRenderer>().enabled = false;
             GetComponent<SphereCollider>().enabled = false;
-            StartCoroutine(CannonballMiss(transform.position));
+            StartCoroutine(CannonballMiss());
         }
     }
 
-    public IEnumerator CannonballMiss(Vector3 position)
+    public IEnumerator CannonballMiss()
     {
-        Instantiate(script.splashPrefab, position, script.splashPrefab.transform.rotation);
-        AudioSource audioSource = gameObject.AddComponent<AudioSource>();
-        audioSource.PlayOneShot(script.splashAudioClip, 0.1f);
-        yield return new WaitForSeconds(script.splashAudioClip.length);
+        Instantiate(splashPrefab, transform.position, splashPrefab.transform.rotation);
+        splashAudioSource.Play();
+        yield return new WaitForSeconds(splashAudioSource.clip.length);
         Destroy(gameObject);
     }
 }

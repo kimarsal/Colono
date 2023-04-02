@@ -131,7 +131,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 }
                 else if (selectFunction != SelectFunction.PlantTrees) isSelectionValid = false;
 
-                cells[(int)selectedCell.x, (int)selectedCell.y].GetComponent<MeshRenderer>().material = IslandEditor.Instance.selectingFirstCellMaterial;
+                cells[(int)selectedCell.x, (int)selectedCell.y].GetComponent<MeshRenderer>().material = ResourceScript.Instance.selectingFirstCellMaterial;
             }
             else
             {
@@ -189,7 +189,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 || islandGenerator.regions[islandScript.regionMap[x, y]].type == Terrain.TerrainType.Field
                 || islandGenerator.regions[islandScript.regionMap[x, y]].type == Terrain.TerrainType.Hill) //Si la cel·la és gespa
             {
-                CreateCell(hoveredCell, IslandEditor.Instance.hoverMaterial);
+                CreateCell(hoveredCell, ResourceScript.Instance.hoverMaterial);
                 wasOtherCellHovered = true;
             }
             return;
@@ -290,9 +290,9 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
         foreach (Vector2 cell in selectedCells)
         {
-            CreateCell(cell, isSelectionValid ? IslandEditor.Instance.selectingMaterial : IslandEditor.Instance.invalidSelectionMaterial);
+            CreateCell(cell, isSelectionValid ? ResourceScript.Instance.selectingMaterial : ResourceScript.Instance.invalidSelectionMaterial);
         }
-        cells[(int)selectedCell.x, (int)selectedCell.y].GetComponent<MeshRenderer>().material = IslandEditor.Instance.selectingFirstCellMaterial;
+        cells[(int)selectedCell.x, (int)selectedCell.y].GetComponent<MeshRenderer>().material = ResourceScript.Instance.selectingFirstCellMaterial;
     }
 
     private void CreateCell(Vector2 position, Material cellMaterial)
@@ -341,7 +341,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     public void ChooseBuilding(BuildingScript.BuildingType buildingType)
     {
-        selectedBuilding = IslandEditor.Instance.GetBuilding(buildingType);
+        selectedBuilding = ResourceScript.Instance.GetBuilding(buildingType);
         selectedBuilding.transform.parent = islandScript.constructionsTransform.transform;
         selectMode = SelectMode.Building;
         selectFunction = SelectFunction.PlaceBuilding;

@@ -5,12 +5,15 @@ using UnityEngine.UI;
 
 public class ConstructionDetailsScript : MonoBehaviour
 {
-    public TextMeshProUGUI title;
-    public TextMeshProUGUI peasantsOnTheirWayText;
-    public TextMeshProUGUI peasantNumText;
-    public GameObject peasantButtons;
-    public Button minusButton;
-    public Button plusButton;
+    [SerializeField] private TextMeshProUGUI title;
+    [SerializeField] private Button previousConstructionButton;
+    [SerializeField] private Button nextConstructionButton;
+
+    [SerializeField] private TextMeshProUGUI peasantsOnTheirWayText;
+    [SerializeField] private TextMeshProUGUI peasantNumText;
+    [SerializeField] private GameObject peasantButtons;
+    [SerializeField] private Button removePeasantButton;
+    [SerializeField] private Button addPeasantButton;
 
     public Button editConstructionButton;
     public Button removeConstructionButton;
@@ -28,7 +31,11 @@ public class ConstructionDetailsScript : MonoBehaviour
         rectTransform = GetComponent<RectTransform>();
         canvasRectTransform = CanvasScript.Instance.GetComponent<RectTransform>();
         rectTransform.anchoredPosition = new Vector2(0, -canvasRectTransform.rect.height);
-        rectTransform.anchoredPosition = new Vector2(0, -canvasRectTransform.rect.height);
+    }
+
+    private void OnRectTransformDimensionsChange()
+    {
+        
     }
 
     public void ShowDetails()
@@ -37,16 +44,18 @@ public class ConstructionDetailsScript : MonoBehaviour
         StartCoroutine(ChangeStateCoroutine());
     }
 
-    public void EditConstruction()
+    public void ToggleConstructionEditor()
     {
         if(state == ConstructionDetailsState.Details)
         {
+            CameraScript.Instance.canMove = false;
             editorScript = constructionScript.editorScript;
             editorScript.gameObject.SetActive(true);
             editorScript.SetEditor(constructionScript);
         }
         else
         {
+            CameraScript.Instance.canMove = true;
             StartCoroutine(HideEditor());
         }
 
@@ -90,11 +99,25 @@ public class ConstructionDetailsScript : MonoBehaviour
 
     public void SetConstructionDetails(ConstructionScript newConstructionScript)
     {
-        if(constructionScript != null) constructionScript.constructionDetailsScript = null;
+        if (constructionScript != null) constructionScript.constructionDetailsScript = null;
         constructionScript = newConstructionScript;
         constructionScript.constructionDetailsScript = this;
 
+        if(state == ConstructionDetailsState.Editor)
+        {
+            editorScript?.gameObject.SetActive(false);
+            editorScript = constructionScript.editorScript;
+            if(editorScript != null)
+            {
+                editorScript.gameObject.SetActive(true);
+                editorScript.SetEditor(constructionScript);
+            }
+        }
+
         title.text = constructionScript.title;
+        bool canSwitchBetweenConstructions = constructionScript.islandScript.constructionList.Count > 0;
+        previousConstructionButton.interactable = nextConstructionButton.interactable = canSwitchBetweenConstructions;
+
         if (constructionScript.canManagePeasants)
         {
             peasantButtons.SetActive(true);
@@ -109,6 +132,28 @@ public class ConstructionDetailsScript : MonoBehaviour
 
         removeConstructionButton.enabled = constructionScript.canBeRemoved;
         editConstructionButton.enabled = constructionScript.editorScript != null;
+    }
+
+    public void SwitchConstruction(bool next)
+    {
+        int constructionCount = constructionScript.islandScript.constructionList.Count;
+
+        int currentConstruction = constructionScript.constructionType == ConstructionScript.ConstructionType.Ship ?
+            constructionCount :
+            constructionScript.islandScript.constructionList.IndexOf(constructionScript);
+
+        if (next)
+        {
+            currentConstruction = (currentConstruction + 1) % (constructionCount + 1);
+        }
+        else
+        {
+            currentConstruction -= 1;
+            if (currentConstruction == -1) currentConstruction = constructionCount;
+        }
+
+        if (currentConstruction == constructionCount) GameManager.Instance.islandSelectionScript.SelectConstruction(ShipScript.Instance);
+        else GameManager.Instance.islandSelectionScript.SelectConstruction(constructionScript.islandScript.constructionList[currentConstruction]);
     }
 
     public void ManagePeasants(bool adding)
@@ -133,8 +178,8 @@ public class ConstructionDetailsScript : MonoBehaviour
 
         int peasantCount = constructionScript.peasantCount;
         peasantNumText.text = (peasantCount - constructionScript.peasantsOnTheirWay).ToString() + "/" + constructionScript.maxPeasants;
-        minusButton.interactable = peasantCount > 0;
-        plusButton.interactable = peasantCount < constructionScript.maxPeasants;
+        removePeasantButton.interactable = peasantCount > 0;
+        addPeasantButton.interactable = peasantCount < constructionScript.maxPeasants;
     }
 
     public void UpdateUpgradeButton()

@@ -35,7 +35,7 @@ public class GardenEditor : EditorScript
             GameObject cropButton = Instantiate(cropButtonPrefab, gridTransform);
             CropButtonScript cropButtonScript = cropButton.GetComponent<CropButtonScript>();
             cropButtonScript.gardenEditor = this;
-            cropButtonScript.cropImage.sprite = IslandEditor.Instance.GetResourceSprite(ResourceType.Crop, (int)pair.Value);
+            cropButtonScript.cropImage.sprite = ResourceScript.Instance.GetResourceSprite(ResourceType.Crop, (int)pair.Value);
             cropButtonScript.cell = pair.Key;
         }
     }
@@ -49,7 +49,7 @@ public class GardenEditor : EditorScript
         {
             if (GameManager.Instance.discoveredCrops[i])
             {
-                cropDropdown.options.Add(new Dropdown.OptionData(IslandEditor.Instance.GetResourceSprite(ResourceType.Crop, i)));
+                cropDropdown.options.Add(new Dropdown.OptionData(ResourceScript.Instance.GetResourceSprite(ResourceType.Crop, i)));
             }
         }
         cropDropdown.template.GetComponent<RectTransform>().sizeDelta = new Vector2(cropDropdown.template.GetComponent<RectTransform>().sizeDelta.x, cropTypes * 100 / 2);
@@ -64,6 +64,6 @@ public class GardenEditor : EditorScript
     public void ChangeCrop(CropButtonScript cropButtonScript)
     {
         gardenScript.cropDictionary[cropButtonScript.cell] = selectedCropType;
-        cropButtonScript.cropImage.sprite = IslandEditor.Instance.GetResourceSprite(ResourceType.Crop, (int)selectedCropType);
+        cropButtonScript.cropImage.sprite = ResourceScript.Instance.GetResourceSprite(ResourceType.Crop, (int)selectedCropType);
     }
 }

@@ -56,7 +56,7 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
             int orientation = Random.Range(0, 360);
             TerrainType terrainType = GameManager.Instance.GetComponent<IslandGenerator>().regions[regionMap[(int)cell.x, (int)cell.y]].type;
 
-            TreeSproutScript treeSproutScript = Instantiate(IslandEditor.Instance.treeSprout, itemPos,
+            TreeSproutScript treeSproutScript = Instantiate(ResourceScript.Instance.treeSprout, itemPos,
                 Quaternion.Euler(0, orientation, 0), itemsTransform.transform).GetComponent<TreeSproutScript>();
             treeSproutScript.terrainType = terrainType;
             treeSproutScript.itemIndex = -1;
@@ -72,6 +72,15 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
         {
             constructionScript.outline = constructionScript.AddComponent<Outline>();
             constructionScript.outline.enabled = false;
+
+            if(((BuildingScript)constructionScript).buildingType == BuildingScript.BuildingType.Warehouse)
+            {
+                inventoryScript.AddCapacityToAllCategories();
+            }
+            else if (((BuildingScript)constructionScript).buildingType == BuildingScript.BuildingType.Tavern)
+            {
+                ((TavernScript)constructionScript).recipeList.Add(new Recipe());
+            }
         }
         constructionScript.islandScript = this;
         constructionList.Add(constructionScript);
@@ -195,7 +204,7 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
         remainingAmount = inventoryScript.AddResource(resourceType, resourceIndex, remainingAmount);
         if (remainingAmount > 0 && GameManager.Instance.isInIsland)
         {
-            ShipScript.Instance.inventoryScript.AddResource(resourceType, resourceIndex, remainingAmount);
+            ShipScript.Instance.shipInterior.inventoryScript.AddResource(resourceType, resourceIndex, remainingAmount);
         }
         CanvasScript.Instance.UpdateInventoryRow(resourceType, resourceIndex);
     }
@@ -203,7 +212,7 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
     public int GetResourceAmount(ResourceScript.ResourceType resourceType, int resourceIndex)
     {
         int amount = inventoryScript.GetResourceAmount(resourceType, resourceIndex);
-        if (GameManager.Instance.isInIsland) amount += ShipScript.Instance.inventoryScript.GetResourceAmount(resourceType, resourceIndex);
+        if (GameManager.Instance.isInIsland) amount += ShipScript.Instance.shipInterior.inventoryScript.GetResourceAmount(resourceType, resourceIndex);
         return amount;
     }
 
@@ -214,7 +223,7 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
         int remainingAmount = inventoryScript.RemoveResource(resourceType, resourceIndex, amount);
         if(remainingAmount > 0)
         {
-            ShipScript.Instance.inventoryScript.RemoveResource(resourceType, resourceIndex, remainingAmount);
+            ShipScript.Instance.shipInterior.inventoryScript.RemoveResource(resourceType, resourceIndex, remainingAmount);
         }
         return true;
     }

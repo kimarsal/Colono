@@ -96,7 +96,7 @@ public class GardenScript : EnclosureScript
         MeshRenderer meshRenderer = patch.AddComponent<MeshRenderer>();
         MeshFilter meshFilter = patch.AddComponent<MeshFilter>();
 
-        meshRenderer.material = IslandEditor.Instance.patchMaterial;
+        meshRenderer.material = ResourceScript.Instance.patchMaterial;
 
         MeshData cellMeshData = MeshGenerator.GenerateCell(cell, 0.01f, islandScript.meshData);
         Mesh mesh = cellMeshData.CreateMesh();

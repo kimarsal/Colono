@@ -20,7 +20,7 @@ public class PatchScript : TaskScript
     public void InitializePatch(PatchInfo patchInfo)
     {
         orientation = patchInfo.orientation;
-        crop = Instantiate(IslandEditor.Instance.GetCropPrefab(cropType, patchInfo.cropState), center, Quaternion.Euler(0, orientation, 0), transform);
+        crop = Instantiate(ResourceScript.Instance.GetCropPrefab(cropType, patchInfo.cropState), center, Quaternion.Euler(0, orientation, 0), transform);
     }
 
     private void Start()
@@ -54,7 +54,7 @@ public class PatchScript : TaskScript
         Destroy(crop);
         if(cropState < CropState.Barren)
         {
-            crop = Instantiate(IslandEditor.Instance.GetCropPrefab(cropType, cropState), center, Quaternion.Euler(0, orientation, 0), transform);
+            crop = Instantiate(ResourceScript.Instance.GetCropPrefab(cropType, cropState), center, Quaternion.Euler(0, orientation, 0), transform);
         }
         timeSinceLastStateChange = 0;
     }
@@ -72,7 +72,7 @@ public class PatchScript : TaskScript
             cropType = gardenScript.cropDictionary[cell];
             orientation = Random.Range(0, 359);
             cropState = CropState.Planted;
-            crop = Instantiate(IslandEditor.Instance.GetCropPrefab(cropType, cropState), center, Quaternion.Euler(0, orientation, 0), transform);
+            crop = Instantiate(ResourceScript.Instance.GetCropPrefab(cropType, cropState), center, Quaternion.Euler(0, orientation, 0), transform);
         }
         else if (cropState == CropState.Blossomed) // Es cullen els fruits
         {

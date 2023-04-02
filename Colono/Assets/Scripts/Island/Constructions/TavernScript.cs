@@ -8,11 +8,6 @@ public class TavernScript : BuildingScript
 
     public override EditorScript editorScript { get { return CanvasScript.Instance.tavernEditor; } }
 
-    private void Start()
-    {
-        recipeList.Add(new Recipe());
-    }
-
     public override void AddPeasant(PeasantScript peasantScript)
     {
         peasantList.Add(peasantScript);
@@ -38,11 +33,12 @@ public class TavernScript : BuildingScript
                 && (recipe.nativeCrop == -1 || islandScript.GetResourceAmount(ResourceScript.ResourceType.Crop, recipe.nativeCrop) > 0)
                 && (recipe.meat == -1 || islandScript.GetResourceAmount(ResourceScript.ResourceType.Meat, recipe.meat) > 0))
             {
-                hungerPoints = recipe.hungerPoints;
+                hungerPoints += recipe.hungerPoints;
                 if (recipe.introducedCrop != -1) islandScript.UseResource(ResourceScript.ResourceType.Crop, recipe.introducedCrop);
                 if (recipe.nativeCrop != -1) islandScript.UseResource(ResourceScript.ResourceType.Crop, recipe.nativeCrop);
                 if (recipe.meat != -1) islandScript.UseResource(ResourceScript.ResourceType.Crop, recipe.meat);
-                break;
+
+                if(hungerPoints >= peasantScript.hunger) break;
             }
         }
 

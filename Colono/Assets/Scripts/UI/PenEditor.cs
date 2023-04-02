@@ -36,7 +36,7 @@ public class PenEditor : EditorScript
             PenRowScript penRowScript = gridRow.GetComponent<PenRowScript>();
             penRowScript.penEditor = this;
             penRowScript.animalType = (AnimalType)i;
-            penRowScript.animalImage.sprite = IslandEditor.Instance.GetResourceSprite(ResourceType.Animal, i);
+            penRowScript.animalImage.sprite = ResourceScript.Instance.GetResourceSprite(ResourceType.Animal, i);
             penRowScript.penAnimals = penScript.animals[i];
             penRowScript.shipAnimals = shipPenScript.animals[i];
             penRowScript.desiredAmount = penScript.desiredAmounts[i];

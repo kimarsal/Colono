@@ -15,7 +15,7 @@ public class ShopEditor : EditorScript
 
     public override void SetEditor(ConstructionScript constructionScript)
     {
-        InventoryScript inventoryScript = ((ShipScript)constructionScript).inventoryScript;
+        InventoryScript inventoryScript = ((ShipScript)constructionScript).shipInterior.inventoryScript;
 
         materialTypes = Enum.GetValues(typeof(ResourceScript.MaterialType)).Length;
         cropTypes = Enum.GetValues(typeof(ResourceScript.CropType)).Length;

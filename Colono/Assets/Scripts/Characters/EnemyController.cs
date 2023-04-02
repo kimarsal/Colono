@@ -10,12 +10,19 @@ public class EnemyController : ShipController
     private bool isToTheRight;
     private bool isTooFar;
 
+    private void Start()
+    {
+        rb = GetComponent<Rigidbody>();
+    }
+
     protected override void ManageInput()
     {
         float xDiff = transform.position.x - ShipScript.Instance.transform.position.x;
 		float zDiff = transform.position.z - ShipScript.Instance.transform.position.z;
         float angle = 180 - Mathf.Atan2(zDiff, xDiff) * Mathf.Rad2Deg;
-        float angleDiff = (angle - transform.rotation.eulerAngles.y) % 360 - 180;
+        float angleDiff = angle - transform.rotation.eulerAngles.y;
+        if (angleDiff < 0) angleDiff = 360 + angleDiff;
+        angleDiff = (angleDiff) % 360 - 180;
 
         isInFront = angleDiff > 0;
         isToTheRight = Mathf.Abs(angleDiff) > 90;

@@ -17,9 +17,11 @@ public class PlayerController : ShipController
 	public float zUpperBounds;
 
 	private void Start()
-	{
-		//S'obtenen les mides del mar
-		GameObject sea = GameObject.Find("Sea");
+    {
+        rb = GetComponent<Rigidbody>();
+
+        //S'obtenen les mides del mar
+        GameObject sea = GameObject.Find("Sea");
 		Bounds seaBounds = sea.GetComponent<Renderer>().bounds;
 
 		//Es calculen les posicions màximes i mínimes del jugador dins el mar

@@ -41,14 +41,14 @@ public class RecipeRowScript : MonoBehaviour
         ingredientAmount = 0;
         if (recipe.meat != -1)
         {
-            Sprite sprite = IslandEditor.Instance.cookedMeatSprites[recipe.meat];
+            Sprite sprite = ResourceScript.Instance.cookedMeatSprites[recipe.meat];
             singleIngredientImage.sprite = sprite;
             firstIngredientImage.sprite = sprite;
             ingredientAmount++;
         }
 
         if (recipe.introducedCrop != -1) {
-            Sprite sprite = IslandEditor.Instance.cookedVegetableSprites[recipe.introducedCrop];
+            Sprite sprite = ResourceScript.Instance.cookedVegetableSprites[recipe.introducedCrop];
             if(recipe.meat == -1)
             {
                 firstIngredientImage.sprite = sprite;
@@ -63,7 +63,7 @@ public class RecipeRowScript : MonoBehaviour
 
         if (recipe.nativeCrop != -1)
         {
-            Sprite sprite = IslandEditor.Instance.cookedVegetableSprites[System.Enum.GetValues(typeof(ResourceScript.CropType)).Length / 2 + recipe.nativeCrop];
+            Sprite sprite = ResourceScript.Instance.cookedVegetableSprites[System.Enum.GetValues(typeof(ResourceScript.CropType)).Length / 2 + recipe.nativeCrop];
             if (recipe.meat == -1 && recipe.introducedCrop == -1)
             {
                 singleIngredientImage.sprite = sprite;

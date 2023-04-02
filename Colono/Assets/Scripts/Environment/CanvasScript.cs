@@ -26,10 +26,13 @@ public class CanvasScript : MonoBehaviour
 
     [Header("Editors")]
     [SerializeField] private PeasantDetailsScript peasantDetailsScript;
+    public ShipEditor shipEditor;
     public GardenEditor gardenEditor;
     public PenEditor penEditor;
     public TavernEditor tavernEditor;
+    public CabinEditor cabinEditor;
     public InventoryEditor inventoryEditor;
+    public MineEditor mineEditor;
     [SerializeField] private ShopEditor shopEditor;
 
     [Header("Others")]

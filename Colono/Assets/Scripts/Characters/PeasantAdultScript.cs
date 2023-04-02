@@ -116,7 +116,7 @@ public class PeasantAdultScript : PeasantScript
         }
         else if (constructionScript != null) //Si té una construcció com a destí
         {
-            if (constructionScript.constructionType == ConstructionScript.ConstructionType.Enclosure) //Si el destí és exterior
+            if (constructionScript.constructionType == ConstructionScript.ConstructionType.Enclosure) //Si la construcció és exterior
             {
                 StartCoroutine(WaitForNextRandomDestinationInEnclosure());
             }

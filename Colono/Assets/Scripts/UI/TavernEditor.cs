@@ -30,19 +30,19 @@ public class TavernEditor : EditorScript
         introducedCropDropdownOptions = new List<Dropdown.OptionData> { new Dropdown.OptionData() }; //S'afegeix una opció buida
         for (int i = 0; i < introducedCropTypes; i++)
         {
-            introducedCropDropdownOptions.Add(new Dropdown.OptionData(IslandEditor.Instance.GetResourceSprite(ResourceScript.ResourceType.Crop, i)));
+            introducedCropDropdownOptions.Add(new Dropdown.OptionData(ResourceScript.Instance.GetResourceSprite(ResourceScript.ResourceType.Crop, i)));
         }
 
         nativeCropDropdownOptions = new List<Dropdown.OptionData> { new Dropdown.OptionData() }; //S'afegeix una opció buida
         for (int i = 0; i < nativeCropTypes; i++)
         {
-            nativeCropDropdownOptions.Add(new Dropdown.OptionData(IslandEditor.Instance.GetResourceSprite(ResourceScript.ResourceType.Crop, introducedCropTypes + i)));
+            nativeCropDropdownOptions.Add(new Dropdown.OptionData(ResourceScript.Instance.GetResourceSprite(ResourceScript.ResourceType.Crop, introducedCropTypes + i)));
         }
 
         meatDropdownOptions = new List<Dropdown.OptionData> { new Dropdown.OptionData() }; //S'afegeix una opció buida
         for (int i = 0; i < meatTypes; i++)
         {
-            meatDropdownOptions.Add(new Dropdown.OptionData(IslandEditor.Instance.GetResourceSprite(ResourceScript.ResourceType.Meat, i)));
+            meatDropdownOptions.Add(new Dropdown.OptionData(ResourceScript.Instance.GetResourceSprite(ResourceScript.ResourceType.Meat, i)));
         }
 
         foreach (Recipe recipe in tavernScript.recipeList)
@@ -122,9 +122,16 @@ public class Recipe
 
     public Recipe()
     {
-        introducedCrop = (int)ResourceScript.CropType.Onion;
+        introducedCrop = -1;
         nativeCrop = -1;
-        meat = -1;
+        meat = (int)ResourceScript.MeatType.Chicken;
+    }
+
+    public Recipe(int introducedCrop, int nativeCrop, int meat)
+    {
+        this.introducedCrop = introducedCrop;
+        this.nativeCrop = nativeCrop;
+        this.meat = meat;
     }
 
     public int hungerPoints

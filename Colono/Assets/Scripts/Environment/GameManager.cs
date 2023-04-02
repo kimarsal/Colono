@@ -11,7 +11,6 @@ public class GameManager : MonoBehaviour
     public List<IslandScript> islandList = new List<IslandScript>();
 
     private IslandGenerator islandGenerator;
-    private CameraScript cameraScript;
     public InventoryEditor inventoryEditor;
 
     private bool isPlayerNearIsland = false;
@@ -24,7 +23,7 @@ public class GameManager : MonoBehaviour
     public bool[] discoveredCrops;
     
     public IslandScript closestIsland;
-    private IslandSelectionScript islandSelectionScript;
+    public IslandSelectionScript islandSelectionScript;
     public IslandCellScript islandCellScript;
     public PenScript buildingInterior;
 
@@ -42,11 +41,10 @@ public class GameManager : MonoBehaviour
         islandSelectionScript.enabled = false;
 
         islandGenerator = GetComponent<IslandGenerator>();
-        cameraScript = Camera.main.GetComponent<CameraScript>();
         //LoadGame();
         StartGame();
 
-        inventoryEditor.shipInventoryScript = ShipScript.Instance.inventoryScript;
+        inventoryEditor.shipInventoryScript = ShipScript.Instance.shipInterior.inventoryScript;
     }
 
     private void Update()
@@ -127,7 +125,7 @@ public class GameManager : MonoBehaviour
 
     public void DockOntoIsland()
     {
-        cameraScript.SetIslandCamera(closestIsland.transform.position);
+        CameraScript.Instance.SetIslandCamera(closestIsland.transform.position);
         inventoryEditor.islandInventoryScript = closestIsland.inventoryScript;
         CanvasScript.Instance.Dock();
 
@@ -197,6 +195,7 @@ public class GameManager : MonoBehaviour
     public void SelectConstruction(ConstructionScript constructionScript)
     {
         islandSelectionScript.selectedConstruction = constructionScript;
+        CameraScript.Instance.SetCameraToConstruction(constructionScript);
         CanvasScript.Instance.ShowConstructionDetails(constructionScript);
     }
 
@@ -208,7 +207,7 @@ public class GameManager : MonoBehaviour
 
     public void Sail()
     {
-        cameraScript.ResetPlayerCamera();
+        CameraScript.Instance.ResetPlayerCamera();
         CanvasScript.Instance.Sail();
 
         islandSelectionScript.enabled = false;

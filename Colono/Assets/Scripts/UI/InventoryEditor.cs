@@ -27,7 +27,7 @@ public class InventoryEditor : EditorScript
         gridRowScript.inventoryEditor = this;
         gridRowScript.resourceType = resourceType;
         gridRowScript.resourceIndex = resourceIndex;
-        gridRowScript.resourceImage.sprite = IslandEditor.Instance.GetResourceSprite(resourceType, resourceIndex);
+        gridRowScript.resourceImage.sprite = ResourceScript.Instance.GetResourceSprite(resourceType, resourceIndex);
         gridRowScript.shipResources = shipInventoryScript.GetResourceAmount(resourceType, resourceIndex);
         gridRowScript.islandResources = islandInventoryScript.GetResourceAmount(resourceType, resourceIndex);
         gridRowScript.UpdateValues();

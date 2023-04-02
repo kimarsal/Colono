@@ -4,12 +4,15 @@ using UnityEngine;
 
 public class CameraScript : MonoBehaviour
 {
+    public static CameraScript Instance { get; private set; }
+
     private Vector3 navigationOffset = new Vector3(0, 15, -8);
     private Vector3 islandOffset = new Vector3(0, 8, -5);
     private Vector3 offset;
     private PlayerController playerController;
     private Vector3 targetPosition;
     private float speed = 25f;
+    public bool canMove = true;
 
     //Distància màxima amb els marges
     private float minYIsland = 3f;
@@ -26,6 +29,11 @@ public class CameraScript : MonoBehaviour
     private float zLowerMarginIsland = 5f;
     private float zUpperMarginIsland = 15f;
 
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     void Start()
     {
         offset = navigationOffset;
@@ -39,6 +47,8 @@ public class CameraScript : MonoBehaviour
 
     void LateUpdate()
     {
+        if (!canMove) return;
+
         if (!GameManager.Instance.isInIsland)
         {
             //Es mou la càmera amb el jugador
@@ -73,7 +83,7 @@ public class CameraScript : MonoBehaviour
         maxX = islandPosition.x + IslandGenerator.mapChunkSize / 2 - xRightMarginIsland;
         minZ = islandPosition.z - IslandGenerator.mapChunkSize / 2 + zLowerMarginIsland;
         maxZ = islandPosition.z + IslandGenerator.mapChunkSize / 2 - zUpperMarginIsland;
-        StartCoroutine(FastCameraSwipe(true));
+        SetCameraToConstruction(ShipScript.Instance);
     }
 
     public void ResetPlayerCamera()
@@ -82,15 +92,20 @@ public class CameraScript : MonoBehaviour
         maxX = playerController.xRightBounds - xRightMarginPlayer;
         minZ = playerController.zLowerBounds + zLowerMarginPlayer;
         maxZ = playerController.zUpperBounds - zUpperMarginPlayer;
-        StartCoroutine(FastCameraSwipe(false));
+        StartCoroutine(FastCameraSwipe(null));
     }
 
-    private IEnumerator FastCameraSwipe(bool intoIsland)
+    public void SetCameraToConstruction(ConstructionScript constructionScript)
     {
-        if (intoIsland)
+        StartCoroutine(FastCameraSwipe(constructionScript));
+    }
+
+    private IEnumerator FastCameraSwipe(ConstructionScript constructionScript)
+    {
+        if (constructionScript != null)
         {
             float previousSpeed = speed;
-            targetPosition = playerController.transform.position + islandOffset;
+            targetPosition = constructionScript.transform.position + islandOffset;
             float distance = Vector3.Distance(transform.position, targetPosition);
             speed = distance / 0.2f; //Fer zoom en 0.2 segons
             offset = islandOffset;
