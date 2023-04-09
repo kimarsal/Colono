@@ -174,8 +174,6 @@ public abstract class PeasantScript : MonoBehaviour
                 UpdateTask();
             }
         }
-
-        peasantDetailsScript?.UpdateDetails();
     }
 
     protected void CheckIfArrivedAtDestination()

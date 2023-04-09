@@ -3,14 +3,13 @@ using static ResourceScript;
 
 public class EnemyShipScript : MonoBehaviour
 {
-
     public Vector3 position;
     public int orientation;
     public InventoryScript inventoryScript;
 
     private void Start()
     {
-        if (inventoryScript == null) RandomizeInventory();
+        RandomizeInventory();
     }
 
     void Update()
@@ -24,7 +23,7 @@ public class EnemyShipScript : MonoBehaviour
         inventoryScript = new InventoryScript();
         inventoryScript.AddCapacityToAllCategories();
 
-        while (!inventoryScript.IsFull())
+        for (int i = 0; i < 30 && !inventoryScript.IsFull(); i++)
         {
             ResourceType resourceType = (ResourceType)Random.Range(0, 3);
             int resourceIndex = Random.Range(0, GetEnumLength(resourceType));

@@ -11,7 +11,6 @@ public class CanvasScript : MonoBehaviour
     [Header("BottomButtons")]
     [SerializeField] private Animator fishButtonAnimator;
     [SerializeField] private Animator tradeButtonAnimator;
-    [SerializeField] private Animator surrenderButtonAnimator;
     [SerializeField] private Animator dockButtonAnimator;
     [SerializeField] private Animator sailButtonAnimator;
 
@@ -33,7 +32,7 @@ public class CanvasScript : MonoBehaviour
     public CabinEditor cabinEditor;
     public InventoryEditor inventoryEditor;
     public MineEditor mineEditor;
-    [SerializeField] private ShopEditor shopEditor;
+    [SerializeField] private TradeEditor tradeEditor;
 
     [Header("Others")]
     [SerializeField] private NewCropPopUpScript newCropPopUpScript;
@@ -164,18 +163,21 @@ public class CanvasScript : MonoBehaviour
     {
         peasantDetailsScript.SetPeasantDetails(peasantScript);
 
-        HideTopButtons();
-        if (buttonState == ButtonState.ConstructionDetails)
+        if (buttonState != ButtonState.PeasantDetails)
         {
-            constructionDetailsScript.HideDetails();
-        }
-        else if(buttonState != ButtonState.PeasantDetails)
-        {
-            sailButtonAnimator.Play("HideBottomButton");
-            peasantDetailsAnimator.Play("ShowDetails");
-        }
+            if (buttonState == ButtonState.ConstructionDetails)
+            {
+                constructionDetailsScript.HideDetails();
+            }
+            else
+            {
+                HideTopButtons();
+                sailButtonAnimator.Play("HideBottomButton");
+            }
 
-        buttonState = ButtonState.PeasantDetails;
+            peasantDetailsAnimator.Play("ShowDetails");
+            buttonState = ButtonState.PeasantDetails;
+        }
     }
 
     public void HidePeasantDetails()
@@ -235,4 +237,19 @@ public class CanvasScript : MonoBehaviour
         buttonState = ButtonState.Idle;
     }
 
+    public void PlayerCanTrade()
+    {
+        tradeButtonAnimator.Play("ShowBottomButton");
+    }
+
+    public void PlayerCannotTrade()
+    {
+        tradeButtonAnimator.Play("HideBottomButton");
+    }
+
+    public void Trade()
+    {
+        tradeEditor.gameObject.SetActive(true);
+        tradeEditor.SetEditor(null);
+    }
 }

@@ -24,8 +24,10 @@ public class CabinScript : BuildingScript
     {
         yield return new WaitForSeconds(5);
 
+        peasantList.Remove(peasantScript);
         peasantScript.transform.parent = islandScript.npcsTransform;
         peasantScript.navMeshAgent.Warp(entry.position);
+        peasantScript.isInBuilding = false;
         peasantScript.exhaustion = 0;
         peasantScript.cabin = null;
 

@@ -91,7 +91,7 @@ public class RecipeRowScript : MonoBehaviour
             thirdIngredientImage.gameObject.SetActive(ingredientAmount == 3);
         }
 
-        hungerPointsText.text = recipe.hungerPoints.ToString();
+        hungerPointsText.text = (recipe.hungerPoints * 10).ToString();
     }
 
     public void IntroducedCropDropdownValueChange(int value)

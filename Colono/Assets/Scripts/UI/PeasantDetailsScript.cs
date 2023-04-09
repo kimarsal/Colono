@@ -18,27 +18,14 @@ public class PeasantDetailsScript : MonoBehaviour
         if(peasantScript != null) peasantScript.peasantDetailsScript = null;
         peasantScript = newPeasantScript;
         peasantScript.peasantDetailsScript = this;
-
-        UpdateDetails();
     }
 
-    public void UpdateDetails()
+    private void Update()
     {
+        if (peasantScript == null) return;
+
         ageSlider.value = peasantScript.age / 60;
         hungerSlider.value = peasantScript.hunger;
         exhaustionSlider.value = peasantScript.exhaustion;
-
-        if(peasantScript.peasantType == PeasantScript.PeasantType.Adult)
-        {
-            PeasantAdultScript peasantAdultScript = (PeasantAdultScript)peasantScript;
-            /*foreach (KeyValuePair<ResourceScript.MaterialType, int> materials in peasantAdultScript.materials)
-            {
-
-            }
-            foreach (KeyValuePair<ResourceScript.CropType, int> crops in peasantAdultScript.crops)
-            {
-
-            }*/
-        }
     }
 }

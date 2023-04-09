@@ -18,6 +18,12 @@ public class PlayerController : ShipController
 
 	private void Start()
     {
+		health = new int[4];
+		for(int i = 0; i < health.Length; i++)
+		{
+			health[i] = 3;
+		}
+
         rb = GetComponent<Rigidbody>();
 
         //S'obtenen les mides del mar
@@ -37,13 +43,13 @@ public class PlayerController : ShipController
         {
             verticalInput = Mathf.Clamp01(Input.GetAxis("Vertical"));
 			horizontalInput = Input.GetAxis("Horizontal");
-			tryToShoot = Input.GetKeyDown(KeyCode.Space);
+			wantsToShoot = Input.GetKeyDown(KeyCode.Space);
         }
 		else
 		{
 			verticalInput = 0;
 			horizontalInput = 0;
-			tryToShoot = false;
+			wantsToShoot = false;
 		}
     }
 
@@ -62,4 +68,21 @@ public class PlayerController : ShipController
 		else if (transform.position.z > zUpperBounds)
 			transform.position = new Vector3(transform.position.x, transform.position.y, zUpperBounds);
 	}
+
+    protected override void Shoot()
+    {
+        if(EnemyController.Instance.enemyStatus == EnemyController.EnemyStatus.Trading)
+		{
+			EnemyController.Instance.enemyStatus = Random.Range(0, 2) % 2 == 0 ? EnemyController.EnemyStatus.Attacking : EnemyController.EnemyStatus.Fleeing;
+        }
+    }
+
+    protected override IEnumerator Sink()
+    {
+		GameManager.Instance.GameOver();
+        base.Sink();
+		rb.constraints = RigidbodyConstraints.FreezeAll;
+        return null;
+    }
+
 }

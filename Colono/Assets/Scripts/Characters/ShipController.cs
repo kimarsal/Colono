@@ -3,11 +3,10 @@ using UnityEngine;
 
 public abstract class ShipController : MonoBehaviour
 {
-    public float health = 1;
-    public float healthLossOnImpact = 0.1f;
+    protected int[] health;
     public float speed = 1.0f;
     public float steerSpeed = 5.0f;
-    private float currentTime;
+    protected float currentTime;
 
     protected float verticalInput;
     protected float horizontalInput;
@@ -19,7 +18,7 @@ public abstract class ShipController : MonoBehaviour
     public AudioClip[] cannonballHitSounds;
     public ParticleSystem explosionPrefab;
 
-    protected bool tryToShoot;
+    protected bool wantsToShoot;
     public LeftCannonballScript leftCannonball;
     public RightCannonballScript rightCannonball;
     public Transform[] leftCannons;
@@ -37,7 +36,7 @@ public abstract class ShipController : MonoBehaviour
         Movement();
         Steer();
         SoundAndParticles();
-        Shoot();
+        TryToShoot();
     }
 
     protected abstract void ManageInput();
@@ -96,15 +95,22 @@ public abstract class ShipController : MonoBehaviour
         yield break;
     }
 
-    private void Shoot()
+    private void TryToShoot()
     {
         timeTillLastShot += Time.deltaTime;
-        if (tryToShoot && timeTillLastShot > timeBetweenShots)
+        if (wantsToShoot && timeTillLastShot > timeBetweenShots)
         {
             fireSound.Play();
             StartCoroutine(FireCannonballs());
             timeTillLastShot = 0;
+
+            Shoot();
         }
+    }
+
+    protected virtual void Shoot()
+    {
+
     }
 
     private IEnumerator FireCannonballs()
@@ -124,12 +130,23 @@ public abstract class ShipController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Cannonball"))
         {
-            health -= healthLossOnImpact;
             Instantiate(explosionPrefab, collision.gameObject.transform.position, Quaternion.Euler(new Vector3(-90, 0, 0)));
             Destroy(collision.gameObject);
             StartCoroutine(CannonballHit());
-            
-            if(health <= 0)
+
+            int i = Random.Range(0, health.Length);
+            int j = (i + 1) % health.Length;
+            while (i != j)
+            {
+                if (health[j] > 0)
+                {
+                    health[j]--;
+                    break;
+                }
+                j = (j + 1) % health.Length;
+            }
+
+            if(i == j)
             {
                 StartCoroutine(Sink());
             }
@@ -146,13 +163,11 @@ public abstract class ShipController : MonoBehaviour
         Destroy(audioSource);
     }
 
-    private IEnumerator Sink()
+    protected virtual IEnumerator Sink()
     {
         rb.constraints = RigidbodyConstraints.FreezeRotation;
         rb.useGravity = true;
         yield return new WaitForSeconds(1);
         Instantiate(ResourceScript.Instance.box, transform.position, Quaternion.identity, transform.parent).inventoryScript = GetComponent<EnemyShipScript>().inventoryScript;
-        Destroy(gameObject);
-
     }
 }

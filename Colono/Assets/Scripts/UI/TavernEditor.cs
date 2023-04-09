@@ -134,7 +134,7 @@ public class Recipe
         this.meat = meat;
     }
 
-    public int hungerPoints
+    public float hungerPoints
     {
         get
         {
@@ -142,7 +142,7 @@ public class Recipe
             if (introducedCrop != -1) ingredients++;
             if (nativeCrop != -1) ingredients++;
             if (meat != -1) ingredients++;
-            return ingredients * 3;
+            return ingredients / 10f;
         }
     }
 }

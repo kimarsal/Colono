@@ -684,7 +684,7 @@ NavMeshAgent:
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0.5
+  m_StoppingDistance: 1
   m_AutoTraverseOffMeshLink: 0
   m_AutoBraking: 0
   m_AutoRepath: 1
@@ -704,15 +704,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a72f9a779dbd143499308763b670d843, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  penScript: {fileID: 0}
   animalType: 6
+  position: {x: 0, y: 0, z: 0}
+  orientation: 0
+  penScript: {fileID: 0}
   walkSpeed: 0.5
-  runSpeed: 1
-  isRunning: 0
-  ageSpeed: 0.1
+  meatAmount: 0
+  ageSpeed: 0.01
   age: 0
-  lustSpeed: 0.05
-  timeSinceLastPairing: 0
+  confortLevel: 0
+  isInPlaceForPairing: 0
 --- !u!1 &9056768537378425841
 GameObject:
   m_ObjectHideFlags: 0

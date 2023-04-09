@@ -6,6 +6,8 @@ public class MineScript : BuildingScript
     private float timeSinceLastExtraction;
     public float extractionSpeed = 0.1f;
 
+    public override bool canManagePeasants { get { return true; } }
+
     public override EditorScript editorScript { get { return CanvasScript.Instance.mineEditor; } }
 
     private void Update()

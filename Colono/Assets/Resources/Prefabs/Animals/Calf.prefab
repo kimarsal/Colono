@@ -894,7 +894,7 @@ NavMeshAgent:
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0.5
+  m_StoppingDistance: 1
   m_AutoTraverseOffMeshLink: 0
   m_AutoBraking: 0
   m_AutoRepath: 1
@@ -920,9 +920,8 @@ MonoBehaviour:
   penScript: {fileID: 0}
   walkSpeed: 1
   meatAmount: 0
-  ageSpeed: 0.1
+  ageSpeed: 0.01
   age: 0
-  confortSpeed: 0.05
   confortLevel: 0
   isInPlaceForPairing: 0
 --- !u!1 &4515779562483629250

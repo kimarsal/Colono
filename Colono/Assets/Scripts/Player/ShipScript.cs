@@ -16,6 +16,7 @@ public class ShipScript : ConstructionScript
     public PenScript shipInteriorPen;
 
     [JsonIgnore] public Transform nextIslandTransform;
+    [JsonIgnore] public Transform enemyShipTransform;
     public override bool canBeRemoved { get { return false; } }
     public override int peasantCount { get { return peasantList.Count + shipInterior.peasantList.Count; } }
 
@@ -48,9 +49,9 @@ public class ShipScript : ConstructionScript
         }
 
         int animalTypes = Enum.GetValues(typeof(AnimalType)).Length;
-        for (int i = 0; i < animalTypes; i++)
+        for (int i = 0; i < 2; i++)
         {
-            for(int j = 0; j < 5; j++)
+            for(int j = 0; j < 1; j++)
             {
                 AnimalScript animalScript = Instantiate(ResourceScript.Instance.GetAnimalPrefab((AnimalType)i),
                     shipInteriorPen.transform.position, Quaternion.identity, shipInteriorPen.animalTransform).GetComponent<AnimalScript>();

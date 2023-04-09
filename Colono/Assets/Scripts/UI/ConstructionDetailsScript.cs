@@ -138,13 +138,13 @@ public class ConstructionDetailsScript : MonoBehaviour
     {
         int constructionCount = constructionScript.islandScript.constructionList.Count;
 
-        int currentConstruction = constructionScript.constructionType == ConstructionScript.ConstructionType.Ship ?
-            constructionCount :
-            constructionScript.islandScript.constructionList.IndexOf(constructionScript);
+        int currentConstruction = constructionScript.constructionType == ConstructionScript.ConstructionType.Ship ? constructionCount
+                                : constructionScript.islandScript.constructionList.IndexOf(constructionScript);
 
         if (next)
         {
-            currentConstruction = (currentConstruction + 1) % (constructionCount + 1);
+            currentConstruction = currentConstruction + 1;
+            if (currentConstruction == constructionCount + 1) currentConstruction = 0;
         }
         else
         {

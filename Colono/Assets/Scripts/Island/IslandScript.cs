@@ -73,6 +73,8 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
             constructionScript.outline = constructionScript.AddComponent<Outline>();
             constructionScript.outline.enabled = false;
 
+            constructionScript.entry.position = NPCManager.GetClosestPointInNavMesh(constructionScript.entry.position);
+
             if(((BuildingScript)constructionScript).buildingType == BuildingScript.BuildingType.Warehouse)
             {
                 inventoryScript.AddCapacityToAllCategories();

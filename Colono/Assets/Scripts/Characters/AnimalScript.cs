@@ -16,7 +16,7 @@ public class AnimalScript : MonoBehaviour
     [JsonIgnore] [SerializeField] private float walkSpeed = 1;
     [JsonIgnore] [SerializeField] private int meatAmount;
 
-    [JsonIgnore] private float ageSpeed = 0.01f;
+    [JsonIgnore] [SerializeField] private float ageSpeed = 0.01f;
     public float age;
 
     [JsonIgnore] private float confortSpeed = 0.05f;
@@ -69,8 +69,19 @@ public class AnimalScript : MonoBehaviour
             age = 1;
             penScript.AgeUpAnimal(this);
         }
+        else //if ((int)animalType % 2 == 1)
+        {
+            age = 1;
+            if (isConfortable)
+            {
+                penScript.confortableAnimals[(int)animalType].Remove(this);
+            }
+            StartCoroutine(Die());
+        }
 
-        if ((int)animalType % 2 == 1 && confortLevel < 1)
+        if ((int)animalType % 2 == 0) return;
+
+        if (confortLevel < 1)
         {
             confortLevel += Time.deltaTime * confortSpeed * penScript.level;
         }
@@ -120,6 +131,7 @@ public class AnimalScript : MonoBehaviour
 
     public IEnumerator Die()
     {
+        penScript.animals[(int)animalType]--;
         navMeshAgent.isStopped = true;
         animator.SetTrigger("Death");
         yield return new WaitForSeconds(animator.GetCurrentAnimatorClipInfo(0)[0].clip.length);

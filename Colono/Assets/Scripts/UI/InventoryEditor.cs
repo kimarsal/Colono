@@ -36,6 +36,8 @@ public class InventoryEditor : EditorScript
 
     public override void SetEditor(ConstructionScript constructionScript)
     {
+        islandInventoryScript = constructionScript.islandScript.inventoryScript;
+
         foreach (Transform row in rows)
         {
             Destroy(row.gameObject);

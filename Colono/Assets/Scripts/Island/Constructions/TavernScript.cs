@@ -26,24 +26,30 @@ public class TavernScript : BuildingScript
     {
         yield return new WaitForSeconds(5);
 
-        int hungerPoints = 0;
+        float hungerPoints = 0;
         foreach (Recipe recipe in recipeList)
         {
             if ((recipe.introducedCrop == -1 || islandScript.GetResourceAmount(ResourceScript.ResourceType.Crop, recipe.introducedCrop) > 0)
                 && (recipe.nativeCrop == -1 || islandScript.GetResourceAmount(ResourceScript.ResourceType.Crop, recipe.nativeCrop) > 0)
                 && (recipe.meat == -1 || islandScript.GetResourceAmount(ResourceScript.ResourceType.Meat, recipe.meat) > 0))
             {
-                hungerPoints += recipe.hungerPoints;
+                hungerPoints += recipe.hungerPoints * level;
                 if (recipe.introducedCrop != -1) islandScript.UseResource(ResourceScript.ResourceType.Crop, recipe.introducedCrop);
                 if (recipe.nativeCrop != -1) islandScript.UseResource(ResourceScript.ResourceType.Crop, recipe.nativeCrop);
                 if (recipe.meat != -1) islandScript.UseResource(ResourceScript.ResourceType.Crop, recipe.meat);
 
-                if(hungerPoints >= peasantScript.hunger) break;
+                if (hungerPoints >= peasantScript.hunger)
+                {
+                    hungerPoints = peasantScript.hunger;
+                    break;
+                }
             }
         }
 
+        peasantList.Remove(peasantScript);
         peasantScript.transform.parent = islandScript.npcsTransform;
         peasantScript.navMeshAgent.Warp(entry.position);
+        peasantScript.isInBuilding = false;
         peasantScript.hunger =- hungerPoints;
         peasantScript.tavern = null;
 

@@ -13,11 +13,15 @@ public class GameManager : MonoBehaviour
     private IslandGenerator islandGenerator;
     public InventoryEditor inventoryEditor;
 
+    private bool canPlayerTrade = false;
     private bool isPlayerNearIsland = false;
     public bool isInIsland = false;
 
+    public float distanceToTrade = 10f;
     public float distanceToDock = 10f;
     public float distanceToCheckIfCanDock = 50f;
+    public float distanceBetweenEnemyShipAndIslands = 50f;
+    public float distanceBetweenEnemyShipPositionAndIslands = 100f;
     public float distanceBetweenIslands = 200f;
 
     public bool[] discoveredCrops;
@@ -49,11 +53,80 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+        if (isInIsland) return;
+
         Vector3 shipPosition = ShipScript.Instance.transform.position;
+        Vector3 enemyShipPosition = EnemyController.Instance.transform.position;
 
+        HandleEnemyShipPosition(shipPosition, enemyShipPosition);
         FindClosestIsland(shipPosition);
-
         FindClosestPointInClosestIsland(shipPosition);
+    }
+
+    private void HandleEnemyShipPosition(Vector3 shipPosition, Vector3 enemyShipPosition)
+    {
+        float distance = Vector3.Distance(shipPosition, enemyShipPosition);
+        if (EnemyController.Instance.enemyStatus == EnemyController.EnemyStatus.Trading)
+        {
+            if (distance < distanceToTrade)
+            {
+                PlayerCanExchange();
+            }
+            else
+            {
+                PlayerCannotShop();
+            }
+            return;
+        }
+
+        Vector3 position = EnemyController.Instance.enemyStatus == EnemyController.EnemyStatus.StandBy ? ShipScript.Instance.enemyShipTransform.position : enemyShipPosition;
+        float minDistance = -1;
+        foreach (IslandScript islandScript in islandList)
+        {
+            float distanceToIsland = Vector3.Distance(islandScript.transform.position, position);
+            if (minDistance == -1 || distanceToIsland < minDistance)
+            {
+                minDistance = distanceToIsland;
+            }
+        }
+
+        if (EnemyController.Instance.enemyStatus == EnemyController.EnemyStatus.StandBy)
+        {
+            if (minDistance > distanceBetweenEnemyShipPositionAndIslands)
+            {
+                EnemyController.Instance.transform.position = position;
+                EnemyController.Instance.Initialize();
+            }
+        }
+        else
+        {
+            if (minDistance < distanceBetweenEnemyShipAndIslands)
+            {
+                EnemyController.Instance.enemyStatus = EnemyController.EnemyStatus.Fleeing;
+            }
+            if (distance > 50)
+            {
+                EnemyController.Instance.HideFromMap();
+            }
+        }
+    }
+
+    private void PlayerCanExchange()
+    {
+        if (!canPlayerTrade)
+        {
+            canPlayerTrade = true;
+            CanvasScript.Instance.PlayerCanTrade();
+        }
+    }
+
+    private void PlayerCannotShop()
+    {
+        if (canPlayerTrade)
+        {
+            canPlayerTrade = false;
+            CanvasScript.Instance.PlayerCannotTrade();
+        }
     }
 
     private void FindClosestIsland(Vector3 shipPosition)
@@ -125,8 +198,9 @@ public class GameManager : MonoBehaviour
 
     public void DockOntoIsland()
     {
+        isInIsland = true;
+
         CameraScript.Instance.SetIslandCamera(closestIsland.transform.position);
-        inventoryEditor.islandInventoryScript = closestIsland.inventoryScript;
         CanvasScript.Instance.Dock();
 
         ShipScript.Instance.islandScript = closestIsland;
@@ -143,6 +217,7 @@ public class GameManager : MonoBehaviour
 
     public void SelectPeasant(PeasantScript peasantScript)
     {
+        CameraScript.Instance.SetCameraToObject(peasantScript.position);
         CanvasScript.Instance.ShowPeasantDetails(peasantScript);
     }
 
@@ -195,7 +270,8 @@ public class GameManager : MonoBehaviour
     public void SelectConstruction(ConstructionScript constructionScript)
     {
         islandSelectionScript.selectedConstruction = constructionScript;
-        CameraScript.Instance.SetCameraToConstruction(constructionScript);
+        CameraScript.Instance.SetCameraToObject(constructionScript.constructionType == ConstructionScript.ConstructionType.Ship?
+                                                constructionScript.transform.position : constructionScript.entry.position);
         CanvasScript.Instance.ShowConstructionDetails(constructionScript);
     }
 
@@ -207,6 +283,8 @@ public class GameManager : MonoBehaviour
 
     public void Sail()
     {
+        isInIsland = false;
+
         CameraScript.Instance.ResetPlayerCamera();
         CanvasScript.Instance.Sail();
 
@@ -214,7 +292,6 @@ public class GameManager : MonoBehaviour
         islandCellScript.enabled = false;
 
         ShipScript.Instance.SendAllPeasantsBack();
-        islandSelectionScript.enabled = false;
     }
 
     public void SaveGame()
@@ -257,6 +334,11 @@ public class GameManager : MonoBehaviour
         }
 
         ShipScript.Instance.AddDefaultElements();
+    }
+
+    public void GameOver()
+    {
+        CameraScript.Instance.canMove = false;
     }
 }
 

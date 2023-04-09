@@ -1,5 +1,3 @@
-using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using static ResourceScript;
@@ -24,7 +22,7 @@ public class PenScript : EnclosureScript
 
     private void InitializeLists()
     {
-        int animalTypes = Enum.GetValues(typeof(AnimalType)).Length;
+        int animalTypes = GetEnumLength(ResourceType.Animal);
         animals = new int[animalTypes];
         desiredAmounts = new int[animalTypes];
         confortableAnimals = new List<AnimalScript>[animalTypes];
@@ -65,8 +63,11 @@ public class PenScript : EnclosureScript
 
         if(animals == null || animals.Length == 0) InitializeLists();
         animalList.Add(animalScript);
-        animals[(int)animalScript.animalType]++;
-        desiredAmounts[(int)animalScript.animalType]++;
+
+        int animalType = (int)animalScript.animalType;
+        animals[animalType]++;
+        int desiredAnimalType = animalType % 2 == 0 ? animalType + 1 : animalType;
+        if(desiredAmounts[desiredAnimalType] < animals[animalType] + animals[desiredAnimalType]) desiredAmounts[desiredAnimalType]++;
 
         animalScript.penScript = this;
     }
@@ -109,14 +110,18 @@ public class PenScript : EnclosureScript
         animalScript1.EndPairing();
         animalScript2.EndPairing();
 
-        AnimalType animalType = animalScript1.animalType - 1;
-        AnimalScript bornAnimalScript = Instantiate(ResourceScript.Instance.GetAnimalPrefab(animalType),
-            animalScript1.transform.position, animalScript1.transform.rotation, transform).GetComponent<AnimalScript>();
-        animalList.Add(bornAnimalScript);
+        int offspringNum = Random.Range(1, level + 1);
+        for(int i = 0; i < offspringNum; i++)
+        {
+            AnimalType animalType = animalScript1.animalType - 1;
+            AnimalScript bornAnimalScript = Instantiate(Instance.GetAnimalPrefab(animalType),
+                animalScript1.transform.position, animalScript1.transform.rotation, animalTransform).GetComponent<AnimalScript>();
+            animalList.Add(bornAnimalScript);
 
-        animals[(int)animalType]++;
-        CanvasScript.Instance.UpdatePenRow(animalType);
-        bornAnimalScript.penScript = this;
+            animals[(int)animalType]++;
+            CanvasScript.Instance.UpdatePenRow(animalType);
+            bornAnimalScript.penScript = this;
+        }
     }
 
     public void AnimalIsConfortable(AnimalScript animalScript)
@@ -134,7 +139,7 @@ public class PenScript : EnclosureScript
     private void ManageAnimals(int animalType)
     {
         if (confortableAnimals[animalType].Count >= 2 //Hi ha dos animals preparats per aparellar-se
-            && desiredAmounts[animalType] > animals[animalType]) //Es volen més animals del mateix tipus
+            && desiredAmounts[animalType] >= animals[animalType]) //Es volen més animals del mateix tipus
         {
             AnimalScript animalScript1 = confortableAnimals[animalType][0];
             AnimalScript animalScript2 = confortableAnimals[animalType][1];
