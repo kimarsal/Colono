@@ -92,13 +92,13 @@ public abstract class PeasantScript : MonoBehaviour
         GameObject head, lower, upper;
         if (headType == 0)
         {
-            head1.SetActive(false);
-            head = head2;
+            head2.SetActive(false);
+            head = head1;
         }
         else
         {
-            head2.SetActive(false);
-            head = head1;
+            head1.SetActive(false);
+            head = head2;
         }
 
         if (isNative)
@@ -129,6 +129,11 @@ public abstract class PeasantScript : MonoBehaviour
         head.GetComponent<SkinnedMeshRenderer>().material = newMaterial;
         lower.GetComponent<SkinnedMeshRenderer>().material = newMaterial;
         upper.GetComponent<SkinnedMeshRenderer>().material = newMaterial;
+    }
+
+    public GameObject GetHead()
+    {
+        return headType == 0 ? head1 : head2;
     }
 
     private void Update()

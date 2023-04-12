@@ -2392,7 +2392,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 80
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!136 &-1225516197737836024
 CapsuleCollider:
@@ -2443,6 +2443,7 @@ MonoBehaviour:
   age: 20
   hunger: 0
   exhaustion: 0
+  isInBuilding: 0
   islandScript: {fileID: 0}
   constructionScript: {fileID: 0}
   speechBubble: {fileID: 6796973763762318536}
@@ -2450,6 +2451,7 @@ MonoBehaviour:
   cabin: {fileID: 0}
   tavern: {fileID: 0}
   outline: {fileID: 0}
+  navMeshAgent: {fileID: 0}
   task: {fileID: 0}
   axe: {fileID: 1923715335560470710}
   shovel: {fileID: 1513827004056866456}

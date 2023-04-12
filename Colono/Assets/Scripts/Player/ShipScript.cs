@@ -29,11 +29,11 @@ public class ShipScript : ConstructionScript
 
     public void AddDefaultElements()
     {
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 50; i++)
         {
             PeasantScript.PeasantType peasantType = (PeasantScript.PeasantType)Random.Range(0, 2);//PeasantScript.PeasantType.Adult
             PeasantScript.PeasantGender peasantGender = (PeasantScript.PeasantGender)Random.Range(0, 2);
-            PeasantScript peasantScript = Instantiate(ResourceScript.Instance.GetNPCPrefab(peasantType, peasantGender),
+            PeasantScript peasantScript = Instantiate(ResourceScript.Instance.GetPeasantPrefab(peasantType, peasantGender),
             shipInteriorPen.transform.position, Quaternion.identity, shipInterior.npcsTransform);
             
             peasantScript.islandScript = shipInterior;

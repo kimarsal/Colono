@@ -189,7 +189,7 @@ public class IslandGenerator : MonoBehaviour
 
             foreach (PeasantScript peasantInfo in islandInfo.peasantList)
             {
-                PeasantScript peasantScript = Instantiate(ResourceScript.Instance.GetNPCPrefab(peasantInfo.peasantType, peasantInfo.peasantGender),
+                PeasantScript peasantScript = Instantiate(ResourceScript.Instance.GetPeasantPrefab(peasantInfo.peasantType, peasantInfo.peasantGender),
                     peasantInfo.position, Quaternion.Euler(0, peasantInfo.orientation, 0), islandScript.npcsTransform);
                 peasantScript.InitializePeasant(peasantInfo);
                 islandScript.peasantList.Add(peasantScript);

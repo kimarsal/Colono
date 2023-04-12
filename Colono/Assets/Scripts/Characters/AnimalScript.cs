@@ -123,6 +123,7 @@ public class AnimalScript : MonoBehaviour
 
     public void EndPairing()
     {
+        isInPlaceForPairing = false;
         confortLevel = 0;
         isConfortable = false;
         animalToPairUpWith = null;

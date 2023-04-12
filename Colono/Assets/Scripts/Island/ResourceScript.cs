@@ -34,6 +34,10 @@ public class ResourceScript : MonoBehaviour
     [SerializeField] private Color[] skinColorsCaucassian;
     [SerializeField] private Color[] hairColors;
 
+    [SerializeField] private GameObject[] malePeasantHeadPrefabs;
+    [SerializeField] private GameObject[] femalePeasantHeadPrefabs;
+    [SerializeField] private GameObject[] childPeasantHeadPrefabs;
+
     [Header("Cell materials")]
     public Material hoverMaterial;
     public Material selectingMaterial;
@@ -263,7 +267,7 @@ public class ResourceScript : MonoBehaviour
         return animals[(int)animalType];
     }
 
-    public PeasantScript GetNPCPrefab(PeasantScript.PeasantType peasantType, PeasantScript.PeasantGender peasantGender)
+    public PeasantScript GetPeasantPrefab(PeasantScript.PeasantType peasantType, PeasantScript.PeasantGender peasantGender)
     {
         PeasantScript prefab = null;
         switch (peasantType)
@@ -271,6 +275,28 @@ public class ResourceScript : MonoBehaviour
             case PeasantScript.PeasantType.Adult: prefab = peasantGender == PeasantScript.PeasantGender.Male ? malePeasantPrefab : femalePeasantPrefab; break;
             case PeasantScript.PeasantType.Child: prefab = childPeasantPrefab; break;
         }
+        return prefab;
+    }
+
+    public GameObject GetPeasantHeadPrefab(PeasantScript peasantScript)
+    {
+        GameObject prefab = null;
+        if(peasantScript.peasantType == PeasantScript.PeasantType.Adult)
+        {
+            if(peasantScript.peasantGender == PeasantScript.PeasantGender.Male)
+            {
+                prefab = malePeasantHeadPrefabs[peasantScript.headType];
+            }
+            else
+            {
+                prefab = femalePeasantHeadPrefabs[peasantScript.headType];
+            }
+        }
+        else
+        {
+            prefab = childPeasantHeadPrefabs[peasantScript.headType];
+        }
+
         return prefab;
     }
 

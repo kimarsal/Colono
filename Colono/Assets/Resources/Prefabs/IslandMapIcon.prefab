@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 184347863469043429}
   - component: {fileID: 8980204728663561885}
-  m_Layer: 5
+  m_Layer: 9
   m_Name: IslandMapIcon
   m_TagString: Island
   m_Icon: {fileID: 0}

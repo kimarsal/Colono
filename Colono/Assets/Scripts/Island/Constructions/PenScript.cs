@@ -54,12 +54,12 @@ public class PenScript : EnclosureScript
         }
     }
 
-    public void AddAnimal(AnimalScript animal)
+    public void AddAnimal(AnimalScript animalScript)
     {
-        AnimalScript animalScript = Instantiate(animal.gameObject, NPCManager.GetRandomPointWithinRange(minPos, maxPos),
+        /*AnimalScript animalScript = Instantiate(animal.gameObject, NPCManager.GetRandomPointWithinRange(minPos, maxPos),
                     Quaternion.Euler(0, animal.orientation, 0), animalTransform).GetComponent<AnimalScript>();
         animalScript.InitializeAnimal(animal);
-        Destroy(animal.gameObject);
+        Destroy(animal.gameObject);*/
 
         if(animals == null || animals.Length == 0) InitializeLists();
         animalList.Add(animalScript);
