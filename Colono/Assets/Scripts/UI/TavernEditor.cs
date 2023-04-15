@@ -8,9 +8,9 @@ public class TavernEditor : EditorScript
     [SerializeField] private Transform listTransform;
     [SerializeField] private GameObject rowPrefab;
     [SerializeField] private Transform addRecipeItemTransform;
-    public List<Dropdown.OptionData> introducedCropDropdownOptions;
+    /*public List<Dropdown.OptionData> introducedCropDropdownOptions;
     public List<Dropdown.OptionData> nativeCropDropdownOptions;
-    public List<Dropdown.OptionData> meatDropdownOptions;
+    public List<Dropdown.OptionData> meatDropdownOptions;*/
 
     public override void SetEditor(ConstructionScript constructionScript)
     {
@@ -23,7 +23,7 @@ public class TavernEditor : EditorScript
             Destroy(listTransform.GetChild(i).gameObject);
         }
 
-        int introducedCropTypes = System.Enum.GetValues(typeof(ResourceScript.CropType)).Length / 2;
+        /*int introducedCropTypes = System.Enum.GetValues(typeof(ResourceScript.CropType)).Length / 2;
         int nativeCropTypes = introducedCropTypes;
         int meatTypes = System.Enum.GetValues(typeof(ResourceScript.MeatType)).Length;
 
@@ -43,7 +43,7 @@ public class TavernEditor : EditorScript
         for (int i = 0; i < meatTypes; i++)
         {
             meatDropdownOptions.Add(new Dropdown.OptionData(ResourceScript.Instance.GetResourceSprite(ResourceScript.ResourceType.Meat, i)));
-        }
+        }*/
 
         foreach (Recipe recipe in tavernScript.recipeList)
         {

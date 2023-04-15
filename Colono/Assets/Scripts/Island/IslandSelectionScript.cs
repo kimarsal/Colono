@@ -79,7 +79,7 @@ public class IslandSelectionScript : MonoBehaviour
         }
     }
 
-    private void SelectPeasant(PeasantScript peasantScript)
+    public void SelectPeasant(PeasantScript peasantScript)
     {
 
         if (selectedConstruction != null)
@@ -90,7 +90,6 @@ public class IslandSelectionScript : MonoBehaviour
         }
         if (selectedPeasant != null)
         {
-            selectedPeasant.peasantDetailsScript = null;
             selectedPeasant.outline.enabled = false;
             selectedPeasant.outline.OutlineWidth = 2;
         }
@@ -103,7 +102,6 @@ public class IslandSelectionScript : MonoBehaviour
 
     public void UnselectPeasant()
     {
-        selectedPeasant.peasantDetailsScript = null;
         selectedPeasant.outline.enabled = false;
         selectedPeasant.outline.OutlineWidth = 2;
         selectedPeasant = null;
@@ -113,7 +111,6 @@ public class IslandSelectionScript : MonoBehaviour
     {
         if (selectedPeasant != null)
         {
-            selectedPeasant.peasantDetailsScript = null;
             selectedPeasant.outline.enabled = false;
             selectedPeasant.outline.OutlineWidth = 2;
         }

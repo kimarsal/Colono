@@ -24,10 +24,6 @@ public class GardenEditor : EditorScript
         {
             Destroy(cropButton.gameObject);
         }
-
-        UpdateDropdown();
-        
-        gridLayoutGroup.cellSize = new Vector2(cropButtonPrefab.GetComponent<RectTransform>().sizeDelta.x, cropButtonPrefab.GetComponent<RectTransform>().sizeDelta.y);
         gridLayoutGroup.constraintCount = gardenScript.width - 2;
 
         foreach(KeyValuePair<Vector2, CropType> pair in gardenScript.cropDictionary)
@@ -38,22 +34,6 @@ public class GardenEditor : EditorScript
             cropButtonScript.cropImage.sprite = ResourceScript.Instance.GetResourceSprite(ResourceType.Crop, (int)pair.Value);
             cropButtonScript.cell = pair.Key;
         }
-    }
-
-    public void UpdateDropdown()
-    {
-        cropDropdown.ClearOptions();
-
-        int cropTypes = System.Enum.GetValues(typeof(CropType)).Length;
-        for (int i = 0; i < cropTypes; i++)
-        {
-            if (GameManager.Instance.discoveredCrops[i])
-            {
-                cropDropdown.options.Add(new Dropdown.OptionData(ResourceScript.Instance.GetResourceSprite(ResourceType.Crop, i)));
-            }
-        }
-        cropDropdown.template.GetComponent<RectTransform>().sizeDelta = new Vector2(cropDropdown.template.GetComponent<RectTransform>().sizeDelta.x, cropTypes * 100 / 2);
-        //cropDropdown.value = 0;
     }
 
     public void DropdownChange(int value)

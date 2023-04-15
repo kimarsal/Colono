@@ -65,6 +65,7 @@ public class ConstructionDetailsScript : MonoBehaviour
 
     private IEnumerator HideEditor()
     {
+        CameraScript.Instance.canMove = true;
         yield return new WaitForSeconds(0.3f);
         if(constructionScript.editorScript != null) constructionScript.editorScript.gameObject.SetActive(false);
     }

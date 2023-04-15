@@ -14,6 +14,8 @@ public class PeasantAdultScript : PeasantScript
     public GameObject basket;
     public GameObject wateringCan;
 
+    public int childrenAmount = 0;
+
     public TaskSourceInterface taskSourceInterface
     {
         get
@@ -105,10 +107,12 @@ public class PeasantAdultScript : PeasantScript
         if (tavern != null) //Si ha anat a menjar
         {
             tavern.PeasantHasArrived(this);
+            peasantRowScript?.PeasantArrivedToBuilding();
         }
         else if (cabin != null) //Si ha anat a dormir
         {
             cabin.PeasantHasArrived(this);
+            peasantRowScript?.PeasantArrivedToBuilding();
         }
         else if (task != null) //Si té una tasca encarregada
         {
@@ -123,6 +127,7 @@ public class PeasantAdultScript : PeasantScript
             else
             {
                 constructionScript.PeasantHasArrived(this);
+                peasantRowScript?.PeasantArrivedToBuilding();
             }
         }
         else

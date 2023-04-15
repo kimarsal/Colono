@@ -27,9 +27,9 @@ public class RecipeRowScript : MonoBehaviour
 
     public void SetRow()
     {
-        introducedCropDropdown.options = tavernEditor.introducedCropDropdownOptions;
+        /*introducedCropDropdown.options = tavernEditor.introducedCropDropdownOptions;
         nativeCropDropdown.options = tavernEditor.nativeCropDropdownOptions;
-        meatDropdown.options = tavernEditor.meatDropdownOptions;
+        meatDropdown.options = tavernEditor.meatDropdownOptions;*/
 
         introducedCropDropdown.value = recipe.introducedCrop + 1;
         nativeCropDropdown.value = recipe.nativeCrop + 1;

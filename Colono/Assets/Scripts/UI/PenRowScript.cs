@@ -18,6 +18,7 @@ public class PenRowScript : MonoBehaviour
     public TextMeshProUGUI animalsInShipText;
 
     public GameObject adultSection;
+    public GameObject youngSection;
     public Button increaseDesiredAmountButton;
     public Button decreaseDesiredAmountButton;
     public TextMeshProUGUI desiredAmountText;
@@ -31,6 +32,12 @@ public class PenRowScript : MonoBehaviour
         if ((int)animalType % 2 == 0)
         {
             adultSection.SetActive(false);
+            youngSection.SetActive(true);
+        }
+        else
+        {
+            adultSection.SetActive(true);
+            youngSection.SetActive(false);
         }
         UpdateDesiredAmount();
     }

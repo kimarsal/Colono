@@ -2,12 +2,15 @@ using Newtonsoft.Json;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
+using static ResourceScript;
 
 public abstract class PeasantScript : MonoBehaviour
 {
     public enum PeasantType { Adult, Child }
     public enum PeasantGender { Male, Female }
-    public enum PeasantAction { Moving, Chopping, Digging, Pulling, Planting, Watering, Gathering, Feeding, Milking, Dancing };
+    public enum PeasantAction { Moving, Chopping, Digging, Pulling, Planting, Watering, Gathering, Dancing, Dying };
+
+    [JsonIgnore] public static int lifeExpectancy = 60;
 
     [Header("Characteristics")]
     public PeasantType peasantType;
@@ -48,13 +51,13 @@ public abstract class PeasantScript : MonoBehaviour
     [JsonIgnore] public IslandScript islandScript;
     [JsonIgnore] public ConstructionScript constructionScript;
     [JsonIgnore] public SpeechBubbleScript speechBubble;
-    [JsonIgnore] public PeasantDetailsScript peasantDetailsScript;
     [JsonIgnore] public CabinScript cabin;
     [JsonIgnore] public TavernScript tavern;
 
     [JsonIgnore] public Outline outline;
     [JsonIgnore] protected Animator animator;
     [JsonIgnore] public NavMeshAgent navMeshAgent;
+    [JsonIgnore] public PeasantRowScript peasantRowScript;
 
     private void Start()
     {
@@ -148,8 +151,6 @@ public abstract class PeasantScript : MonoBehaviour
 
     protected void UpdateDetails()
     {
-        age += Time.deltaTime * ageSpeed;
-
         if (hunger < 1)
         {
             hunger += Time.deltaTime * hungerSpeed;
@@ -179,6 +180,57 @@ public abstract class PeasantScript : MonoBehaviour
                 UpdateTask();
             }
         }
+
+        age += Time.deltaTime * ageSpeed;
+        if (age > 18 && age < 20)
+        {
+            AgeUpPeasant();
+        }
+        else if (age > lifeExpectancy)
+        {
+            StartCoroutine(Die());
+        }
+        else
+        {
+            peasantRowScript?.UpdatePeasantDetails();
+        }
+    }
+
+    private void AgeUpPeasant()
+    {
+        PeasantAdultScript peasantAdultScript = Instantiate(ResourceScript.Instance.GetPeasantPrefab(PeasantType.Adult, peasantGender),
+            transform.position, transform.rotation, transform.parent).GetComponent<PeasantAdultScript>();
+
+        peasantAdultScript.islandScript = islandScript;
+        peasantAdultScript.isNative = false;
+        peasantAdultScript.headType = Random.Range(0, 2);
+        peasantAdultScript._SKINCOLOR = _SKINCOLOR;
+        peasantAdultScript._HAIRCOLOR = _HAIRCOLOR;
+        peasantAdultScript._CLOTH3COLOR = _CLOTH3COLOR;
+        peasantAdultScript._CLOTH4COLOR = _CLOTH4COLOR;
+        peasantAdultScript._OTHERCOLOR = _OTHERCOLOR;
+
+        peasantRowScript?.SetPeasant(peasantAdultScript);
+
+        islandScript.peasantList.Add(peasantAdultScript);
+        peasantAdultScript.UpdateTask();
+        islandScript.peasantList.Remove(this);
+        Destroy(gameObject);
+    }
+
+    private IEnumerator Die()
+    {
+        peasantRowScript?.PeasantDies();
+        islandScript.peasantList.Remove(this);
+        if (constructionScript != null) constructionScript.peasantList.Remove(this);
+        if (tavern != null) tavern.peasantList.Remove(this);
+        if (cabin != null) cabin.peasantList.Remove(this);
+
+        navMeshAgent.isStopped = true;
+        animator.SetFloat("Speed", 0);
+        animator.SetInteger("State", (int)PeasantAction.Dying);
+        yield return new WaitForSeconds(animator.GetCurrentAnimatorClipInfo(0)[0].clip.length);
+        Destroy(gameObject);
     }
 
     protected void CheckIfArrivedAtDestination()
@@ -220,10 +272,13 @@ public abstract class PeasantScript : MonoBehaviour
 
     protected void SetDestination(Vector3 destination)
     {
-        navMeshAgent.SetDestination(destination);
-        if (animator.GetCurrentAnimatorClipInfo(0)[0].clip.name == "Peasant_Idle"
-            || animator.GetCurrentAnimatorClipInfo(0)[0].clip.name == "Peasant_Walking"
-            || animator.GetCurrentAnimatorClipInfo(0)[0].clip.name == "Peasant_Running") MoveCharacter();
+        if(navMeshAgent.isActiveAndEnabled && navMeshAgent.isOnNavMesh)
+        {
+            navMeshAgent.SetDestination(destination);
+            if (animator.GetCurrentAnimatorClipInfo(0)[0].clip.name == "Peasant_Idle"
+                || animator.GetCurrentAnimatorClipInfo(0)[0].clip.name == "Peasant_Walking"
+                || animator.GetCurrentAnimatorClipInfo(0)[0].clip.name == "Peasant_Running") MoveCharacter();
+        }
     }
 
     public abstract void UpdateTask();

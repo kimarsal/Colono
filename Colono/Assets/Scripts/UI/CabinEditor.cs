@@ -17,7 +17,7 @@ public class CabinEditor : EditorScript
     private void SetRow(PeasantScript peasantScript, int tab)
     {
         PeasantRowScript rowScript = Instantiate(peasantRowPrefab, rowsTransform);
-        rowScript.peasantScript = peasantScript;
+        rowScript.SetPeasant(peasantScript);
         peasantRows[tab].Add(rowScript);
     }
 
@@ -63,5 +63,26 @@ public class CabinEditor : EditorScript
         }
 
         scrollRect.normalizedPosition = new Vector2(0, 1);
+    }
+
+    public void RemoveRow(PeasantRowScript peasantRowScript, bool inConstruction)
+    {
+        peasantRows[inConstruction ? 0 : 1].Remove(peasantRowScript);
+        Destroy(peasantRowScript.gameObject);
+    }
+
+    public void MoveRow(PeasantRowScript peasantRowScript, bool toConstruction)
+    {
+        if (toConstruction)
+        {
+            peasantRows[0].Remove(peasantRowScript);
+            peasantRows[1].Add(peasantRowScript);
+        }
+        else
+        {
+            peasantRows[1].Remove(peasantRowScript);
+            peasantRows[0].Add(peasantRowScript);
+        }
+        peasantRowScript.gameObject.SetActive(selectedTab == (toConstruction ? 1 : 0));
     }
 }

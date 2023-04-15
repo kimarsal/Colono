@@ -29,7 +29,7 @@ public class ShipScript : ConstructionScript
 
     public void AddDefaultElements()
     {
-        for (int i = 0; i < 50; i++)
+        for (int i = 0; i < 30; i++)
         {
             PeasantScript.PeasantType peasantType = (PeasantScript.PeasantType)Random.Range(0, 2);//PeasantScript.PeasantType.Adult
             PeasantScript.PeasantGender peasantGender = (PeasantScript.PeasantGender)Random.Range(0, 2);
@@ -49,9 +49,9 @@ public class ShipScript : ConstructionScript
         }
 
         int animalTypes = Enum.GetValues(typeof(AnimalType)).Length;
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < animalTypes; i++)
         {
-            for(int j = 0; j < 1; j++)
+            for(int j = 0; j < 2; j++)
             {
                 AnimalScript animalScript = Instantiate(ResourceScript.Instance.GetAnimalPrefab((AnimalType)i),
                     shipInteriorPen.transform.position, Quaternion.identity, shipInteriorPen.animalTransform).GetComponent<AnimalScript>();

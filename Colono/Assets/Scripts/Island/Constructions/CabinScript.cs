@@ -1,6 +1,6 @@
-using System;
 using System.Collections;
 using UnityEngine;
+using static PeasantScript;
 
 public class CabinScript : BuildingScript
 {
@@ -31,10 +31,30 @@ public class CabinScript : BuildingScript
         peasantScript.exhaustion = 0;
         peasantScript.cabin = null;
 
-        if (peasantScript.peasantType == PeasantScript.PeasantType.Adult)
+        if (peasantScript.peasantType == PeasantType.Adult)
         {
             PeasantAdultScript peasantAdultScript = (PeasantAdultScript)peasantScript;
             peasantAdultScript.taskSourceInterface.GetNextPendingTask(peasantAdultScript);
+            if(peasantAdultScript.peasantGender == PeasantGender.Female && peasantAdultScript.childrenAmount < 2)
+            {
+                PeasantGender peasantGender = (PeasantGender)Random.Range(0, 2);
+                PeasantChildScript peasantChildScript = Instantiate(ResourceScript.Instance.GetPeasantPrefab(PeasantType.Child, peasantGender),
+                peasantAdultScript.transform.position, peasantAdultScript.transform.rotation, islandScript.npcsTransform).GetComponent<PeasantChildScript>();
+
+                peasantChildScript.islandScript = islandScript;
+                peasantChildScript.isNative = false;
+                peasantChildScript.headType = Random.Range(0, 2);
+                peasantChildScript._SKINCOLOR = ResourceScript.Instance.GetRandomSkinColor();
+                peasantChildScript._HAIRCOLOR = ResourceScript.Instance.GetRandomHairColor();
+                peasantChildScript._CLOTH3COLOR = Random.ColorHSV();
+                peasantChildScript._CLOTH4COLOR = Random.ColorHSV();
+                peasantChildScript._OTHERCOLOR = Random.ColorHSV();
+
+                islandScript.peasantList.Add(peasantScript);
+                peasantChildScript.UpdateTask();
+
+                peasantAdultScript.childrenAmount++;
+            }
         }
         else peasantScript.UpdateTask();
     }

@@ -34,14 +34,17 @@ public class PeasantChildScript : PeasantScript
         if (tavern != null) //Si ha anat a menjar
         {
             tavern.PeasantHasArrived(this);
+            peasantRowScript?.PeasantArrivedToBuilding();
         }
         else if (cabin != null) //Si ha anat a dormir
         {
             cabin.PeasantHasArrived(this);
+            peasantRowScript?.PeasantArrivedToBuilding();
         }
         else if (constructionScript != null) //Si té el vaixell com a destí
         {
             constructionScript.PeasantHasArrived(this);
+            peasantRowScript?.PeasantArrivedToBuilding();
         }
         else
         {

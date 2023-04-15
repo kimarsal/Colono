@@ -166,9 +166,12 @@ public class AnimalScript : MonoBehaviour
             animator = GetComponent<Animator>();
             navMeshAgent = GetComponent<NavMeshAgent>();
         }
-        navMeshAgent.SetDestination(destination);
-        navMeshAgent.isStopped = false;
-        navMeshAgent.speed = walkSpeed;
-        animator.SetFloat("Speed", 0.5f);
+        if (navMeshAgent.isActiveAndEnabled && navMeshAgent.isOnNavMesh)
+        {
+            navMeshAgent.SetDestination(destination);
+            navMeshAgent.isStopped = false;
+            navMeshAgent.speed = walkSpeed;
+            animator.SetFloat("Speed", 0.5f);
+        }
     }
 }

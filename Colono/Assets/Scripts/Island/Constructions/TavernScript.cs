@@ -30,13 +30,13 @@ public class TavernScript : BuildingScript
         foreach (Recipe recipe in recipeList)
         {
             if ((recipe.introducedCrop == -1 || islandScript.GetResourceAmount(ResourceScript.ResourceType.Crop, recipe.introducedCrop) > 0)
-                && (recipe.nativeCrop == -1 || islandScript.GetResourceAmount(ResourceScript.ResourceType.Crop, recipe.nativeCrop) > 0)
+                && (recipe.nativeCrop == -1 || islandScript.GetResourceAmount(ResourceScript.ResourceType.Crop, recipe.nativeCrop + 5) > 0)
                 && (recipe.meat == -1 || islandScript.GetResourceAmount(ResourceScript.ResourceType.Meat, recipe.meat) > 0))
             {
                 hungerPoints += recipe.hungerPoints * level;
                 if (recipe.introducedCrop != -1) islandScript.UseResource(ResourceScript.ResourceType.Crop, recipe.introducedCrop);
-                if (recipe.nativeCrop != -1) islandScript.UseResource(ResourceScript.ResourceType.Crop, recipe.nativeCrop);
-                if (recipe.meat != -1) islandScript.UseResource(ResourceScript.ResourceType.Crop, recipe.meat);
+                if (recipe.nativeCrop != -1) islandScript.UseResource(ResourceScript.ResourceType.Crop, recipe.nativeCrop + 5);
+                if (recipe.meat != -1) islandScript.UseResource(ResourceScript.ResourceType.Meat, recipe.meat);
 
                 if (hungerPoints >= peasantScript.hunger)
                 {
@@ -50,7 +50,7 @@ public class TavernScript : BuildingScript
         peasantScript.transform.parent = islandScript.npcsTransform;
         peasantScript.navMeshAgent.Warp(entry.position);
         peasantScript.isInBuilding = false;
-        peasantScript.hunger =- hungerPoints;
+        peasantScript.hunger -= hungerPoints;
         peasantScript.tavern = null;
 
         if (peasantScript.peasantType == PeasantScript.PeasantType.Adult)

@@ -33,6 +33,7 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+        //Time.timeScale = 2;
         Instance = this;
     }
 
