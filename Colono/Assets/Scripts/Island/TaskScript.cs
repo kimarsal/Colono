@@ -1,16 +1,22 @@
-using System.Collections;
-using System.Collections.Generic;
+using Newtonsoft.Json;
 using UnityEngine;
 
+[JsonObject(MemberSerialization.OptIn)]
 public abstract class TaskScript : MonoBehaviour
 {
     public TaskSourceInterface taskSourceScript;
     public enum TaskType { Item, Patch }
-    public Vector3 center;
-    public TaskType taskType;
+    [JsonProperty] public Vector3 center;
+    [JsonProperty] public TaskType taskType;
 
     public PeasantAdultScript peasantAdultScript;
-    public bool isBeingTakenCareOf;
+    [JsonProperty] public int peasantIndex = -1;
+    [JsonProperty] public bool isBeingTakenCareOf;
+
+    public virtual void AssignPeasant(PeasantAdultScript newPeasantAdultScript)
+    {
+        peasantAdultScript = newPeasantAdultScript;
+    }
 
     public virtual void TaskProgress()
     {

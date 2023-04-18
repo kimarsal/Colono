@@ -38,7 +38,7 @@ public class PeasantRowScript : MonoBehaviour
 
     public void SelectPeasant()
     {
-        if (!isInDetails && !peasantScript.isInBuilding)
+        if (peasantScript.islandScript != ShipScript.Instance.shipInterior && !peasantScript.isInBuilding)
         {
             CameraScript.Instance.canMove = true;
             GameManager.Instance.islandSelectionScript.SelectPeasant(peasantScript);
@@ -57,19 +57,15 @@ public class PeasantRowScript : MonoBehaviour
         }
     }
 
-    public void MovePeasant(bool toConstruction)
+    public void PeasantArrivedToBuilding(bool toShip = false)
     {
-        if (!isInDetails)
-        {
-            CanvasScript.Instance.cabinEditor.MoveRow(this, toConstruction);
-        }
-    }
-
-    public void PeasantArrivedToBuilding()
-    {
-        if(isInDetails)
+        if (isInDetails)
         {
             GameManager.Instance.UnselectPeasant();
+        }
+        else if (toShip)
+        {
+            CanvasScript.Instance.cabinEditor.MoveRowToShipList(this);
         }
     }
 

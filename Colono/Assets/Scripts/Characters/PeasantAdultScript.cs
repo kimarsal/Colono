@@ -1,9 +1,8 @@
-using System;
+using Newtonsoft.Json;
 using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
+[JsonObject(MemberSerialization.OptIn)]
 public class PeasantAdultScript : PeasantScript
 {
     public TaskScript task;
@@ -14,7 +13,7 @@ public class PeasantAdultScript : PeasantScript
     public GameObject basket;
     public GameObject wateringCan;
 
-    public int childrenAmount = 0;
+    [JsonProperty] public int childrenAmount = 0;
 
     public TaskSourceInterface taskSourceInterface
     {
@@ -98,12 +97,18 @@ public class PeasantAdultScript : PeasantScript
     public void AssignTask(TaskScript taskScript)
     {
         task = taskScript;
-        if (task != null) task.peasantAdultScript = this;
+        if (task != null) task.AssignPeasant(this);
         UpdateTask();
     }
 
     protected override void ArrivedAtDestination()
     {
+        if (age >= lifeExpectancy)
+        {
+            StartCoroutine(Die());
+            return;
+        }
+
         if (tavern != null) //Si ha anat a menjar
         {
             tavern.PeasantHasArrived(this);
@@ -127,7 +132,7 @@ public class PeasantAdultScript : PeasantScript
             else
             {
                 constructionScript.PeasantHasArrived(this);
-                peasantRowScript?.PeasantArrivedToBuilding();
+                peasantRowScript?.PeasantArrivedToBuilding(constructionScript.constructionType == ConstructionScript.ConstructionType.Ship);
             }
         }
         else
@@ -201,5 +206,36 @@ public class PeasantAdultScript : PeasantScript
             hunger += 0.05f;
             exhaustion += 0.05f;
         }
+    }
+
+    private IEnumerator Die()
+    {
+        peasantRowScript?.PeasantDies();
+        islandScript.peasantList.Remove(this);
+        if (tavern != null)
+        {
+            if (isInBuilding)
+            {
+                tavern.peasantsInside--;
+                Debug.Log("Peasant " + islandScript.peasantList.IndexOf(this) + " died inside a tavern. Number of peasants inside: " + tavern.peasantsInside);
+            }
+            tavern.peasantList.Remove(this);
+        }
+        if (cabin != null)
+        {
+            if (tavern == null && isInBuilding)
+            {
+                cabin.peasantsInside--;
+                Debug.Log("Peasant " + islandScript.peasantList.IndexOf(this) + " died inside a cabin. Number of peasants inside: " + cabin.peasantsInside);
+            }
+            cabin.peasantList.Remove(this);
+        }
+        if (constructionScript != null) constructionScript.peasantList.Remove(this);
+
+        navMeshAgent.isStopped = true;
+        animator.SetFloat("Speed", 0);
+        animator.SetInteger("State", (int)PeasantAction.Dying);
+        yield return new WaitForSeconds(animator.GetCurrentAnimatorClipInfo(0)[0].clip.length);
+        Destroy(gameObject);
     }
 }

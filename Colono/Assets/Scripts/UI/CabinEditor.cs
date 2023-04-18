@@ -28,7 +28,7 @@ public class CabinEditor : EditorScript
             Destroy(row.gameObject);
         }
 
-        peasantRows = new List<PeasantRowScript>[2];
+        peasantRows = new List<PeasantRowScript>[3];
         peasantRows[0] = new List<PeasantRowScript>();
         foreach(PeasantScript peasantScript in constructionScript.islandScript.peasantList)
         {
@@ -42,6 +42,12 @@ public class CabinEditor : EditorScript
             {
                 SetRow(peasantScript, 1);
             }
+        }
+
+        peasantRows[2] = new List<PeasantRowScript>();
+        foreach (PeasantScript peasantScript in ShipScript.Instance.shipInterior.peasantList)
+        {
+            SetRow(peasantScript, 2);
         }
 
         SelectTab(0);
@@ -71,18 +77,10 @@ public class CabinEditor : EditorScript
         Destroy(peasantRowScript.gameObject);
     }
 
-    public void MoveRow(PeasantRowScript peasantRowScript, bool toConstruction)
+    public void MoveRowToShipList(PeasantRowScript peasantRowScript)
     {
-        if (toConstruction)
-        {
-            peasantRows[0].Remove(peasantRowScript);
-            peasantRows[1].Add(peasantRowScript);
-        }
-        else
-        {
-            peasantRows[1].Remove(peasantRowScript);
-            peasantRows[0].Add(peasantRowScript);
-        }
-        peasantRowScript.gameObject.SetActive(selectedTab == (toConstruction ? 1 : 0));
+        peasantRows[1].Remove(peasantRowScript);
+        peasantRows[2].Add(peasantRowScript);
+        peasantRowScript.gameObject.SetActive(selectedTab == 2);
     }
 }

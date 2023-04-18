@@ -2,28 +2,29 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using UnityEngine;
 
+[JsonObject(MemberSerialization.OptIn)]
 public abstract class ConstructionScript : MonoBehaviour
 {
     public enum ConstructionType { Ship, Enclosure, Building }
-    public ConstructionType constructionType;
-    public Vector2[] cells;
-    public int length;
-    public int width;
+    [JsonProperty] public ConstructionType constructionType;
+    [JsonProperty] public Vector2[] cells;
+    [JsonProperty] public int length;
+    [JsonProperty] public int width;
 
-    public int level = 1;
-    public int maxPeasants;
-    public List<PeasantScript> peasantList = new List<PeasantScript>();
-    public int peasantsOnTheirWay;
+    [JsonProperty] public int level = 1;
+    [JsonProperty] public int maxPeasants;
+    [JsonProperty] public List<PeasantScript> peasantList = new List<PeasantScript>();
+    [JsonProperty] public int peasantsInside;
 
-    [JsonIgnore] public IslandScript islandScript;
-    [JsonIgnore] public ConstructionDetailsScript constructionDetailsScript;
-    [JsonIgnore] public Transform entry;
-    [JsonIgnore] public Outline outline;
+    public IslandScript islandScript;
+    public ConstructionDetailsScript constructionDetailsScript;
+    public Transform entry;
+    public Outline outline;
 
-    [JsonIgnore] public virtual string title { get { return constructionType.ToString(); } }
-    [JsonIgnore] public virtual bool canManagePeasants { get { return true; } }
-    [JsonIgnore] public virtual bool canBeRemoved { get { return true; } }
-    [JsonIgnore] public virtual int peasantCount { get { return peasantList.Count; } }
+    public virtual string title { get { return constructionType.ToString(); } }
+    public virtual bool canManagePeasants { get { return true; } }
+    public virtual bool canBeRemoved { get { return true; } }
+    public virtual int peasantCount { get { return peasantList.Count; } }
 
     public abstract EditorScript editorScript { get; }
 
@@ -31,7 +32,7 @@ public abstract class ConstructionScript : MonoBehaviour
     {
         peasantScript.constructionScript = this;
         peasantList.Add(peasantScript);
-        peasantsOnTheirWay++;
+        UpdateConstructionDetails();
     }
 
     public virtual PeasantScript RemovePeasant()
@@ -39,15 +40,15 @@ public abstract class ConstructionScript : MonoBehaviour
         PeasantScript peasantScript = peasantList[0];
         peasantList.RemoveAt(0);
 
-        if (!peasantScript.isInBuilding)
+        if (peasantScript.isInBuilding)
         {
-            peasantsOnTheirWay--;
-        }
-        else
-        {
+            peasantsInside--;
+            Debug.Log("Peasant " + islandScript.peasantList.IndexOf(peasantScript) + " was inside and was removed. Number of peasants inside: " + peasantsInside);
+
             peasantScript.transform.parent = islandScript.npcsTransform;
             peasantScript.navMeshAgent.Warp(entry.position);
             peasantScript.isInBuilding = false;
+            peasantScript.isInConstruction = false;
         }
 
         return peasantScript;
@@ -55,7 +56,8 @@ public abstract class ConstructionScript : MonoBehaviour
 
     public virtual PeasantScript PeasantHasArrived(PeasantScript peasantScript)
     {
-        peasantsOnTheirWay--;
+        peasantsInside++;
+        Debug.Log("Peasant " + islandScript.peasantList.IndexOf(peasantScript) + " has arrived. Number of peasants inside: " + peasantsInside);
         UpdateConstructionDetails();
         return peasantScript;
     }

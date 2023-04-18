@@ -1,25 +1,21 @@
 using Newtonsoft.Json;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using static UnityEditor.Progress;
 
 public class ItemScript : TaskScript
 {
     public enum ActionType { Chop, Dig, Pull, Pick }
-    [JsonIgnore] public ActionType actionType;
-    public Vector2 itemCell;
-    public int orientation;
+    public ActionType actionType;
+    [JsonProperty] public Vector2 itemCell;
+    [JsonProperty] public int orientation;
 
-    [JsonIgnore] public ResourceScript.MaterialType materialType;
-    public int materialAmount;
-    public Terrain.TerrainType terrainType;
-    public int itemIndex;
+    public ResourceScript.MaterialType materialType;
+    [JsonProperty]public int materialAmount;
+    [JsonProperty]public Terrain.TerrainType terrainType;
+    [JsonProperty] public int itemIndex;
 
-    [JsonIgnore] public IslandScript islandScript;
-    public bool isScheduledForClearing;
-    [JsonIgnore] private Outline outline;
+    public IslandScript islandScript;
+    [JsonProperty] public bool isScheduledForClearing;
+    private Outline outline;
 
     private void Start()
     {
@@ -41,6 +37,12 @@ public class ItemScript : TaskScript
         outline.enabled = toClear;
         if (toClear) islandScript.AddItemToClear(this);
         else islandScript.RemoveItemToClear(this);
+    }
+
+    public override void AssignPeasant(PeasantAdultScript newPeasantAdultScript)
+    {
+        base.AssignPeasant(newPeasantAdultScript);
+        peasantIndex = islandScript.peasantList.IndexOf(newPeasantAdultScript);
     }
 
     public override void TaskProgress()

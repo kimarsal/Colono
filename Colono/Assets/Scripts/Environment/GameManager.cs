@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        //Time.timeScale = 2;
+        Time.timeScale = 5;
         Instance = this;
     }
 
@@ -343,10 +343,42 @@ public class GameManager : MonoBehaviour
     }
 }
 
-[System.Serializable]
+[Serializable]
 public class GameInfo
 {
     public int seed;
-    public ShipScript shipScript;
+    [JsonIgnore] public ShipScript shipScript;
     public List<IslandScript> islandList = new List<IslandScript>();
+}
+
+public class ColorHandler : JsonConverter
+{
+    public ColorHandler()
+    {
+    }
+
+    public override bool CanConvert(Type objectType)
+    {
+        return true;
+    }
+
+    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    {
+        try
+        {
+            ColorUtility.TryParseHtmlString("#" + reader.Value, out Color loadedColor);
+            return loadedColor;
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError($"Failed to parse color {objectType} : {ex.Message}");
+            return null;
+        }
+    }
+
+    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    {
+        string val = ColorUtility.ToHtmlStringRGB((Color)value);
+        writer.WriteValue(val);
+    }
 }

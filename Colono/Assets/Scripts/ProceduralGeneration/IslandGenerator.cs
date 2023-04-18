@@ -142,21 +142,6 @@ public class IslandGenerator : MonoBehaviour
         }
         else
         {
-            foreach (KeyValuePair<Vector2, ItemScript> pair in islandInfo.itemDictionary)
-            {
-                ItemScript itemScript = ResourceScript.Instance.GetItemPrefab(pair.Value.terrainType, pair.Value.itemIndex);
-                Vector3 itemPos = islandScript.transform.position + MeshGenerator.GetCellCenter(pair.Key, islandScript.meshData);
-                itemScript.transform.position = itemPos;
-                itemScript.transform.rotation = Quaternion.Euler(0, pair.Value.orientation, 0);
-                itemScript.transform.parent = islandScript.itemsTransform.transform;
-                itemScript.terrainType = pair.Value.terrainType;
-                itemScript.itemIndex = pair.Value.itemIndex;
-                itemScript.itemCell = pair.Key;
-                itemScript.orientation = pair.Value.orientation;
-                itemScript.materialAmount = pair.Value.materialAmount;
-                islandScript.AddItem(itemScript);
-            }
-
             islandScript.inventoryScript = islandInfo.inventoryScript;
 
             foreach (ConstructionScript constructionInfo in islandInfo.constructionList)
@@ -193,6 +178,28 @@ public class IslandGenerator : MonoBehaviour
                     peasantInfo.position, Quaternion.Euler(0, peasantInfo.orientation, 0), islandScript.npcsTransform);
                 peasantScript.InitializePeasant(peasantInfo);
                 islandScript.peasantList.Add(peasantScript);
+            }
+
+            foreach (KeyValuePair<Vector2, ItemScript> pair in islandInfo.itemDictionary)
+            {
+                ItemScript itemScript = ResourceScript.Instance.GetItemPrefab(pair.Value.terrainType, pair.Value.itemIndex);
+                Vector3 itemPos = islandScript.transform.position + MeshGenerator.GetCellCenter(pair.Key, islandScript.meshData);
+                itemScript.transform.position = itemPos;
+                itemScript.transform.rotation = Quaternion.Euler(0, pair.Value.orientation, 0);
+                itemScript.transform.parent = islandScript.itemsTransform.transform;
+                itemScript.terrainType = pair.Value.terrainType;
+                itemScript.itemIndex = pair.Value.itemIndex;
+                itemScript.itemCell = pair.Key;
+                itemScript.orientation = pair.Value.orientation;
+                itemScript.materialAmount = pair.Value.materialAmount;
+
+                if(pair.Value.peasantIndex != -1)
+                {
+                    PeasantAdultScript peasantAdultScript = (PeasantAdultScript)islandScript.peasantList[pair.Value.peasantIndex];
+                    peasantAdultScript.AssignTask(itemScript);
+                }
+
+                islandScript.AddItem(itemScript);
             }
         }
 

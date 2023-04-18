@@ -4,12 +4,12 @@ using UnityEngine;
 public abstract class EnclosureScript : ConstructionScript, TaskSourceInterface
 {
     public enum EnclosureType { Garden, Pen, Training };
-    public EnclosureType enclosureType;
+    [JsonProperty] public EnclosureType enclosureType;
 
-    public Vector3 minPos;
-    public Vector3 maxPos;
+    [JsonProperty] public Vector3 minPos;
+    [JsonProperty] public Vector3 maxPos;
 
-    [JsonIgnore] public override string title { get { return enclosureType.ToString(); } }
+    public override string title { get { return enclosureType.ToString(); } }
 
     public virtual void InitializeEnclosure(EnclosureScript enclosureScript, IslandScript islandScript)
     {
@@ -81,7 +81,6 @@ public abstract class EnclosureScript : ConstructionScript, TaskSourceInterface
         }
         peasantScript.CancelTask();
         peasantList.Remove(peasantScript);
-        peasantsOnTheirWay--;
 
         return peasantScript;
     }
@@ -90,7 +89,8 @@ public abstract class EnclosureScript : ConstructionScript, TaskSourceInterface
     {
         if (other.gameObject.CompareTag("NPC"))
         {
-            peasantsOnTheirWay--;
+            peasantsInside++;
+            Debug.Log("Peasant " + islandScript.peasantList.IndexOf(other.gameObject.GetComponent<PeasantScript>()) + " has arrived to enclosure. Number of peasants inside: " + peasantsInside);
             UpdateConstructionDetails();
         }
     }
@@ -99,7 +99,8 @@ public abstract class EnclosureScript : ConstructionScript, TaskSourceInterface
     {
         if (other.gameObject.CompareTag("NPC"))
         {
-            peasantsOnTheirWay++;
+            peasantsInside--;
+            Debug.Log("Peasant " + islandScript.peasantList.IndexOf(other.gameObject.GetComponent<PeasantScript>()) + " has exited enclosure. Number of peasants inside: " + peasantsInside);
             UpdateConstructionDetails();
         }
     }

@@ -273,7 +273,7 @@ public class ResourceScript : MonoBehaviour
         switch (peasantType)
         {
             case PeasantScript.PeasantType.Adult: prefab = peasantGender == PeasantScript.PeasantGender.Male ? malePeasantPrefab : femalePeasantPrefab; break;
-            case PeasantScript.PeasantType.Child: prefab = childPeasantPrefab; break;
+            case PeasantScript.PeasantType.Child: prefab = childPeasantPrefab; prefab.peasantGender = peasantGender; break;
         }
         return prefab;
     }

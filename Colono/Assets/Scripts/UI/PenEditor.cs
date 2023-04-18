@@ -68,13 +68,13 @@ public class PenEditor : EditorScript
 
     public void MoveAnimal(AnimalType animalType, bool toPen)
     {
-        PenScript origin = toPen ? shipPenScript : penScript;
-        PenScript destination = toPen ? penScript : shipPenScript;
+        PenScript originalPen = toPen ? shipPenScript : penScript;
+        PenScript newPen = toPen ? penScript : shipPenScript;
         
-        AnimalScript animalScript = origin.RemoveAnimal(animalType);
+        AnimalScript animalScript = originalPen.RemoveAnimal(animalType);
         if (animalScript == null) return;
         
-        destination.AddAnimal(animalScript);
+        newPen.AddAnimal(animalScript);
 
         UpdatePenText();
     }

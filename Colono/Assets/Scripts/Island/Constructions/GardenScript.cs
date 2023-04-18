@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,9 +6,9 @@ using UnityEngine;
 public class GardenScript : EnclosureScript
 {
     private Transform patchesTransform;
-    public List<PatchScript> patchList = new List<PatchScript>();
-    public Dictionary<Vector2, ResourceScript.CropType> cropDictionary = new Dictionary<Vector2, ResourceScript.CropType>();
-    private int lastWorkedOnPatch = -1;
+    [JsonProperty] public List<PatchScript> patchList = new List<PatchScript>();
+    [JsonProperty] public Dictionary<Vector2, ResourceScript.CropType> cropDictionary = new Dictionary<Vector2, ResourceScript.CropType>();
+    [JsonProperty] private int lastWorkedOnPatch = -1;
 
     public override EditorScript editorScript { get { return CanvasScript.Instance.gardenEditor; } }
 
@@ -27,11 +28,10 @@ public class GardenScript : EnclosureScript
         }
         else
         {
-            for(int i = 0; i < gardenScript.patchList.Count; i++)
+            foreach(PatchScript patchScript in gardenScript.patchList)
             {
-                PatchScript patchScript = gardenScript.patchList[i];
                 ResourceScript.CropType cropType = gardenScript.cropDictionary[patchScript.cell];
-                CreatePatch(patchScript.cell, patchScript.cropType);
+                CreatePatch(patchScript.cell, patchScript.cropType, patchScript.peasantIndex);
                 cropDictionary[patchScript.cell] = cropType;
             }
             lastWorkedOnPatch = gardenScript.lastWorkedOnPatch;
@@ -90,7 +90,7 @@ public class GardenScript : EnclosureScript
         }
     }
 
-    private void CreatePatch(Vector2 cell, ResourceScript.CropType cropType)
+    private void CreatePatch(Vector2 cell, ResourceScript.CropType cropType, int peasantIndex = -1)
     {
         GameObject patch = new GameObject("patch");
         MeshRenderer meshRenderer = patch.AddComponent<MeshRenderer>();
@@ -110,6 +110,12 @@ public class GardenScript : EnclosureScript
         patchScript.cell = cell;
         patchScript.cropType = cropType;
         patchScript.center = islandScript.transform.position + MeshGenerator.GetCellCenter(cell, islandScript.meshData);
+
+        if (peasantIndex != -1)
+        {
+            PeasantAdultScript peasantAdultScript = (PeasantAdultScript)peasantList[peasantIndex];
+            peasantAdultScript.AssignTask(patchScript);
+        }
 
         patchList.Add(patchScript);
         cropDictionary.Add(cell, cropType);

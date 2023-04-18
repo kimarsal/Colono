@@ -1,6 +1,6 @@
 using System;
 
-[System.Serializable]
+[Serializable]
 public class InventoryScript
 {
     private const int materialCapacity = 50;
@@ -108,6 +108,7 @@ public class InventoryScript
     }
 }
 
+[Serializable]
 public class InventoryCategory
 {
     public int level;

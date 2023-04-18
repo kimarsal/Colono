@@ -3,26 +3,30 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
+[JsonObject(MemberSerialization.OptIn)]
 public class AnimalScript : MonoBehaviour
 {
-    public ResourceScript.AnimalType animalType;
-    public Vector3 position;
-    public int orientation;
-    [JsonIgnore] public PenScript penScript;
-    [JsonIgnore] private AnimalScript animalToPairUpWith;
+    [JsonProperty] public ResourceScript.AnimalType animalType;
+    [JsonProperty] public Vector3 position;
+    [JsonProperty] public int orientation;
+    
+    [JsonProperty] public float age;
+    [JsonProperty] public float confortLevel;
+    private bool isConfortable;
+    public bool isInPlaceForPairing;
+    private AnimalScript animalToPairUpWith;
+    private bool isDying;
 
-    [JsonIgnore] private NavMeshAgent navMeshAgent;
-    [JsonIgnore] private Animator animator;
+    public PenScript penScript;
+
+    private NavMeshAgent navMeshAgent;
+    private Animator animator;
+
     [JsonIgnore] [SerializeField] private float walkSpeed = 1;
     [JsonIgnore] [SerializeField] private int meatAmount;
 
     [JsonIgnore] [SerializeField] private float ageSpeed = 0.01f;
-    public float age;
-
-    [JsonIgnore] private float confortSpeed = 0.05f;
-    public float confortLevel;
-    private bool isConfortable;
-    public bool isInPlaceForPairing;
+    [JsonIgnore] [SerializeField] private float confortSpeed = 0.05f;
 
     private void Start()
     {
@@ -69,9 +73,10 @@ public class AnimalScript : MonoBehaviour
             age = 1;
             penScript.AgeUpAnimal(this);
         }
-        else //if ((int)animalType % 2 == 1)
+        else if (!isDying && animalToPairUpWith == null)
         {
             age = 1;
+            isDying = true;
             if (isConfortable)
             {
                 penScript.confortableAnimals[(int)animalType].Remove(this);
@@ -115,10 +120,10 @@ public class AnimalScript : MonoBehaviour
         }
     }
 
-    public void GetReadyForPairing(AnimalScript animalScript)
+    public void GetReadyForPairing(Vector3 pairingSpot, AnimalScript animalScript)
     {
         animalToPairUpWith = animalScript;
-        SetDestination(penScript.entry.position);
+        SetDestination(pairingSpot);
     }
 
     public void EndPairing()
@@ -133,6 +138,7 @@ public class AnimalScript : MonoBehaviour
     public IEnumerator Die()
     {
         penScript.animals[(int)animalType]--;
+        penScript.animalList.Remove(this);
         navMeshAgent.isStopped = true;
         animator.SetTrigger("Death");
         yield return new WaitForSeconds(animator.GetCurrentAnimatorClipInfo(0)[0].clip.length);

@@ -1,15 +1,16 @@
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 using static ResourceScript;
 
 public class PenScript : EnclosureScript
 {
     public Transform animalTransform;
-    public int[] animals;
-    public int[] desiredAmounts;
-    public List<AnimalScript> animalList = new List<AnimalScript>();
+    [JsonProperty] public int[] animals;
+    [JsonProperty] public int[] desiredAmounts;
+    [JsonProperty] public List<AnimalScript> animalList = new List<AnimalScript>();
     public List<AnimalScript>[] confortableAnimals;
-    public int animalAmount;
 
     public override bool canManagePeasants { get { return false; } }
 
@@ -56,10 +57,8 @@ public class PenScript : EnclosureScript
 
     public void AddAnimal(AnimalScript animalScript)
     {
-        /*AnimalScript animalScript = Instantiate(animal.gameObject, NPCManager.GetRandomPointWithinRange(minPos, maxPos),
-                    Quaternion.Euler(0, animal.orientation, 0), animalTransform).GetComponent<AnimalScript>();
-        animalScript.InitializeAnimal(animal);
-        Destroy(animal.gameObject);*/
+        animalScript.transform.parent = animalTransform;
+        animalScript.GetComponent<NavMeshAgent>().Warp(NPCManager.GetRandomPointWithinRange(minPos, maxPos));
 
         if(animals == null || animals.Length == 0) InitializeLists();
         animalList.Add(animalScript);
@@ -138,7 +137,8 @@ public class PenScript : EnclosureScript
 
     private void ManageAnimals(int animalType)
     {
-        if (confortableAnimals[animalType].Count >= 2 //Hi ha dos animals preparats per aparellar-se
+        if (animalList.Count < maxPeasants //Hi caben més animals al tancat
+            && confortableAnimals[animalType].Count >= 2 //Hi ha dos animals preparats per aparellar-se
             && desiredAmounts[animalType] >= animals[animalType]) //Es volen més animals del mateix tipus
         {
             AnimalScript animalScript1 = confortableAnimals[animalType][0];
@@ -146,8 +146,9 @@ public class PenScript : EnclosureScript
             confortableAnimals[animalType].RemoveAt(0);
             confortableAnimals[animalType].RemoveAt(0);
 
-            animalScript1.GetReadyForPairing(animalScript2);
-            animalScript2.GetReadyForPairing(animalScript1);
+            Vector3 pairingSpot = NPCManager.GetRandomPointWithinRange(minPos, maxPos);
+            animalScript1.GetReadyForPairing(pairingSpot, animalScript2);
+            animalScript2.GetReadyForPairing(pairingSpot, animalScript1);
 
             return;
         }

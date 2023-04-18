@@ -1,12 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
+using Newtonsoft.Json;
 using UnityEngine;
-using UnityEngine.UI;
 
 public abstract class EditorScript : MonoBehaviour
 {
-    [SerializeField] private UpgradeButtonScript upgradeButton;
-    private ConstructionScript constructionScript;
+    [SerializeField] protected UpgradeButtonScript upgradeButton;
+    protected ConstructionScript constructionScript;
 
     public virtual void SetEditor(ConstructionScript constructionScript)
     {
@@ -14,12 +12,8 @@ public abstract class EditorScript : MonoBehaviour
         UpdateUpgradeButton();
     }
 
-    public void UpdateUpgradeButton()
+    public virtual void UpdateUpgradeButton()
     {
-        if (upgradeButton != null)
-        {
-            upgradeButton.UpdateButton(constructionScript.level,
-                constructionScript.islandScript.GetResourceAmount(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Gem));
-        }
+        upgradeButton?.UpdateButton(constructionScript.level, constructionScript.islandScript.GetResourceAmount(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Gem));
     }
 }

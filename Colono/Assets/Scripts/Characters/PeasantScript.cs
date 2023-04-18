@@ -2,25 +2,25 @@ using Newtonsoft.Json;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
-using static ResourceScript;
 
+[JsonObject(MemberSerialization.OptIn)]
 public abstract class PeasantScript : MonoBehaviour
 {
     public enum PeasantType { Adult, Child }
     public enum PeasantGender { Male, Female }
     public enum PeasantAction { Moving, Chopping, Digging, Pulling, Planting, Watering, Gathering, Dancing, Dying };
 
-    [JsonIgnore] public static int lifeExpectancy = 60;
+    public static int lifeExpectancy = 60;
+    [JsonProperty] public Vector3 position;
+    [JsonProperty] public int orientation;
 
     [Header("Characteristics")]
-    public PeasantType peasantType;
-    public PeasantGender peasantGender;
-    public Vector3 position;
-    public int orientation;
-    [JsonIgnore] public float walkSpeed;
-    [JsonIgnore] public float runSpeed;
-    private bool isRunning;
-    public bool isNative;
+    [JsonProperty] public PeasantType peasantType;
+    [JsonProperty] public PeasantGender peasantGender;
+    [JsonProperty] private bool isRunning;
+    [JsonProperty] public bool isNative;
+    public float walkSpeed;
+    public float runSpeed;
 
     [Header("Appearence")]
     [JsonIgnore] [SerializeField] private GameObject head1;
@@ -31,33 +31,34 @@ public abstract class PeasantScript : MonoBehaviour
     [JsonIgnore] [SerializeField] private GameObject upperClothed;
     [JsonIgnore] [SerializeField] private Material material;
 
-    public int headType;
-    public Color _SKINCOLOR;
-    public Color _HAIRCOLOR;
-    public Color _CLOTH3COLOR;
-    public Color _CLOTH4COLOR;
-    public Color _OTHERCOLOR;
+    [JsonProperty] public int headType;
+    [JsonProperty] [JsonConverter(typeof(ColorHandler))] public Color _SKINCOLOR;
+    [JsonProperty] [JsonConverter(typeof(ColorHandler))] public Color _HAIRCOLOR;
+    [JsonProperty] [JsonConverter(typeof(ColorHandler))] public Color _CLOTH3COLOR;
+    [JsonProperty] [JsonConverter(typeof(ColorHandler))] public Color _CLOTH4COLOR;
+    [JsonProperty] [JsonConverter(typeof(ColorHandler))] public Color _OTHERCOLOR;
 
     [Header("State")]
-    public float age;
-    public float hunger;
-    public float exhaustion;
-    public bool isInBuilding;
-    [JsonIgnore] private float ageSpeed = 0.1f;
-    [JsonIgnore] private float hungerSpeed = 0.01f;
-    [JsonIgnore] private float exhaustionSpeed = 0.01f;
+    [JsonProperty] public float age;
+    [JsonProperty] public float hunger;
+    [JsonProperty] public float exhaustion;
+    [JsonProperty] public bool isInBuilding;
+    [JsonProperty] public bool isInConstruction;
+    private float ageSpeed = 0.1f;
+    private float hungerSpeed = 0.01f;
+    private float exhaustionSpeed = 0.01f;
 
     [Header("Scripts")]
-    [JsonIgnore] public IslandScript islandScript;
-    [JsonIgnore] public ConstructionScript constructionScript;
-    [JsonIgnore] public SpeechBubbleScript speechBubble;
-    [JsonIgnore] public CabinScript cabin;
-    [JsonIgnore] public TavernScript tavern;
+    public IslandScript islandScript;
+    public ConstructionScript constructionScript;
+    public SpeechBubbleScript speechBubble;
+    public CabinScript cabin;
+    public TavernScript tavern;
 
-    [JsonIgnore] public Outline outline;
-    [JsonIgnore] protected Animator animator;
-    [JsonIgnore] public NavMeshAgent navMeshAgent;
-    [JsonIgnore] public PeasantRowScript peasantRowScript;
+    public Outline outline;
+    protected Animator animator;
+    public NavMeshAgent navMeshAgent;
+    public PeasantRowScript peasantRowScript;
 
     private void Start()
     {
@@ -182,60 +183,14 @@ public abstract class PeasantScript : MonoBehaviour
         }
 
         age += Time.deltaTime * ageSpeed;
-        if (age > 18 && age < 20)
-        {
-            AgeUpPeasant();
-        }
-        else if (age > lifeExpectancy)
-        {
-            StartCoroutine(Die());
-        }
-        else
-        {
-            peasantRowScript?.UpdatePeasantDetails();
-        }
-    }
-
-    private void AgeUpPeasant()
-    {
-        PeasantAdultScript peasantAdultScript = Instantiate(ResourceScript.Instance.GetPeasantPrefab(PeasantType.Adult, peasantGender),
-            transform.position, transform.rotation, transform.parent).GetComponent<PeasantAdultScript>();
-
-        peasantAdultScript.islandScript = islandScript;
-        peasantAdultScript.isNative = false;
-        peasantAdultScript.headType = Random.Range(0, 2);
-        peasantAdultScript._SKINCOLOR = _SKINCOLOR;
-        peasantAdultScript._HAIRCOLOR = _HAIRCOLOR;
-        peasantAdultScript._CLOTH3COLOR = _CLOTH3COLOR;
-        peasantAdultScript._CLOTH4COLOR = _CLOTH4COLOR;
-        peasantAdultScript._OTHERCOLOR = _OTHERCOLOR;
-
-        peasantRowScript?.SetPeasant(peasantAdultScript);
-
-        islandScript.peasantList.Add(peasantAdultScript);
-        peasantAdultScript.UpdateTask();
-        islandScript.peasantList.Remove(this);
-        Destroy(gameObject);
-    }
-
-    private IEnumerator Die()
-    {
-        peasantRowScript?.PeasantDies();
-        islandScript.peasantList.Remove(this);
-        if (constructionScript != null) constructionScript.peasantList.Remove(this);
-        if (tavern != null) tavern.peasantList.Remove(this);
-        if (cabin != null) cabin.peasantList.Remove(this);
-
-        navMeshAgent.isStopped = true;
-        animator.SetFloat("Speed", 0);
-        animator.SetInteger("State", (int)PeasantAction.Dying);
-        yield return new WaitForSeconds(animator.GetCurrentAnimatorClipInfo(0)[0].clip.length);
-        Destroy(gameObject);
+        
+        peasantRowScript?.UpdatePeasantDetails();
     }
 
     protected void CheckIfArrivedAtDestination()
     {
-        if (!isInBuilding && !navMeshAgent.pathPending
+        if (!isInBuilding
+            && navMeshAgent.isActiveAndEnabled && !navMeshAgent.pathPending
             && navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance
             && (!navMeshAgent.hasPath || navMeshAgent.velocity.sqrMagnitude == 0f))
         {

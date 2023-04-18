@@ -6,26 +6,25 @@ using UnityEngine;
 using UnityEngine.AI;
 using static Terrain;
 
+[JsonObject(MemberSerialization.OptIn)]
 public class IslandScript : MonoBehaviour, TaskSourceInterface
 {
-    public string islandName;
-    public Vector2 offset;
-    public bool hasBeenDiscovered;
-    [JsonIgnore] public MeshData meshData;
-    [JsonIgnore] public int[,] regionMap;
-    [JsonIgnore] public NavMeshSurface navMeshSurface;
-    //[JsonIgnore] public GameObject convexColliders;
-    //[JsonIgnore] public List<MeshCollider> convexCollidersList;
-    public InventoryScript inventoryScript;
+    [JsonProperty] public string islandName;
+    [JsonProperty] public Vector2 offset;
+    [JsonProperty] public bool hasBeenDiscovered;
+    public MeshData meshData;
+    public int[,] regionMap;
 
-    [JsonIgnore] public Transform itemsTransform;
-    [JsonIgnore] public Transform constructionsTransform;
-    [JsonIgnore] public Transform npcsTransform;
+    public NavMeshSurface navMeshSurface;
+    public Transform itemsTransform;
+    public Transform constructionsTransform;
+    public Transform npcsTransform;
 
-    public Dictionary<Vector2, ItemScript> itemDictionary = new Dictionary<Vector2, ItemScript>();
-    public List<ItemScript> itemsToClear = new List<ItemScript>();
-    public List<ConstructionScript> constructionList = new List<ConstructionScript>();
-    public List<PeasantScript> peasantList = new List<PeasantScript>();
+    [JsonProperty] public InventoryScript inventoryScript;
+    [JsonProperty] public Dictionary<Vector2, ItemScript> itemDictionary = new Dictionary<Vector2, ItemScript>();
+    [JsonProperty] public List<ItemScript> itemsToClear = new List<ItemScript>();
+    [JsonProperty] public List<ConstructionScript> constructionList = new List<ConstructionScript>();
+    [JsonProperty] public List<PeasantScript> peasantList = new List<PeasantScript>();
 
     public bool isCellTaken(Vector2 cell)
     {

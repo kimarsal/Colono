@@ -1,8 +1,10 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : ShipController
 {
+	[SerializeField] private Button[] repairButtons;
 
 	//Distància màxima amb les vores
 	private float xLeftMargin = 20f;
@@ -21,7 +23,7 @@ public class PlayerController : ShipController
 		health = new int[4];
 		for(int i = 0; i < health.Length; i++)
 		{
-			health[i] = 3;
+			health[i] = maxHealth;
 		}
 
         rb = GetComponent<Rigidbody>();
@@ -77,6 +79,15 @@ public class PlayerController : ShipController
         }
     }
 
+    protected override int LoseHealth()
+    {
+        int position = base.LoseHealth();
+
+		repairButtons[position].interactable = true;
+
+		return position;
+    }
+
     protected override IEnumerator Sink()
     {
 		GameManager.Instance.GameOver();
@@ -84,5 +95,11 @@ public class PlayerController : ShipController
 		rb.constraints = RigidbodyConstraints.FreezeAll;
         return null;
     }
+
+	public void Repair(int position)
+	{
+		health[position]++;
+		repairButtons[position].interactable = health[position] < maxHealth;
+	}
 
 }

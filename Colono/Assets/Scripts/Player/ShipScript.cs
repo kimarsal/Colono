@@ -19,7 +19,6 @@ public class ShipScript : ConstructionScript
     [JsonIgnore] public Transform enemyShipTransform;
     public override bool canBeRemoved { get { return false; } }
     public override int peasantCount { get { return peasantList.Count + shipInterior.peasantList.Count; } }
-
     public override EditorScript editorScript { get { return CanvasScript.Instance.shipEditor; } }
 
     private void Awake()
@@ -29,7 +28,7 @@ public class ShipScript : ConstructionScript
 
     public void AddDefaultElements()
     {
-        for (int i = 0; i < 30; i++)
+        for (int i = 0; i < 3; i++)
         {
             PeasantScript.PeasantType peasantType = (PeasantScript.PeasantType)Random.Range(0, 2);//PeasantScript.PeasantType.Adult
             PeasantScript.PeasantGender peasantGender = (PeasantScript.PeasantGender)Random.Range(0, 2);
@@ -49,7 +48,7 @@ public class ShipScript : ConstructionScript
         }
 
         int animalTypes = Enum.GetValues(typeof(AnimalType)).Length;
-        for (int i = 0; i < animalTypes; i++)
+        for (int i = 0; i < 2; i++)
         {
             for(int j = 0; j < 2; j++)
             {
@@ -69,7 +68,7 @@ public class ShipScript : ConstructionScript
         {
             shipInterior.inventoryScript.AddResource(ResourceType.Meat, i, 5);
         }
-        shipInterior.inventoryScript.AddResource(ResourceType.Material, (int)MaterialType.Wood, 100);
+        shipInterior.inventoryScript.AddResource(ResourceType.Material, (int)MaterialType.Wood, 45);
 
         ((TavernScript)shipInterior.constructionList[1]).recipeList = new List<Recipe> {
             new Recipe(-1, -1, (int)MeatType.Chicken),
@@ -77,6 +76,8 @@ public class ShipScript : ConstructionScript
             new Recipe(-1, -1, (int)MeatType.Pork),
             new Recipe(-1, -1, (int)MeatType.Cow),
         };
+
+        shipInterior.inventoryScript.AddResource(ResourceType.Material, (int)MaterialType.Gem, 5);
     }
 
     void Update()
@@ -103,12 +104,13 @@ public class ShipScript : ConstructionScript
         {
             peasantScript = peasantList[0];
             peasantList.RemoveAt(0);
-            peasantsOnTheirWay--;
         }
         else
         {
             peasantScript = shipInterior.peasantList[0];
             shipInterior.peasantList.RemoveAt(0);
+            peasantsInside--;
+            Debug.Log("Peasant " + islandScript.peasantList.IndexOf(peasantScript) + " was removed from ship. Number of peasants inside: " + peasantsInside);
 
             peasantScript.transform.parent = islandScript.npcsTransform;
             peasantScript.navMeshAgent.Warp(entry.position);

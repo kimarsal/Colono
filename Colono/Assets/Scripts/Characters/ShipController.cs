@@ -4,6 +4,7 @@ using UnityEngine;
 public abstract class ShipController : MonoBehaviour
 {
     protected int[] health;
+    protected const int maxHealth = 3;
     public float speed = 1.0f;
     public float steerSpeed = 5.0f;
     protected float currentTime;
@@ -134,24 +135,32 @@ public abstract class ShipController : MonoBehaviour
             Destroy(collision.gameObject);
             StartCoroutine(CannonballHit());
 
-            int i = Random.Range(0, health.Length);
-            int j = (i + 1) % health.Length;
-            while (i != j)
-            {
-                if (health[j] > 0)
-                {
-                    health[j]--;
-                    break;
-                }
-                j = (j + 1) % health.Length;
-            }
-
-            if(i == j)
-            {
-                StartCoroutine(Sink());
-            }
+            LoseHealth();
         }
 
+    }
+
+    protected virtual int LoseHealth()
+    {
+
+        int i = Random.Range(0, health.Length);
+        int j = (i + 1) % health.Length;
+        while (i != j)
+        {
+            if (health[j] > 0)
+            {
+                health[j]--;
+                break;
+            }
+            j = (j + 1) % health.Length;
+        }
+
+        if (i == j)
+        {
+            StartCoroutine(Sink());
+        }
+
+        return j;
     }
 
     private IEnumerator CannonballHit()

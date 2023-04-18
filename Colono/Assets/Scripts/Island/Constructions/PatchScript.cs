@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using UnityEngine;
 using static PatchScript;
 
@@ -6,18 +7,18 @@ public class PatchScript : TaskScript
     public enum CropState { Planted, Grown, Blossomed, Dead, Barren }
 
     private GardenScript gardenScript;
-    public Vector2 cell;
-    private int orientation;
-    public GameObject crop;
-    public ResourceScript.CropType cropType;
-    public CropState cropState = CropState.Barren;
+    [JsonProperty] public Vector2 cell;
+    [JsonProperty] public ResourceScript.CropType cropType;
+    [JsonProperty] public CropState cropState = CropState.Barren;
+    [JsonProperty] private int orientation;
+    private GameObject crop;
 
-    private float timeSinceLastStateChange;
-    private float timeSinceLastTakenCareOf;
-    private const float timeBetweenStates = 60f;
-    private const float maxUnattendedTime = 60f;
+    [JsonProperty] private float timeSinceLastStateChange;
+    [JsonProperty] private float timeSinceLastTakenCareOf;
+    public const float timeBetweenStates = 60f;
+    public const float maxUnattendedTime = 60f;
 
-    public void InitializePatch(PatchInfo patchInfo)
+    public void InitializePatch(PatchScript patchInfo)
     {
         orientation = patchInfo.orientation;
         crop = Instantiate(ResourceScript.Instance.GetCropPrefab(cropType, patchInfo.cropState), center, Quaternion.Euler(0, orientation, 0), transform);
@@ -47,6 +48,12 @@ public class PatchScript : TaskScript
                 ChangeCropState();
             }
         }
+    }
+
+    public override void AssignPeasant(PeasantAdultScript newPeasantAdultScript)
+    {
+        base.AssignPeasant(newPeasantAdultScript);
+        peasantIndex = gardenScript.peasantList.IndexOf(newPeasantAdultScript);
     }
 
     private void ChangeCropState()
@@ -94,13 +101,4 @@ public class PatchScript : TaskScript
             ((GardenScript)taskSourceScript).islandScript.AddResource(ResourceScript.ResourceType.Crop, (int)cropType);
         }
     }
-}
-
-[System.Serializable]
-public class PatchInfo
-{
-    public Vector2 cell;
-    public int orientation;
-    public ResourceScript.CropType cropType;
-    public CropState cropState;
 }

@@ -167,10 +167,11 @@ public class ConstructionDetailsScript : MonoBehaviour
 
     public void UpdatePeasantNum()
     {
-        if (constructionScript.peasantsOnTheirWay != 0)
+        int peasantsOnTheirWay = constructionScript.peasantList.Count - constructionScript.peasantsInside;
+        if (peasantsOnTheirWay != 0)
         {
             peasantsOnTheirWayText.enabled = true;
-            peasantsOnTheirWayText.text = (constructionScript.peasantsOnTheirWay > 0 ? "+" : "") + constructionScript.peasantsOnTheirWay;
+            peasantsOnTheirWayText.text = (peasantsOnTheirWay > 0 ? "+" : "") + peasantsOnTheirWay;
         }
         else
         {
@@ -178,14 +179,14 @@ public class ConstructionDetailsScript : MonoBehaviour
         }
 
         int peasantCount = constructionScript.peasantCount;
-        peasantNumText.text = (peasantCount - constructionScript.peasantsOnTheirWay).ToString() + "/" + constructionScript.maxPeasants;
+        peasantNumText.text = (peasantCount - peasantsOnTheirWay).ToString() + "/" + constructionScript.maxPeasants;
         removePeasantButton.interactable = peasantCount > 0;
         addPeasantButton.interactable = peasantCount < constructionScript.maxPeasants;
     }
 
     public void UpdateUpgradeButton()
     {
-        if (editorScript != null) editorScript.UpdateUpgradeButton();
+        editorScript?.UpdateUpgradeButton();
     }
 
     public void UpgradeConstruction()
