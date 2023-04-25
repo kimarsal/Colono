@@ -50,16 +50,20 @@ MonoBehaviour:
   cells: []
   length: 3
   width: 5
+  level: 1
   maxPeasants: 0
   peasantList: []
-  peasantsOnTheirWay: 0
+  peasantsInside: 0
   islandScript: {fileID: 0}
   constructionDetailsScript: {fileID: 0}
   entry: {fileID: 2659500063952886743}
   outline: {fileID: 0}
+  isService: 1
   buildingType: 0
   position: {x: 0, y: 0, z: 0}
   orientation: 0
+  requiredWood: 8
+  requiredStone: 6
 --- !u!1001 &55199954664440583
 PrefabInstance:
   m_ObjectHideFlags: 0

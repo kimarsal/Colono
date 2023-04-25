@@ -44,6 +44,16 @@ public class CameraScript : MonoBehaviour
         maxX = playerController.xRightBounds - xRightMarginPlayer;
         minZ = playerController.zLowerBounds + zLowerMarginPlayer;
         maxZ = playerController.zUpperBounds - zUpperMarginPlayer;
+
+
+        targetPosition = playerController.transform.position + offset;
+
+        //Es manté la càmera dins els marges
+        float x = Mathf.Clamp(targetPosition.x, minX, maxX);
+        float y = targetPosition.y;
+        float z = Mathf.Clamp(targetPosition.z, minZ, maxZ);
+
+        transform.position = new Vector3(x, y, z);
     }
 
     void LateUpdate()

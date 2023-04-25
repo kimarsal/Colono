@@ -53,14 +53,17 @@ MonoBehaviour:
   level: 1
   maxPeasants: 10
   peasantList: []
-  peasantsOnTheirWay: 0
+  peasantsInside: 0
   islandScript: {fileID: 0}
   constructionDetailsScript: {fileID: 0}
   entry: {fileID: 2660757951229852377}
   outline: {fileID: 0}
+  isService: 1
   buildingType: 1
   position: {x: 0, y: 0, z: 0}
   orientation: 0
+  requiredWood: 3
+  requiredStone: 5
 --- !u!1001 &54188765613646345
 PrefabInstance:
   m_ObjectHideFlags: 0

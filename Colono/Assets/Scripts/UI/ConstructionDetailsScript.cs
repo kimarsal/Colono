@@ -33,11 +33,6 @@ public class ConstructionDetailsScript : MonoBehaviour
         rectTransform.anchoredPosition = new Vector2(0, -canvasRectTransform.rect.height);
     }
 
-    private void OnRectTransformDimensionsChange()
-    {
-        
-    }
-
     public void ShowDetails()
     {
         state = ConstructionDetailsState.Details;
@@ -66,7 +61,7 @@ public class ConstructionDetailsScript : MonoBehaviour
     private IEnumerator HideEditor()
     {
         CameraScript.Instance.canMove = true;
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(0.2f);
         if(constructionScript.editorScript != null) constructionScript.editorScript.gameObject.SetActive(false);
     }
 
@@ -79,7 +74,7 @@ public class ConstructionDetailsScript : MonoBehaviour
 
     private IEnumerator ChangeStateCoroutine()
     {
-        float duration = 0.3f;
+        float duration = 0.2f;
         float currentTime = 0;
         float startPos = rectTransform.anchoredPosition.y;
         float targetPos = 0;

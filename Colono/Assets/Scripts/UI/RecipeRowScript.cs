@@ -27,16 +27,19 @@ public class RecipeRowScript : MonoBehaviour
 
     public void SetRow()
     {
-        /*introducedCropDropdown.options = tavernEditor.introducedCropDropdownOptions;
-        nativeCropDropdown.options = tavernEditor.nativeCropDropdownOptions;
-        meatDropdown.options = tavernEditor.meatDropdownOptions;*/
-
         introducedCropDropdown.value = recipe.introducedCrop + 1;
         nativeCropDropdown.value = recipe.nativeCrop + 1;
         meatDropdown.value = recipe.meat + 1;
     }
 
     public void RecipeChange()
+    {
+        UpdateDishImage();
+
+        hungerPointsText.text = (recipe.hungerPoints * tavernEditor.tavernScript.level * 10).ToString();
+    }
+
+    private void UpdateDishImage()
     {
         ingredientAmount = 0;
         if (recipe.meat != -1)
@@ -47,9 +50,10 @@ public class RecipeRowScript : MonoBehaviour
             ingredientAmount++;
         }
 
-        if (recipe.introducedCrop != -1) {
+        if (recipe.introducedCrop != -1)
+        {
             Sprite sprite = ResourceScript.Instance.cookedVegetableSprites[recipe.introducedCrop];
-            if(recipe.meat == -1)
+            if (recipe.meat == -1)
             {
                 firstIngredientImage.sprite = sprite;
                 singleIngredientImage.sprite = sprite;
@@ -63,7 +67,7 @@ public class RecipeRowScript : MonoBehaviour
 
         if (recipe.nativeCrop != -1)
         {
-            Sprite sprite = ResourceScript.Instance.cookedVegetableSprites[System.Enum.GetValues(typeof(ResourceScript.CropType)).Length / 2 + recipe.nativeCrop];
+            Sprite sprite = ResourceScript.Instance.cookedVegetableSprites[ResourceScript.GetEnumLength(ResourceScript.ResourceType.Crop) / 2 + recipe.nativeCrop];
             if (recipe.meat == -1 && recipe.introducedCrop == -1)
             {
                 singleIngredientImage.sprite = sprite;
@@ -79,7 +83,7 @@ public class RecipeRowScript : MonoBehaviour
             ingredientAmount++;
         }
 
-        if(ingredientAmount == 1)
+        if (ingredientAmount == 1)
         {
             multipleIngredientDish.SetActive(false);
             singleIngredientImage.gameObject.SetActive(true);
@@ -90,8 +94,6 @@ public class RecipeRowScript : MonoBehaviour
             multipleIngredientDish.SetActive(true);
             thirdIngredientImage.gameObject.SetActive(ingredientAmount == 3);
         }
-
-        hungerPointsText.text = (recipe.hungerPoints * 10).ToString();
     }
 
     public void IntroducedCropDropdownValueChange(int value)

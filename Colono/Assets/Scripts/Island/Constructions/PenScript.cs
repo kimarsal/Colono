@@ -43,7 +43,7 @@ public class PenScript : EnclosureScript
 
         PenScript penScript = (PenScript)enclosureScript;
 
-        if (penScript != null)
+        if (penScript is not null)
         {
             foreach (AnimalScript animal in penScript.animalList)
             {

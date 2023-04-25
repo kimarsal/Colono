@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 
 public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerMoveHandler
 {
-    private enum SelectFunction { PlantTrees, ClearItems, CancelItemClearing, CreateEnclosure, PlaceBuilding };
+    public enum SelectFunction { PlantTrees, ClearItems, CancelItemClearing, CreateEnclosure, PlaceBuilding };
     private enum SelectMode { None, Selecting, Building };
     private IslandGenerator islandGenerator;
     public IslandScript islandScript;
@@ -101,6 +101,8 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 ChangeSelectedBuildingColor(Color.white);
                 selectedBuilding.cells = selectedCells;
                 selectedBuilding.position = selectedBuilding.transform.position;
+                islandScript.UseResource(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Wood, selectedBuilding.requiredWood);
+                islandScript.UseResource(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Stone, selectedBuilding.requiredStone);
                 islandScript.AddConstruction(selectedBuilding); //Col·locar edifici
                 GameManager.Instance.SelectConstruction(selectedBuilding);
 
@@ -147,12 +149,15 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         {
             if (selectFunction == SelectFunction.CreateEnclosure)
             {
+                int fenceAmount = (int)((selectedCells[selectedCells.Length - 1].x - selectedCells[0].x) * 2 + (selectedCells[selectedCells.Length - 1].y - selectedCells[0].y - 2) * 2);
+                islandScript.UseResource(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Wood, fenceAmount);
                 EnclosureScript enclosureScript = islandScript.CreateEnclosure(selectedEnclosureType, selectedCells);
                 islandScript.AddConstruction(enclosureScript);
                 GameManager.Instance.SelectConstruction(enclosureScript);
             }
             else if(selectFunction == SelectFunction.PlantTrees)
             {
+                islandScript.UseResource(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Sprout, selectedCells.Length);
                 islandScript.PlantTrees(selectedCells);
                 CanvasScript.Instance.ShowDefaultButtons();
             }
@@ -272,8 +277,9 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         else if (selectFunction == SelectFunction.CreateEnclosure)
         {
             int availableWood = islandScript.GetResourceAmount(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Wood);
+            int fenceAmount = (int)((endCell.x - startCell.x) * 2 + (endCell.y - startCell.y - 2) * 2);
             if (selectedItems.Count > 0 || endCell.x - startCell.x < 2 || endCell.y - startCell.y < 2
-                || availableWood < (endCell.x - startCell.x) * 2 + (endCell.y - startCell.y) * 2)
+                || availableWood < fenceAmount)
             {
                 isSelectionValid = false;
             }
@@ -339,10 +345,9 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     // -------------------------------- BUILDINGS ------------------------------------
 
-    public void ChooseBuilding(BuildingScript.BuildingType buildingType)
+    public void ChooseBuilding(BuildingScript buildingScript)
     {
-        selectedBuilding = ResourceScript.Instance.GetBuilding(buildingType);
-        selectedBuilding.transform.parent = islandScript.constructionsTransform.transform;
+        selectedBuilding = Instantiate(buildingScript, islandScript.constructionsTransform.transform);
         selectMode = SelectMode.Building;
         selectFunction = SelectFunction.PlaceBuilding;
     }
@@ -357,9 +362,9 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     //
 
-    public void ManageItems(int selectFunction)
+    public void ManageItems(SelectFunction selectFunction)
     {
-        this.selectFunction = (SelectFunction)selectFunction;
+        this.selectFunction = selectFunction;
         selectMode = SelectMode.None;
     }
 

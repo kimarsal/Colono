@@ -34,6 +34,7 @@ public class PeasantChildScript : PeasantScript
         if (age > 18)
         {
             AgeUpPeasant();
+            return;
         }
 
         if (tavern != null) //Si ha anat a menjar
@@ -60,29 +61,27 @@ public class PeasantChildScript : PeasantScript
     private void AgeUpPeasant()
     {
         Vector3 pos = transform.position;
-        if (constructionScript != null) //Estava de camí al vaixell
-        {
-            constructionScript.peasantList.Remove(this);
-        }
         if (tavern != null)
         {
-            tavern.peasantList.Remove(this);
             if (isInBuilding)
             {
                 tavern.peasantsInside--;
-                Debug.Log("Peasant " + islandScript.peasantList.IndexOf(this) + " aged up inside a tavern. Number of peasants inside: " + tavern.peasantsInside);
                 pos = tavern.entry.position;
             }
+            tavern.peasantList.Remove(this);
         }
         if (cabin != null)
         {
-            cabin.peasantList.Remove(this);
-            if (isInBuilding && tavern == null)
+            if (tavern == null && isInBuilding)
             {
                 cabin.peasantsInside--;
-                Debug.Log("Peasant " + islandScript.peasantList.IndexOf(this) + " aged up inside a cabin. Number of peasants inside: " + cabin.peasantsInside);
                 pos = cabin.entry.position;
             }
+            cabin.peasantList.Remove(this);
+        }
+        if (constructionScript != null) //Estava de camí al vaixell
+        {
+            constructionScript.peasantList.Remove(this);
         }
         islandScript.peasantList.Remove(this);
 

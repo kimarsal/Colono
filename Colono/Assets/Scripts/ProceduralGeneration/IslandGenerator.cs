@@ -8,7 +8,6 @@ public class IslandGenerator : MonoBehaviour
 {
     public static IslandGenerator Instance { get; private set; }
 
-    public int seed;
     public static int mapChunkSize = 101;
     public Material islandMaterial;
     public AnimationCurve meshHeightCurve;
@@ -73,7 +72,7 @@ public class IslandGenerator : MonoBehaviour
         islandScript.navMeshSurface.BuildNavMesh();
 
         // Part 4: Es genera el soroll a partir del seed i l'offset
-        MapData mapData = GenerateMapData(seed, offset);
+        MapData mapData = GenerateMapData(GameManager.seed, offset);
         Texture2D colorTexture = TextureGenerator.TextureFromColourMap(mapData.colourMap, mapChunkSize, mapChunkSize);
         meshRenderer.material.mainTexture = colorTexture;
         islandScript.regionMap = mapData.regionMap;
@@ -104,7 +103,7 @@ public class IslandGenerator : MonoBehaviour
         Instantiate(ResourceScript.Instance.islandMapIcon, island.transform);
         
         // Part 8: S'afegeixen els elements de joc
-        if (islandInfo == null)
+        if (islandInfo is null)
         {
             islandScript.inventoryScript = new InventoryScript();
 
@@ -125,7 +124,7 @@ public class IslandGenerator : MonoBehaviour
                     itemScript.transform.parent = islandScript.itemsTransform.transform;
                     itemScript.terrainType = terrainType;
                     itemScript.itemIndex = itemIndex;
-                    itemScript.itemCell = itemCell;
+                    itemScript.cell = itemCell;
                     itemScript.orientation = orientation;
                     islandScript.AddItem(itemScript);
                 }
@@ -144,68 +143,83 @@ public class IslandGenerator : MonoBehaviour
         {
             islandScript.inventoryScript = islandInfo.inventoryScript;
 
+            foreach (KeyValuePair<Vector2, ItemScript> pair in islandInfo.itemDictionary)
+            {
+                ItemScript itemScript = ResourceScript.Instance.GetItemPrefab(pair.Value.terrainType, pair.Value.itemIndex);
+                itemScript.islandScript = islandScript;
+                itemScript.Initialize(pair);
+
+                islandScript.AddItem(itemScript);
+            }
+
             foreach (ConstructionScript constructionInfo in islandInfo.constructionList)
             {
+                ConstructionScript constructionScript;
                 if (constructionInfo.constructionType == ConstructionScript.ConstructionType.Enclosure)
                 {
                     EnclosureScript enclosureInfo = (EnclosureScript)constructionInfo;
-                    EnclosureScript enclosureScript = islandScript.CreateEnclosure(enclosureInfo.enclosureType, constructionInfo.cells, enclosureInfo);
-
-                    islandScript.AddConstruction(enclosureScript);
+                    constructionScript = islandScript.CreateEnclosure(enclosureInfo.enclosureType, constructionInfo.cells, enclosureInfo);
                 }
                 else
                 {
                     BuildingScript buildingInfo = (BuildingScript)constructionInfo;
-                    BuildingScript buildingScript = ResourceScript.Instance.GetBuilding(buildingInfo.buildingType);
-                    buildingScript.transform.position = buildingInfo.position;
-                    buildingScript.transform.rotation = Quaternion.Euler(0, 90 * buildingInfo.orientation, 0);
-                    buildingScript.transform.parent = islandScript.constructionsTransform.transform;
-                    buildingScript.cells = buildingInfo.cells;
-                    buildingScript.orientation = buildingInfo.orientation;
-
-                    if (buildingScript.buildingType == BuildingType.Tavern)
-                    {
-                        ((TavernScript)buildingScript).recipeList = ((TavernScript)buildingInfo).recipeList;
-                    }
-
-                    islandScript.AddConstruction(buildingScript);
+                    constructionScript = ResourceScript.Instance.GetBuilding(buildingInfo.buildingType);
+                    ((BuildingScript)constructionScript).InitializeBuilding(buildingInfo);
                 }
+
+                foreach (PeasantScript peasantInfo in islandInfo.peasantList)
+                {
+                    PeasantScript peasantScript = Instantiate(ResourceScript.Instance.GetPeasantPrefab(peasantInfo.peasantType, peasantInfo.peasantGender),
+                        peasantInfo.position, Quaternion.Euler(0, peasantInfo.orientation, 0), islandScript.npcsTransform);
+                    peasantScript.islandScript = islandScript;
+                    peasantScript.InitializePeasant(peasantInfo);
+                    constructionScript.AddPeasant(peasantScript);
+
+                    if(peasantInfo.peasantType == PeasantScript.PeasantType.Adult)
+                    {
+                        PeasantAdultScript peasantAdultInfo = (PeasantAdultScript)peasantInfo;
+                        if (peasantAdultInfo.taskCell != Vector2.zero)
+                        {
+                            PeasantAdultScript peasantAdultScript = (PeasantAdultScript)peasantScript;
+                            peasantAdultScript.AssignTask(((GardenScript)constructionScript).patchDictionary[peasantAdultInfo.taskCell]);
+                        }
+                        else peasantScript.UpdateTask();
+                    }
+                    else peasantScript.UpdateTask();
+
+                    islandScript.peasantList.Add(peasantScript);
+                }
+
+                islandScript.AddConstruction(constructionScript);
             }
 
             foreach (PeasantScript peasantInfo in islandInfo.peasantList)
             {
                 PeasantScript peasantScript = Instantiate(ResourceScript.Instance.GetPeasantPrefab(peasantInfo.peasantType, peasantInfo.peasantGender),
                     peasantInfo.position, Quaternion.Euler(0, peasantInfo.orientation, 0), islandScript.npcsTransform);
+                peasantScript.islandScript = islandScript;
                 peasantScript.InitializePeasant(peasantInfo);
-                islandScript.peasantList.Add(peasantScript);
-            }
 
-            foreach (KeyValuePair<Vector2, ItemScript> pair in islandInfo.itemDictionary)
-            {
-                ItemScript itemScript = ResourceScript.Instance.GetItemPrefab(pair.Value.terrainType, pair.Value.itemIndex);
-                Vector3 itemPos = islandScript.transform.position + MeshGenerator.GetCellCenter(pair.Key, islandScript.meshData);
-                itemScript.transform.position = itemPos;
-                itemScript.transform.rotation = Quaternion.Euler(0, pair.Value.orientation, 0);
-                itemScript.transform.parent = islandScript.itemsTransform.transform;
-                itemScript.terrainType = pair.Value.terrainType;
-                itemScript.itemIndex = pair.Value.itemIndex;
-                itemScript.itemCell = pair.Key;
-                itemScript.orientation = pair.Value.orientation;
-                itemScript.materialAmount = pair.Value.materialAmount;
-
-                if(pair.Value.peasantIndex != -1)
+                if (peasantInfo.peasantType == PeasantScript.PeasantType.Adult)
                 {
-                    PeasantAdultScript peasantAdultScript = (PeasantAdultScript)islandScript.peasantList[pair.Value.peasantIndex];
-                    peasantAdultScript.AssignTask(itemScript);
+                    PeasantAdultScript peasantAdultInfo = (PeasantAdultScript)peasantInfo;
+                    if (peasantAdultInfo.taskCell != Vector2.zero)
+                    {
+                        PeasantAdultScript peasantAdultScript = (PeasantAdultScript)peasantScript;
+                        peasantAdultScript.AssignTask(islandScript.itemDictionary[peasantAdultInfo.taskCell]);
+                    }
+                    else peasantScript.UpdateTask();
                 }
+                else peasantScript.UpdateTask();
 
-                islandScript.AddItem(itemScript);
+                islandScript.peasantList.Add(peasantScript);
             }
         }
 
         GameManager.Instance.islandList.Add(islandScript);
     }
 
+    /*
     private IEnumerator BuildNavMesh(IslandScript islandScript)
     {
         var buildSources = islandScript.navMeshSurface.CollectSources();
@@ -259,6 +273,7 @@ public class IslandGenerator : MonoBehaviour
 
         yield return null;
     }
+    */
 
     public MapData GenerateMapData(int seed, Vector2 offset)
     {

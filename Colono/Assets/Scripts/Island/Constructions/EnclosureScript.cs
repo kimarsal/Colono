@@ -6,8 +6,8 @@ public abstract class EnclosureScript : ConstructionScript, TaskSourceInterface
     public enum EnclosureType { Garden, Pen, Training };
     [JsonProperty] public EnclosureType enclosureType;
 
-    [JsonProperty] public Vector3 minPos;
-    [JsonProperty] public Vector3 maxPos;
+    [JsonProperty] [JsonConverter(typeof(VectorConverter))] public Vector3 minPos;
+    [JsonProperty] [JsonConverter(typeof(VectorConverter))] public Vector3 maxPos;
 
     public override string title { get { return enclosureType.ToString(); } }
 

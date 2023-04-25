@@ -9,6 +9,13 @@ public class TavernScript : BuildingScript
 
     public override EditorScript editorScript { get { return CanvasScript.Instance.tavernEditor; } }
 
+    public override void InitializeBuilding(BuildingScript buildingInfo)
+    {
+        base.InitializeBuilding(buildingInfo);
+
+        recipeList = ((TavernScript)buildingInfo).recipeList;
+    }
+
     public override void AddPeasant(PeasantScript peasantScript)
     {
         peasantList.Add(peasantScript);

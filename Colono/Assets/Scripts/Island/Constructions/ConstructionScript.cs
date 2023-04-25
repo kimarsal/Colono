@@ -7,19 +7,20 @@ public abstract class ConstructionScript : MonoBehaviour
 {
     public enum ConstructionType { Ship, Enclosure, Building }
     [JsonProperty] public ConstructionType constructionType;
-    [JsonProperty] public Vector2[] cells;
+    [JsonProperty] [JsonConverter(typeof(VectorArrayConverter))] public Vector2[] cells;
     [JsonProperty] public int length;
     [JsonProperty] public int width;
 
     [JsonProperty] public int level = 1;
     [JsonProperty] public int maxPeasants;
-    [JsonProperty] public List<PeasantScript> peasantList = new List<PeasantScript>();
+    [JsonProperty] [JsonConverter(typeof(PeasantListConverter))] public List<PeasantScript> peasantList = new List<PeasantScript>();
     [JsonProperty] public int peasantsInside;
 
     public IslandScript islandScript;
     public ConstructionDetailsScript constructionDetailsScript;
     public Transform entry;
     public Outline outline;
+    public bool isService;
 
     public virtual string title { get { return constructionType.ToString(); } }
     public virtual bool canManagePeasants { get { return true; } }
@@ -43,8 +44,6 @@ public abstract class ConstructionScript : MonoBehaviour
         if (peasantScript.isInBuilding)
         {
             peasantsInside--;
-            Debug.Log("Peasant " + islandScript.peasantList.IndexOf(peasantScript) + " was inside and was removed. Number of peasants inside: " + peasantsInside);
-
             peasantScript.transform.parent = islandScript.npcsTransform;
             peasantScript.navMeshAgent.Warp(entry.position);
             peasantScript.isInBuilding = false;
@@ -57,7 +56,6 @@ public abstract class ConstructionScript : MonoBehaviour
     public virtual PeasantScript PeasantHasArrived(PeasantScript peasantScript)
     {
         peasantsInside++;
-        Debug.Log("Peasant " + islandScript.peasantList.IndexOf(peasantScript) + " has arrived. Number of peasants inside: " + peasantsInside);
         UpdateConstructionDetails();
         return peasantScript;
     }

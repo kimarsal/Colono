@@ -3,9 +3,14 @@ using UnityEngine;
 using System.IO;
 using Newtonsoft.Json;
 using System;
+using Newtonsoft.Json.Linq;
+using System.Globalization;
 
 public class GameManager : MonoBehaviour
 {
+    public static string gameName;
+    public float timePlayed;
+    public static int seed;
     public static GameManager Instance { get; private set; }
     public Transform islandsTransform;
     public List<IslandScript> islandList = new List<IslandScript>();
@@ -33,7 +38,7 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        Time.timeScale = 5;
+        //Time.timeScale = 5;
         Instance = this;
     }
 
@@ -46,14 +51,17 @@ public class GameManager : MonoBehaviour
         islandSelectionScript.enabled = false;
 
         islandGenerator = GetComponent<IslandGenerator>();
-        //LoadGame();
-        StartGame();
+
+        if(MenuManager.loadGame) LoadGame();
+        else StartGame();
 
         inventoryEditor.shipInventoryScript = ShipScript.Instance.shipInterior.inventoryScript;
     }
 
     private void Update()
     {
+        timePlayed += Time.deltaTime;
+
         if (isInIsland) return;
 
         Vector3 shipPosition = ShipScript.Instance.transform.position;
@@ -228,11 +236,17 @@ public class GameManager : MonoBehaviour
         CanvasScript.Instance.HidePeasantDetails();
     }
 
-    public void ManageItems(int selectFunction)
+    public void TopButtonClick(TopButtonScript topButtonScript)
     {
-        islandCellScript.enabled = true;
-        islandCellScript.ManageItems(selectFunction);
+        CanvasScript.Instance.ChooseTopButton();
         islandSelectionScript.enabled = false;
+        islandCellScript.enabled = true;
+        switch (topButtonScript.function)
+        {
+            case IslandCellScript.SelectFunction.PlaceBuilding: islandCellScript.ChooseBuilding(topButtonScript.buildingScript); break;
+            case IslandCellScript.SelectFunction.CreateEnclosure: islandCellScript.ChooseEnclosure(topButtonScript.enclosureType); break;
+            default: islandCellScript.ManageItems(topButtonScript.function); break;
+        }
     }
 
     public bool CheckIfCropIsNew(int cropType)
@@ -244,20 +258,6 @@ public class GameManager : MonoBehaviour
         CanvasScript.Instance.CropIsDiscovered(cropType);
 
         return true;
-    }
-
-    public void ChooseEnclosure(int enclosureType)
-    {
-        islandCellScript.enabled = true;
-        islandCellScript.ChooseEnclosure((EnclosureScript.EnclosureType)enclosureType);
-        islandSelectionScript.enabled = false;
-    }
-
-    public void ChooseBuilding(int buildingType)
-    {
-        islandCellScript.enabled = true;
-        islandCellScript.ChooseBuilding((BuildingScript.BuildingType)buildingType);
-        islandSelectionScript.enabled = false;
     }
 
     public void RemoveConstruction()
@@ -298,29 +298,22 @@ public class GameManager : MonoBehaviour
     public void SaveGame()
     {
         GameInfo gameInfo = new GameInfo();
-        gameInfo.seed = islandGenerator.seed;
+        gameInfo.timePlayed = timePlayed;
+        gameInfo.seed = seed;
         gameInfo.shipScript = ShipScript.Instance;
         gameInfo.islandList = islandList;
 
-        string json = JsonConvert.SerializeObject(gameInfo, Formatting.Indented, new JsonSerializerSettings
-        {
-            TypeNameHandling = TypeNameHandling.Auto,
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-        });
-        File.WriteAllText("gameInfo.json", json);
+        string json = JsonConvert.SerializeObject(gameInfo, Formatting.Indented, MenuManager.serializerSettings);
+        File.WriteAllText(MenuManager.gameSavesPath + "/" + gameName + ".json", json);
     }
 
     public void LoadGame()
     {
-        GameInfo gameInfo = JsonConvert.DeserializeObject<GameInfo>(File.ReadAllText("gameInfo.json"), new JsonSerializerSettings
-        {
-            TypeNameHandling = TypeNameHandling.Auto,
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-        });
+        GameInfo gameInfo = JsonConvert.DeserializeObject<GameInfo>(File.ReadAllText(MenuManager.gameSavesPath + "/" + gameName + ".json"), MenuManager.serializerSettings);
 
-        ShipScript.Instance.transform.position = gameInfo.shipScript.position;
-        ShipScript.Instance.transform.rotation = Quaternion.Euler(0, gameInfo.shipScript.orientation, 0);
-        islandGenerator.seed = gameInfo.seed;
+        timePlayed = gameInfo.timePlayed;
+        seed = gameInfo.seed;
+        ShipScript.Instance.InitializeShip(gameInfo.shipScript);
         islandGenerator.LoadIslands(gameInfo.islandList);
     }
 
@@ -341,39 +334,308 @@ public class GameManager : MonoBehaviour
     {
         CameraScript.Instance.canMove = false;
     }
+
+    public static object ConvertStringToVector(string sValue)
+    {
+        // Remove the parentheses
+        string sVector = sValue.Substring(1, sValue.Length - 2);
+
+        // split the items
+        string[] sArray = sVector.Split(',');
+
+        if (sArray.Length == 2)
+        {
+            return new Vector2(float.Parse(sArray[0], CultureInfo.InvariantCulture.NumberFormat),
+                                float.Parse(sArray[1], CultureInfo.InvariantCulture.NumberFormat));
+        }
+        else
+        {
+            return new Vector3(float.Parse(sArray[0], CultureInfo.InvariantCulture.NumberFormat),
+                                float.Parse(sArray[1], CultureInfo.InvariantCulture.NumberFormat),
+                                float.Parse(sArray[2], CultureInfo.InvariantCulture.NumberFormat));
+        }
+    }
+
+    public static Dictionary<string, T> CreateDictionaryWithType<T>(Type valueType)
+    {
+        return new Dictionary<string, T>();
+    }
 }
 
 [Serializable]
 public class GameInfo
 {
+    public float timePlayed;
     public int seed;
-    [JsonIgnore] public ShipScript shipScript;
+    public ShipScript shipScript;
     public List<IslandScript> islandList = new List<IslandScript>();
 }
 
-public class ColorHandler : JsonConverter
+public class VectorConverter : JsonConverter
 {
-    public ColorHandler()
-    {
-    }
-
     public override bool CanConvert(Type objectType)
     {
-        return true;
+        return objectType == typeof(Vector2);
     }
 
     public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
     {
-        try
-        {
-            ColorUtility.TryParseHtmlString("#" + reader.Value, out Color loadedColor);
-            return loadedColor;
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"Failed to parse color {objectType} : {ex.Message}");
+        string sValue = (string)reader.Value;
+
+        return GameManager.ConvertStringToVector(sValue);
+    }
+
+    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    {
+        writer.WriteValue(value.ToString());
+    }
+}
+
+public class VectorDictionaryConverter : JsonConverter
+{
+    public override bool CanConvert(Type objectType)
+    {
+        return objectType.IsGenericType && objectType.GetGenericTypeDefinition() == typeof(Dictionary<,>) &&
+               objectType.GetGenericArguments()[0] == typeof(Vector2);
+    }
+
+    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    {
+        if (reader.TokenType == JsonToken.Null)
             return null;
+
+        int startIndex = reader.Path.LastIndexOf('.') + 1;
+        string variableName = reader.Path.Substring(startIndex, reader.Path.Length - startIndex);
+        /*Type valueType;
+        switch (variableName)
+        {
+            case "itemDictionary": valueType = typeof(ItemScript); break;
+            case "patchDictionary": valueType = typeof(PatchScript); break;
+            case "cropDictionary": valueType = typeof(ResourceScript.CropType); break;
+        }*/
+
+        var jObject = JObject.Load(reader);
+
+        if (variableName == "itemDictionary")
+        {
+            Dictionary<Vector2, ItemScript> result = new Dictionary<Vector2, ItemScript>();
+            foreach (var jProperty in jObject.Properties())
+            {
+                Vector2 vector2 = (Vector2)GameManager.ConvertStringToVector(jProperty.Name);
+                ItemScript value = (ItemScript)jProperty.Value.ToObject(objectType.GetGenericArguments()[1], serializer);
+                result.Add(vector2, value);
+            }
+
+            return result;
         }
+        else if (variableName == "patchDictionary")
+        {
+            Dictionary<Vector2, PatchScript> result = new Dictionary<Vector2, PatchScript>();
+            foreach (var jProperty in jObject.Properties())
+            {
+                Vector2 vector2 = (Vector2)GameManager.ConvertStringToVector(jProperty.Name);
+                PatchScript value = (PatchScript)jProperty.Value.ToObject(objectType.GetGenericArguments()[1], serializer);
+                result.Add(vector2, value);
+            }
+
+            return result;
+        }
+        else //cropDictionary
+        {
+            Dictionary<Vector2, ResourceScript.CropType> result = new Dictionary<Vector2, ResourceScript.CropType>();
+            foreach (var jProperty in jObject.Properties())
+            {
+                Vector2 vector2 = (Vector2)GameManager.ConvertStringToVector(jProperty.Name);
+                ResourceScript.CropType value = (ResourceScript.CropType)jProperty.Value.ToObject(objectType.GetGenericArguments()[1], serializer);
+                result.Add(vector2, value);
+            }
+
+            return result;
+        }
+    }
+
+    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    {
+        int startIndex = writer.Path.LastIndexOf('.') + 1;
+        string variableName = writer.Path.Substring(startIndex, writer.Path.Length - startIndex);
+
+        writer.WriteStartObject();
+
+        if (variableName == "itemDictionary")
+        {
+            Dictionary<Vector2, ItemScript> dictionary = (Dictionary<Vector2, ItemScript>)value;
+            foreach (KeyValuePair<Vector2, ItemScript> pair in dictionary)
+            {
+                writer.WritePropertyName(pair.Key.ToString());
+                serializer.Serialize(writer, pair.Value);
+            }
+        }
+        else if (variableName == "patchDictionary")
+        {
+            Dictionary<Vector2, PatchScript> dictionary = (Dictionary<Vector2, PatchScript>)value;
+            foreach (KeyValuePair<Vector2, PatchScript> pair in dictionary)
+            {
+                writer.WritePropertyName(pair.Key.ToString());
+                serializer.Serialize(writer, pair.Value);
+            }
+        }
+        else
+        {
+            Dictionary<Vector2, ResourceScript.CropType> dictionary = (Dictionary<Vector2, ResourceScript.CropType>)value;
+            foreach (KeyValuePair<Vector2, ResourceScript.CropType> pair in dictionary)
+            {
+                writer.WritePropertyName(pair.Key.ToString());
+                serializer.Serialize(writer, pair.Value);
+            }
+        }
+
+        writer.WriteEndObject();
+    }
+}
+
+public class PeasantListConverter : JsonConverter
+{
+    public override bool CanConvert(Type objectType)
+    {
+        return typeof(List<PeasantScript>).IsAssignableFrom(objectType);
+    }
+
+    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    {
+        if (reader.TokenType == JsonToken.Null)
+            return null;
+
+        JArray array = JArray.Load(reader);
+
+        List<PeasantScript> list = new List<PeasantScript>();
+
+        foreach (JObject obj in array)
+        {
+            PeasantScript peasantScript = null;
+            int peasantType = (int)obj["peasantType"];
+            if(peasantType == (int)PeasantScript.PeasantType.Child)
+            {
+                peasantScript = obj.ToObject<PeasantChildScript>(serializer);
+            }
+            else
+            {
+                peasantScript = obj.ToObject<PeasantAdultScript>(serializer);
+            }
+            list.Add(peasantScript);
+        }
+
+        return list;
+    }
+
+    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    {
+        int startIndex = writer.Path.LastIndexOf('[') + 1;
+        int endIndex = writer.Path.LastIndexOf(']');
+        int lastPoint = writer.Path.LastIndexOf('.');
+        int constructionIndex = endIndex != lastPoint - 1 ? -1 : int.Parse(writer.Path.Substring(startIndex, endIndex - startIndex));
+
+        List<PeasantScript> list = (List<PeasantScript>)value;
+
+        JArray array = new JArray();
+
+        foreach (PeasantScript peasantScript in list)
+        {
+            if (constructionIndex != -1 && peasantScript.islandScript.constructionList[constructionIndex].isService) break;
+
+            if(peasantScript.cabin != null)
+            {
+                peasantScript.cabinIndex = peasantScript.islandScript.constructionList.IndexOf(peasantScript.cabin);
+            }
+            else
+            {
+                peasantScript.cabinIndex = -1;
+            }
+
+            if (peasantScript.tavern != null)
+            {
+                peasantScript.tavernIndex = peasantScript.islandScript.constructionList.IndexOf(peasantScript.tavern);
+            }
+            else
+            {
+                peasantScript.tavernIndex = -1;
+            }
+
+            JObject peasantScriptObject;
+            if (peasantScript.peasantType == PeasantScript.PeasantType.Adult)
+            {
+                PeasantAdultScript peasantAdultScript = (PeasantAdultScript)peasantScript;
+                if(peasantAdultScript.task != null)
+                {
+                    peasantAdultScript.taskCell = peasantAdultScript.task.cell;
+                }
+
+                peasantScriptObject = JObject.FromObject(peasantAdultScript, serializer);
+            }
+            else
+            {
+                peasantScriptObject = JObject.FromObject(peasantScript, serializer);
+            }
+
+            array.Add(peasantScriptObject);
+
+        }
+
+        array.WriteTo(writer);
+    }
+}
+
+public class VectorArrayConverter : JsonConverter
+{
+    public override bool CanConvert(Type objectType)
+    {
+        return typeof(Vector2[]).IsAssignableFrom(objectType);
+    }
+
+    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    {
+        if (reader.TokenType == JsonToken.Null)
+            return null;
+
+        JArray array = JArray.Load(reader);
+
+        Vector2[] vectorArray = new Vector2[array.Count];
+
+        int i = 0;
+        foreach (JObject obj in array)
+        {
+            vectorArray[i] = (Vector2)GameManager.ConvertStringToVector(obj.ToString());
+            i++;
+        }
+
+        return vectorArray;
+    }
+
+    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+    {
+        Vector2[] vectorArray = (Vector2[])value;
+
+        JArray array = new JArray();
+
+        foreach (Vector2 vector in vectorArray)
+        {
+            array.Add(vector.ToString());
+        }
+
+        array.WriteTo(writer);
+    }
+}
+
+public class ColorHandler : JsonConverter
+{
+    public override bool CanConvert(Type objectType)
+    {
+        return objectType == typeof(Color);
+    }
+
+    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+    {
+        ColorUtility.TryParseHtmlString("#" + reader.Value, out Color loadedColor);
+        return loadedColor;
     }
 
     public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

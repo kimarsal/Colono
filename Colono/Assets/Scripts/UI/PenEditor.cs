@@ -72,7 +72,7 @@ public class PenEditor : EditorScript
         PenScript newPen = toPen ? penScript : shipPenScript;
         
         AnimalScript animalScript = originalPen.RemoveAnimal(animalType);
-        if (animalScript == null) return;
+        //if (animalScript == null) return;
         
         newPen.AddAnimal(animalScript);
 

@@ -18,9 +18,9 @@ public class TreeSproutScript : ItemScript
                 itemScript.islandScript = islandScript;
                 itemScript.terrainType = terrainType;
                 itemScript.itemIndex = index;
-                itemScript.itemCell = itemCell;
+                itemScript.cell = cell;
                 itemScript.orientation = orientation;
-                islandScript.RemoveItemAtCell(itemCell);
+                islandScript.RemoveItemAtCell(cell);
                 islandScript.AddItem(itemScript);
                 Destroy(gameObject);
             }

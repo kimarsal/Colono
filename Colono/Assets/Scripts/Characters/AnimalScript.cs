@@ -7,7 +7,7 @@ using UnityEngine.AI;
 public class AnimalScript : MonoBehaviour
 {
     [JsonProperty] public ResourceScript.AnimalType animalType;
-    [JsonProperty] public Vector3 position;
+    [JsonProperty] [JsonConverter(typeof(VectorConverter))] public Vector3 position;
     [JsonProperty] public int orientation;
     
     [JsonProperty] public float age;
@@ -54,6 +54,8 @@ public class AnimalScript : MonoBehaviour
 
     void Update()
     {
+        if (isDying) return;
+
         UpdateDetails();
 
         CheckIfArrivedAtDestination();

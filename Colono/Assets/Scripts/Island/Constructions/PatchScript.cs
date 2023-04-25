@@ -7,7 +7,6 @@ public class PatchScript : TaskScript
     public enum CropState { Planted, Grown, Blossomed, Dead, Barren }
 
     private GardenScript gardenScript;
-    [JsonProperty] public Vector2 cell;
     [JsonProperty] public ResourceScript.CropType cropType;
     [JsonProperty] public CropState cropState = CropState.Barren;
     [JsonProperty] private int orientation;
@@ -48,12 +47,6 @@ public class PatchScript : TaskScript
                 ChangeCropState();
             }
         }
-    }
-
-    public override void AssignPeasant(PeasantAdultScript newPeasantAdultScript)
-    {
-        base.AssignPeasant(newPeasantAdultScript);
-        peasantIndex = gardenScript.peasantList.IndexOf(newPeasantAdultScript);
     }
 
     private void ChangeCropState()

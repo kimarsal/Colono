@@ -11,7 +11,7 @@ public abstract class PeasantScript : MonoBehaviour
     public enum PeasantAction { Moving, Chopping, Digging, Pulling, Planting, Watering, Gathering, Dancing, Dying };
 
     public static int lifeExpectancy = 60;
-    [JsonProperty] public Vector3 position;
+    [JsonProperty] [JsonConverter(typeof(VectorConverter))] public Vector3 position;
     [JsonProperty] public int orientation;
 
     [Header("Characteristics")]
@@ -44,6 +44,7 @@ public abstract class PeasantScript : MonoBehaviour
     [JsonProperty] public float exhaustion;
     [JsonProperty] public bool isInBuilding;
     [JsonProperty] public bool isInConstruction;
+    protected bool isDying;
     private float ageSpeed = 0.1f;
     private float hungerSpeed = 0.01f;
     private float exhaustionSpeed = 0.01f;
@@ -51,10 +52,11 @@ public abstract class PeasantScript : MonoBehaviour
     [Header("Scripts")]
     public IslandScript islandScript;
     public ConstructionScript constructionScript;
-    public SpeechBubbleScript speechBubble;
-    public CabinScript cabin;
     public TavernScript tavern;
-
+    [JsonProperty] public int tavernIndex;
+    public CabinScript cabin;
+    [JsonProperty] public int cabinIndex;
+    public SpeechBubbleScript speechBubble;
     public Outline outline;
     protected Animator animator;
     public NavMeshAgent navMeshAgent;
@@ -74,21 +76,44 @@ public abstract class PeasantScript : MonoBehaviour
         UpdateTask();
     }
 
-    public void InitializePeasant(PeasantScript peasantScript)
+    public virtual void InitializePeasant(PeasantScript peasantInfo = null)
     {
-        isRunning = peasantScript.isRunning;
-        isNative = peasantScript.isNative;
+        if (peasantInfo is not null)
+        {
+            isRunning = peasantInfo.isRunning;
+            isNative = peasantInfo.isNative;
 
-        headType = peasantScript.headType;
-        _SKINCOLOR = peasantScript._SKINCOLOR;
-        _HAIRCOLOR = peasantScript._HAIRCOLOR;
-        _CLOTH3COLOR = peasantScript._CLOTH3COLOR;
-        _CLOTH4COLOR = peasantScript._CLOTH4COLOR;
-        _OTHERCOLOR = peasantScript._OTHERCOLOR;
+            headType = peasantInfo.headType;
+            _SKINCOLOR = peasantInfo._SKINCOLOR;
+            _HAIRCOLOR = peasantInfo._HAIRCOLOR;
+            _CLOTH3COLOR = peasantInfo._CLOTH3COLOR;
+            _CLOTH4COLOR = peasantInfo._CLOTH4COLOR;
+            _OTHERCOLOR = peasantInfo._OTHERCOLOR;
 
-        age = peasantScript.age;
-        hunger = peasantScript.hunger;
-        exhaustion = peasantScript.exhaustion;
+            age = peasantInfo.age;
+            hunger = peasantInfo.hunger;
+            exhaustion = peasantInfo.exhaustion;
+
+            if (peasantInfo.tavernIndex != -1)
+            {
+                tavern = (TavernScript)islandScript.constructionList[peasantInfo.tavernIndex];
+            }
+            if (peasantInfo.cabinIndex != -1)
+            {
+                cabin = (CabinScript)islandScript.constructionList[peasantInfo.cabinIndex];
+            }
+        }
+        else
+        {
+            isNative = false;
+
+            headType = Random.Range(0, 2);
+            _SKINCOLOR = ResourceScript.Instance.GetRandomSkinColor();
+            _HAIRCOLOR = ResourceScript.Instance.GetRandomHairColor();
+            _CLOTH3COLOR = Random.ColorHSV();
+            _CLOTH4COLOR = Random.ColorHSV();
+            _OTHERCOLOR = Random.ColorHSV();
+        }
     }
 
     private void SetAppearence()
@@ -142,6 +167,8 @@ public abstract class PeasantScript : MonoBehaviour
 
     private void Update()
     {
+        if (isDying) return;
+
         UpdateDetails();
 
         CheckIfArrivedAtDestination();

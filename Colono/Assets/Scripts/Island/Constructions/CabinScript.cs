@@ -37,7 +37,7 @@ public class CabinScript : BuildingScript
             {
                 PeasantAdultScript peasantAdultScript = (PeasantAdultScript)peasantScript;
                 peasantAdultScript.taskSourceInterface.GetNextPendingTask(peasantAdultScript);
-                if(peasantAdultScript.peasantGender == PeasantGender.Female && peasantAdultScript.childrenAmount < 2 && peasantAdultScript.hunger < 1)
+                if(peasantAdultScript.peasantGender == PeasantGender.Female && peasantAdultScript.childrenAmount < 3 && peasantAdultScript.hunger < 1)
                 {
                     PeasantGender peasantGender = (PeasantGender)Random.Range(0, 2);
                     PeasantChildScript peasantChildScript = Instantiate(ResourceScript.Instance.GetPeasantPrefab(PeasantType.Child, peasantGender),

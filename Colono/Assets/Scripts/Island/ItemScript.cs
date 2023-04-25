@@ -1,16 +1,16 @@
 using Newtonsoft.Json;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ItemScript : TaskScript
 {
     public enum ActionType { Chop, Dig, Pull, Pick }
     public ActionType actionType;
-    [JsonProperty] public Vector2 itemCell;
     [JsonProperty] public int orientation;
 
     public ResourceScript.MaterialType materialType;
-    [JsonProperty]public int materialAmount;
-    [JsonProperty]public Terrain.TerrainType terrainType;
+    [JsonProperty] public int materialAmount;
+    [JsonProperty] public Terrain.TerrainType terrainType;
     [JsonProperty] public int itemIndex;
 
     public IslandScript islandScript;
@@ -29,6 +29,21 @@ public class ItemScript : TaskScript
         center = transform.position;
     }
 
+    public void Initialize(KeyValuePair<Vector2, ItemScript> pair)
+    {
+        Vector3 itemPos = islandScript.transform.position + MeshGenerator.GetCellCenter(pair.Key, islandScript.meshData);
+        transform.position = itemPos;
+        transform.rotation = Quaternion.Euler(0, pair.Value.orientation, 0);
+        transform.parent = islandScript.itemsTransform.transform;
+        terrainType = pair.Value.terrainType;
+        itemIndex = pair.Value.itemIndex;
+        cell = pair.Key;
+        orientation = pair.Value.orientation;
+        materialAmount = pair.Value.materialAmount;
+
+        if (isScheduledForClearing) islandScript.itemsToClear.Add(this);
+    }
+
     public void ChangeItemClearingState(bool toClear)
     {
         if (isScheduledForClearing == toClear) return;
@@ -39,12 +54,6 @@ public class ItemScript : TaskScript
         else islandScript.RemoveItemToClear(this);
     }
 
-    public override void AssignPeasant(PeasantAdultScript newPeasantAdultScript)
-    {
-        base.AssignPeasant(newPeasantAdultScript);
-        peasantIndex = islandScript.peasantList.IndexOf(newPeasantAdultScript);
-    }
-
     public override void TaskProgress()
     {
         materialAmount--;
@@ -52,7 +61,7 @@ public class ItemScript : TaskScript
         if (materialAmount == 0)
         {
             islandScript.RemoveItemToClear(this);
-            islandScript.RemoveItemAtCell(itemCell);
+            islandScript.RemoveItemAtCell(cell);
             Destroy(gameObject);
         }
     }

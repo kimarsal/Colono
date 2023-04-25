@@ -6,11 +6,11 @@ public abstract class TaskScript : MonoBehaviour
 {
     public TaskSourceInterface taskSourceScript;
     public enum TaskType { Item, Patch }
-    [JsonProperty] public Vector3 center;
+    [JsonProperty] [JsonConverter(typeof(VectorConverter))] public Vector3 center;
     [JsonProperty] public TaskType taskType;
+    public Vector2 cell;
 
     public PeasantAdultScript peasantAdultScript;
-    [JsonProperty] public int peasantIndex = -1;
     [JsonProperty] public bool isBeingTakenCareOf;
 
     public virtual void AssignPeasant(PeasantAdultScript newPeasantAdultScript)

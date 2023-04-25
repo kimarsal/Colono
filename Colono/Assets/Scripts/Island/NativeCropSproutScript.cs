@@ -7,7 +7,7 @@ public class NativeCropSproutScript : ItemScript
         int cropTypes = System.Enum.GetValues(typeof(ResourceScript.CropType)).Length;
         islandScript.AddResource(ResourceScript.ResourceType.Crop, Random.Range(cropTypes / 2, cropTypes));
         islandScript.RemoveItemToClear(this);
-        islandScript.RemoveItemAtCell(itemCell);
+        islandScript.RemoveItemAtCell(cell);
         Destroy(gameObject);
     }
 }

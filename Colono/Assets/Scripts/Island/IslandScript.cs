@@ -10,7 +10,7 @@ using static Terrain;
 public class IslandScript : MonoBehaviour, TaskSourceInterface
 {
     [JsonProperty] public string islandName;
-    [JsonProperty] public Vector2 offset;
+    [JsonProperty] [JsonConverter(typeof(VectorConverter))] public Vector2 offset;
     [JsonProperty] public bool hasBeenDiscovered;
     public MeshData meshData;
     public int[,] regionMap;
@@ -21,10 +21,10 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
     public Transform npcsTransform;
 
     [JsonProperty] public InventoryScript inventoryScript;
-    [JsonProperty] public Dictionary<Vector2, ItemScript> itemDictionary = new Dictionary<Vector2, ItemScript>();
-    [JsonProperty] public List<ItemScript> itemsToClear = new List<ItemScript>();
+    [JsonProperty] [JsonConverter(typeof(VectorDictionaryConverter))] public Dictionary<Vector2, ItemScript> itemDictionary = new Dictionary<Vector2, ItemScript>();
+    public List<ItemScript> itemsToClear = new List<ItemScript>();
     [JsonProperty] public List<ConstructionScript> constructionList = new List<ConstructionScript>();
-    [JsonProperty] public List<PeasantScript> peasantList = new List<PeasantScript>();
+    [JsonProperty] [JsonConverter(typeof(PeasantListConverter))] public List<PeasantScript> peasantList = new List<PeasantScript>();
 
     public bool isCellTaken(Vector2 cell)
     {
@@ -39,7 +39,7 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
     public void AddItem(ItemScript itemScript)
     {
         itemScript.islandScript = this;
-        itemDictionary.Add(itemScript.itemCell, itemScript);
+        itemDictionary.Add(itemScript.cell, itemScript);
     }
 
     public void RemoveItemAtCell(Vector2 cell)
@@ -59,7 +59,7 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
                 Quaternion.Euler(0, orientation, 0), itemsTransform.transform).GetComponent<TreeSproutScript>();
             treeSproutScript.terrainType = terrainType;
             treeSproutScript.itemIndex = -1;
-            treeSproutScript.itemCell = cell;
+            treeSproutScript.cell = cell;
             treeSproutScript.orientation = orientation;
             AddItem(treeSproutScript);
         }
@@ -197,17 +197,28 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
                 }
             }
         }
-        else if(resourceType == ResourceScript.ResourceType.Material && resourceIndex == (int)ResourceScript.MaterialType.Gem)
-        {
-            CanvasScript.Instance.constructionDetailsScript.UpdateUpgradeButton();
-        }
 
         remainingAmount = inventoryScript.AddResource(resourceType, resourceIndex, remainingAmount);
-        if (remainingAmount > 0 && GameManager.Instance.isInIsland)
+        if (remainingAmount > 0 && GameManager.Instance.isInIsland && GameManager.Instance.closestIsland == this)
         {
             ShipScript.Instance.shipInterior.inventoryScript.AddResource(resourceType, resourceIndex, remainingAmount);
         }
+
+        if (!(GameManager.Instance.isInIsland && GameManager.Instance.closestIsland == this)) return;
+
         CanvasScript.Instance.UpdateInventoryRow(resourceType, resourceIndex);
+
+        if (resourceType == ResourceScript.ResourceType.Material)
+        {
+            if (resourceIndex == (int)ResourceScript.MaterialType.Gem)
+            {
+                CanvasScript.Instance.constructionDetailsScript.UpdateUpgradeButton();
+            }
+            else
+            {
+                CanvasScript.Instance.UpdateTopButtons();
+            }
+        }
     }
 
     public int GetResourceAmount(ResourceScript.ResourceType resourceType, int resourceIndex)

@@ -6,6 +6,7 @@ using UnityEngine;
 public class PeasantAdultScript : PeasantScript
 {
     public TaskScript task;
+    [JsonProperty] [JsonConverter(typeof(VectorConverter))] public Vector2 taskCell;
 
     [Header("Tools")]
     public GameObject axe;
@@ -24,6 +25,28 @@ public class PeasantAdultScript : PeasantScript
                 return (EnclosureScript)constructionScript;
             }
             return islandScript;
+        }
+    }
+
+    public override void InitializePeasant(PeasantScript peasantInfo = null)
+    {
+        base.InitializePeasant(peasantInfo);
+
+        if(peasantInfo != null)
+        {
+            PeasantAdultScript peasantAdultInfo = (PeasantAdultScript)peasantInfo;
+
+            if(peasantAdultInfo.taskCell != Vector2.zero)
+            {
+                if(constructionScript == null)
+                {
+                    AssignTask(islandScript.itemDictionary[peasantAdultInfo.taskCell]); 
+                }
+                else
+                {
+                    AssignTask(((GardenScript)constructionScript).patchDictionary[peasantAdultInfo.taskCell]);
+                }
+            }
         }
     }
 
@@ -210,14 +233,13 @@ public class PeasantAdultScript : PeasantScript
 
     private IEnumerator Die()
     {
+        isDying = true;
         peasantRowScript?.PeasantDies();
-        islandScript.peasantList.Remove(this);
         if (tavern != null)
         {
             if (isInBuilding)
             {
                 tavern.peasantsInside--;
-                Debug.Log("Peasant " + islandScript.peasantList.IndexOf(this) + " died inside a tavern. Number of peasants inside: " + tavern.peasantsInside);
             }
             tavern.peasantList.Remove(this);
         }
@@ -226,11 +248,11 @@ public class PeasantAdultScript : PeasantScript
             if (tavern == null && isInBuilding)
             {
                 cabin.peasantsInside--;
-                Debug.Log("Peasant " + islandScript.peasantList.IndexOf(this) + " died inside a cabin. Number of peasants inside: " + cabin.peasantsInside);
             }
             cabin.peasantList.Remove(this);
         }
         if (constructionScript != null) constructionScript.peasantList.Remove(this);
+        islandScript.peasantList.Remove(this);
 
         navMeshAgent.isStopped = true;
         animator.SetFloat("Speed", 0);

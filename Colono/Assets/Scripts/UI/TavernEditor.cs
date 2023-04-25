@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class TavernEditor : EditorScript
 {
-    private TavernScript tavernScript;
+    public TavernScript tavernScript;
     [SerializeField] private Transform listTransform;
     [SerializeField] private GameObject rowPrefab;
     [SerializeField] private Transform addRecipeItemTransform;
@@ -142,7 +142,7 @@ public class Recipe
             if (introducedCrop != -1) ingredients++;
             if (nativeCrop != -1) ingredients++;
             if (meat != -1) ingredients++;
-            return ingredients / 10f;
+            return ingredients / 5f;
         }
     }
 }

@@ -10,13 +10,13 @@ public class ShipScript : ConstructionScript
 {
     public static ShipScript Instance { get; private set; }
 
-    public Vector3 position;
-    public int orientation;
-    public IslandScript shipInterior;
-    public PenScript shipInteriorPen;
+    [JsonProperty] [JsonConverter(typeof(VectorConverter))] public Vector3 position;
+    [JsonProperty] public int orientation;
+    [JsonProperty] public IslandScript shipInterior;
+    public PenScript shipInteriorPen { get { return (PenScript)shipInterior.constructionList[0]; } }
 
-    [JsonIgnore] public Transform nextIslandTransform;
-    [JsonIgnore] public Transform enemyShipTransform;
+    public Transform nextIslandTransform;
+    public Transform enemyShipTransform;
     public override bool canBeRemoved { get { return false; } }
     public override int peasantCount { get { return peasantList.Count + shipInterior.peasantList.Count; } }
     public override EditorScript editorScript { get { return CanvasScript.Instance.shipEditor; } }
@@ -28,47 +28,21 @@ public class ShipScript : ConstructionScript
 
     public void AddDefaultElements()
     {
-        for (int i = 0; i < 3; i++)
-        {
-            PeasantScript.PeasantType peasantType = (PeasantScript.PeasantType)Random.Range(0, 2);//PeasantScript.PeasantType.Adult
-            PeasantScript.PeasantGender peasantGender = (PeasantScript.PeasantGender)Random.Range(0, 2);
-            PeasantScript peasantScript = Instantiate(ResourceScript.Instance.GetPeasantPrefab(peasantType, peasantGender),
-            shipInteriorPen.transform.position, Quaternion.identity, shipInterior.npcsTransform);
-            
-            peasantScript.islandScript = shipInterior;
-            peasantScript.isNative = false;
-            peasantScript.headType = Random.Range(0, 2);
-            peasantScript._SKINCOLOR = ResourceScript.Instance.GetRandomSkinColor();
-            peasantScript._HAIRCOLOR = ResourceScript.Instance.GetRandomHairColor();
-            peasantScript._CLOTH3COLOR = Random.ColorHSV();
-            peasantScript._CLOTH4COLOR = Random.ColorHSV();
-            peasantScript._OTHERCOLOR = Random.ColorHSV();
-
-            shipInterior.peasantList.Add(peasantScript);
-        }
-
-        int animalTypes = Enum.GetValues(typeof(AnimalType)).Length;
-        for (int i = 0; i < 2; i++)
-        {
-            for(int j = 0; j < 2; j++)
-            {
-                AnimalScript animalScript = Instantiate(ResourceScript.Instance.GetAnimalPrefab((AnimalType)i),
-                    shipInteriorPen.transform.position, Quaternion.identity, shipInteriorPen.animalTransform).GetComponent<AnimalScript>();
-                shipInteriorPen.AddAnimal(animalScript);
-            }
-        }
-
+        shipInterior.inventoryScript = new InventoryScript();
         shipInterior.inventoryScript.AddCapacityToAllCategories();
 
-        for(int i = 0; i < GetEnumLength(ResourceType.Crop) / 2; i++)
+        for (int i = 0; i < GetEnumLength(ResourceType.Crop) / 2; i++)
         {
-            shipInterior.inventoryScript.AddResource(ResourceType.Crop, i, 3);
+            shipInterior.inventoryScript.AddResource(ResourceType.Crop, i, 1);
         }
+
         for (int i = 0; i < GetEnumLength(ResourceType.Meat); i++)
         {
-            shipInterior.inventoryScript.AddResource(ResourceType.Meat, i, 5);
+            shipInterior.inventoryScript.AddResource(ResourceType.Meat, i, 10);
         }
+
         shipInterior.inventoryScript.AddResource(ResourceType.Material, (int)MaterialType.Wood, 45);
+        shipInterior.inventoryScript.AddResource(ResourceType.Material, (int)MaterialType.Gem, 5);
 
         ((TavernScript)shipInterior.constructionList[1]).recipeList = new List<Recipe> {
             new Recipe(-1, -1, (int)MeatType.Chicken),
@@ -77,7 +51,55 @@ public class ShipScript : ConstructionScript
             new Recipe(-1, -1, (int)MeatType.Cow),
         };
 
-        shipInterior.inventoryScript.AddResource(ResourceType.Material, (int)MaterialType.Gem, 5);
+        for (int i = 0; i < 20; i++)
+        {
+            PeasantScript.PeasantType peasantType = (PeasantScript.PeasantType)Random.Range(0, 2);
+            PeasantScript.PeasantGender peasantGender = (PeasantScript.PeasantGender)Random.Range(0, 2);
+            PeasantScript peasantScript = Instantiate(ResourceScript.Instance.GetPeasantPrefab(peasantType, peasantGender),
+                shipInteriorPen.transform.position, Quaternion.identity, shipInterior.npcsTransform);
+            
+            peasantScript.InitializePeasant();
+
+            peasantScript.islandScript = shipInterior;
+            shipInterior.peasantList.Add(peasantScript);
+        }
+
+        int animalTypes = ResourceScript.GetEnumLength(ResourceType.Animal);
+        for (int i = 0; i < 2; i++)
+        {
+            for(int j = 0; j < 10; j++)
+            {
+                AnimalScript animalScript = Instantiate(ResourceScript.Instance.GetAnimalPrefab((AnimalType)i),
+                    shipInteriorPen.transform.position, Quaternion.identity, shipInteriorPen.animalTransform);
+                shipInteriorPen.AddAnimal(animalScript);
+            }
+        }
+    }
+
+    public void InitializeShip(ShipScript shipInfo)
+    {
+        transform.position = shipInfo.position;
+        transform.rotation = Quaternion.Euler(0, shipInfo.orientation, 0);
+        shipInterior.inventoryScript = shipInfo.shipInterior.inventoryScript;
+
+        ((TavernScript)shipInterior.constructionList[1]).recipeList = ((TavernScript)shipInfo.shipInterior.constructionList[1]).recipeList;
+
+        foreach (PeasantScript peasantInfo in shipInfo.shipInterior.peasantList)
+        {
+            PeasantScript peasantScript = Instantiate(ResourceScript.Instance.GetPeasantPrefab(peasantInfo.peasantType, peasantInfo.peasantGender),
+                peasantInfo.position, Quaternion.Euler(0, peasantInfo.orientation, 0), shipInterior.npcsTransform);
+            peasantScript.islandScript = shipInterior;
+            peasantScript.InitializePeasant(peasantInfo);
+            shipInterior.peasantList.Add(peasantScript);
+        }
+
+        foreach(AnimalScript animalInfo in shipInfo.shipInteriorPen.animalList)
+        {
+            AnimalScript animalScript = Instantiate(ResourceScript.Instance.GetAnimalPrefab(animalInfo.animalType),
+                shipInteriorPen.transform.position, Quaternion.Euler(0, animalInfo.orientation, 0), shipInteriorPen.animalTransform);
+            animalScript.InitializeAnimal(animalInfo);
+            shipInteriorPen.AddAnimal(animalScript);
+        }
     }
 
     void Update()
@@ -110,7 +132,6 @@ public class ShipScript : ConstructionScript
             peasantScript = shipInterior.peasantList[0];
             shipInterior.peasantList.RemoveAt(0);
             peasantsInside--;
-            Debug.Log("Peasant " + islandScript.peasantList.IndexOf(peasantScript) + " was removed from ship. Number of peasants inside: " + peasantsInside);
 
             peasantScript.transform.parent = islandScript.npcsTransform;
             peasantScript.navMeshAgent.Warp(entry.position);

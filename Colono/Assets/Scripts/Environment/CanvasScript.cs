@@ -18,6 +18,7 @@ public class CanvasScript : MonoBehaviour
     [SerializeField] private Animator serviceButtonsAnimator;
     [SerializeField] private Animator workButtonsAnimator;
     [SerializeField] private Animator itemButtonsAnimator;
+    [SerializeField] private TopButtonScript[] topButtons;
 
     [Header("Details")]
     public ConstructionDetailsScript constructionDetailsScript;
@@ -221,6 +222,14 @@ public class CanvasScript : MonoBehaviour
     public void UpdateInventoryRow(ResourceScript.ResourceType resourceType, int resourceIndex)
     {
         inventoryEditor.UpdateInventoryRow(resourceType, resourceIndex);
+    }
+
+    public void UpdateTopButtons()
+    {
+        foreach(TopButtonScript topButtonScript in topButtons)
+        {
+            topButtonScript.UpdateAvailability();
+        }
     }
 
     public void UpdatePenRow(ResourceScript.AnimalType animalType)

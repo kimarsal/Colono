@@ -121,6 +121,8 @@ public class InventoryEditor : EditorScript
     {
         shipInventoryText.text = shipInventoryScript.GetUsedCapacity(selectedTab);
         islandInventoryText.text = islandInventoryScript.GetUsedCapacity(selectedTab);
+
+        CanvasScript.Instance.constructionDetailsScript.removeConstructionButton.enabled = islandInventoryScript.CanWarehouseBeRemoved();
     }
 
     public bool MoveResource(ResourceType resourceType, int resourceIndex, int difference)
