@@ -11,6 +11,7 @@ public class GardenScript : EnclosureScript
     [JsonProperty] [JsonConverter(typeof(VectorDictionaryConverter))] public Dictionary<Vector2, ResourceScript.CropType> cropDictionary = new Dictionary<Vector2, ResourceScript.CropType>();
     [JsonProperty] private int lastWorkedOnPatch = -1;
 
+    public override Sprite sprite { get { return ResourceScript.Instance.gardenSprite; } }
     public override EditorScript editorScript { get { return CanvasScript.Instance.gardenEditor; } }
 
     public override void InitializeEnclosure(EnclosureScript enclosureScript, IslandScript islandScript)

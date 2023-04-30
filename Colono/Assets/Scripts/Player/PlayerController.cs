@@ -41,18 +41,18 @@ public class PlayerController : ShipController
 
     protected override void ManageInput()
     {
-        if (!GameManager.Instance.isInIsland)
+        if (GameManager.Instance.isInIsland || ShipScript.Instance.fishingScript.enabled)
         {
-            verticalInput = Mathf.Clamp01(Input.GetAxis("Vertical"));
-			horizontalInput = Input.GetAxis("Horizontal");
-			wantsToShoot = Input.GetKeyDown(KeyCode.Space);
-        }
-		else
-		{
 			verticalInput = 0;
 			horizontalInput = 0;
 			wantsToShoot = false;
+			return;
 		}
+
+
+        verticalInput = Mathf.Clamp01(Input.GetAxis("Vertical"));
+        horizontalInput = Input.GetAxis("Horizontal");
+        wantsToShoot = Input.GetKeyDown(KeyCode.Space);
     }
 
 	protected override void Movement()

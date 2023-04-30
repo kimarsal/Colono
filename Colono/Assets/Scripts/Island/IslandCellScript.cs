@@ -104,7 +104,8 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 islandScript.UseResource(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Wood, selectedBuilding.requiredWood);
                 islandScript.UseResource(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Stone, selectedBuilding.requiredStone);
                 islandScript.AddConstruction(selectedBuilding); //Col·locar edifici
-                GameManager.Instance.SelectConstruction(selectedBuilding);
+                GameManager.Instance.islandSelectionScript.enabled = true;
+                GameManager.Instance.islandSelectionScript.SelectConstruction(selectedBuilding);
 
             }
             GameManager.Instance.DisableIslandCellScript();
@@ -153,7 +154,8 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 islandScript.UseResource(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Wood, fenceAmount);
                 EnclosureScript enclosureScript = islandScript.CreateEnclosure(selectedEnclosureType, selectedCells);
                 islandScript.AddConstruction(enclosureScript);
-                GameManager.Instance.SelectConstruction(enclosureScript);
+                GameManager.Instance.islandSelectionScript.enabled = true;
+                GameManager.Instance.islandSelectionScript.SelectConstruction(selectedBuilding);
             }
             else if(selectFunction == SelectFunction.PlantTrees)
             {

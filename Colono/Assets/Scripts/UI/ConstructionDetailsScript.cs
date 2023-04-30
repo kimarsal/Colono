@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class ConstructionDetailsScript : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI title;
+    [SerializeField] private Image image;
     [SerializeField] private Button previousConstructionButton;
     [SerializeField] private Button nextConstructionButton;
 
@@ -111,6 +112,7 @@ public class ConstructionDetailsScript : MonoBehaviour
         }
 
         title.text = constructionScript.title;
+        image.sprite = constructionScript.sprite;
         bool canSwitchBetweenConstructions = constructionScript.islandScript.constructionList.Count > 0;
         previousConstructionButton.interactable = nextConstructionButton.interactable = canSwitchBetweenConstructions;
 

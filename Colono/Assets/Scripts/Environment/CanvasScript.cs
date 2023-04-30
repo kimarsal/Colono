@@ -36,8 +36,14 @@ public class CanvasScript : MonoBehaviour
     [SerializeField] private TradeEditor tradeEditor;
 
     [Header("Others")]
+    [SerializeField] private Animator compassAnimator;
     [SerializeField] private NewCropPopUpScript newCropPopUpScript;
     public Button dockButton;
+
+    [SerializeField] private PopUpScript pauseMenu;
+
+    private bool canPlayerTrade = false;
+    private bool canPlayerFish = false;
 
     private void Awake()
     {
@@ -47,6 +53,7 @@ public class CanvasScript : MonoBehaviour
     private void Start()
     {
         constructionDetailsScript.gameObject.SetActive(true);
+        compassAnimator.Play("ShowCompass");
     }
 
     public void PlayerIsNearIsland(IslandScript islandScript)
@@ -63,6 +70,7 @@ public class CanvasScript : MonoBehaviour
 
     public void Dock()
     {
+        compassAnimator.Play("HideCompass");
         dockButtonAnimator.Play("HideBottomButton");
         ShowDefaultButtons();
     }
@@ -239,6 +247,7 @@ public class CanvasScript : MonoBehaviour
 
     public void Sail()
     {
+        compassAnimator.Play("ShowCompass");
         HideTopButtons();
         sailButtonAnimator.Play("HideBottomButton");
         dockButtonAnimator.Play("ShowBottomButton");
@@ -246,19 +255,65 @@ public class CanvasScript : MonoBehaviour
         buttonState = ButtonState.Idle;
     }
 
-    public void PlayerCanTrade()
+    public void CanTrade()
     {
-        tradeButtonAnimator.Play("ShowBottomButton");
+        if (!canPlayerTrade)
+        {
+            canPlayerTrade = true;
+            tradeButtonAnimator.Play("ShowBottomButton");
+        }
     }
 
-    public void PlayerCannotTrade()
+    public void CannotTrade()
     {
-        tradeButtonAnimator.Play("HideBottomButton");
+        if (canPlayerTrade)
+        {
+            canPlayerTrade = false;
+            tradeButtonAnimator.Play("HideBottomButton");
+        }
+    }
+
+    public void CanFish()
+    {
+        if (!canPlayerFish && !ShipScript.Instance.fishingScript.enabled)
+        {
+            canPlayerFish = true;
+            fishButtonAnimator.Play("ShowBottomButton");
+        }
+    }
+
+    public void CannotFish()
+    {
+        if (canPlayerFish)
+        {
+            canPlayerFish = false;
+            if (ShipScript.Instance.fishingScript.enabled)
+            {
+                ShipScript.Instance.EndFishingSession();
+            }
+            else
+            {
+                fishButtonAnimator.Play("HideBottomButton");
+            }
+        }
     }
 
     public void Trade()
     {
         tradeEditor.gameObject.SetActive(true);
         tradeEditor.SetEditor(null);
+    }
+
+    public void TogglePauseMenu()
+    {
+        if (pauseMenu.gameObject.activeSelf)
+        {
+            pauseMenu.HidePopUp();
+        }
+        else
+        {
+            pauseMenu.gameObject.SetActive(true);
+            pauseMenu.ShowPopUp();
+        }
     }
 }

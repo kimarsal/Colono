@@ -5,6 +5,8 @@ using static PeasantScript;
 
 public class CabinScript : BuildingScript
 {
+
+    public override Sprite sprite { get { return ResourceScript.Instance.cabinSprite; } }
     public override EditorScript editorScript { get { return CanvasScript.Instance.cabinEditor; } }
 
     public override void AddPeasant(PeasantScript peasantScript)

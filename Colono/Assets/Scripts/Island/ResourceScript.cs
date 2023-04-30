@@ -47,6 +47,15 @@ public class ResourceScript : MonoBehaviour
     public Material selectedHoverMaterial;
     public Material patchMaterial;
 
+    [Header("Constructions")]
+    public Sprite shipSprite;
+    public Sprite warehouseSprite;
+    public Sprite tavernSprite;
+    public Sprite cabinSprite;
+    public Sprite gardenSprite;
+    public Sprite penSprite;
+    public Sprite mineSprite;
+
     [Header("Buildings")]
     [SerializeField] private BuildingScript[] buildings;
 

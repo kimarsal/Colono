@@ -7,6 +7,7 @@ public class TavernScript : BuildingScript
 {
     [JsonProperty] public List<Recipe> recipeList = new List<Recipe>();
 
+    public override Sprite sprite { get { return ResourceScript.Instance.tavernSprite; } }
     public override EditorScript editorScript { get { return CanvasScript.Instance.tavernEditor; } }
 
     public override void InitializeBuilding(BuildingScript buildingInfo)

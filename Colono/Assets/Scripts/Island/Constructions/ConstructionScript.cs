@@ -22,6 +22,7 @@ public abstract class ConstructionScript : MonoBehaviour
     public Outline outline;
     public bool isService;
 
+    public abstract Sprite sprite { get; }
     public virtual string title { get { return constructionType.ToString(); } }
     public virtual bool canManagePeasants { get { return true; } }
     public virtual bool canBeRemoved { get { return true; } }

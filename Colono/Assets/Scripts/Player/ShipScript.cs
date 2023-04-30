@@ -17,13 +17,18 @@ public class ShipScript : ConstructionScript
 
     public Transform nextIslandTransform;
     public Transform enemyShipTransform;
+
+    public override Sprite sprite { get { return ResourceScript.Instance.shipSprite; } }
     public override bool canBeRemoved { get { return false; } }
     public override int peasantCount { get { return peasantList.Count + shipInterior.peasantList.Count; } }
     public override EditorScript editorScript { get { return CanvasScript.Instance.shipEditor; } }
 
+    public FishingScript fishingScript;
+
     private void Awake()
     {
         Instance = this;
+        fishingScript = GetComponent<FishingScript>();
     }
 
     public void AddDefaultElements()
@@ -159,6 +164,16 @@ public class ShipScript : ConstructionScript
     public override void FinishUpBusiness()
     {
         return;
+    }
+
+    public void StartFishingSession()
+    {
+        fishingScript.enabled = true;
+    }
+
+    public void EndFishingSession()
+    {
+        fishingScript.enabled = false;
     }
 
     public void CollectBooty(InventoryScript boxInventoryScript)

@@ -9,6 +9,7 @@ TagManager:
   - Cannonball
   - NPC
   - Construction
+  - Compass
   layers:
   - Default
   - TransparentFX

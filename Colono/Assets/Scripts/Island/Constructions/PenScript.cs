@@ -12,8 +12,8 @@ public class PenScript : EnclosureScript
     [JsonProperty] public List<AnimalScript> animalList = new List<AnimalScript>();
     public List<AnimalScript>[] confortableAnimals;
 
+    public override Sprite sprite { get { return ResourceScript.Instance.penSprite; } }
     public override bool canManagePeasants { get { return false; } }
-
     public override EditorScript editorScript { get { return CanvasScript.Instance.penEditor; } }
 
     private void Start()
