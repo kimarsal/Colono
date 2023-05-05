@@ -164,7 +164,7 @@ public class ConstructionDetailsScript : MonoBehaviour
 
     public void UpdatePeasantNum()
     {
-        int peasantsOnTheirWay = constructionScript.peasantList.Count - constructionScript.peasantsInside;
+        int peasantsOnTheirWay = constructionScript.peasantCount - constructionScript.peasantsInside;
         if (peasantsOnTheirWay != 0)
         {
             peasantsOnTheirWayText.enabled = true;

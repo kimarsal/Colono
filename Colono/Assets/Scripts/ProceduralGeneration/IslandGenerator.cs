@@ -34,15 +34,24 @@ public class IslandGenerator : MonoBehaviour
         return falloffMap;
     }
 
-    public void LoadIslands(List<IslandScript> islandList)
+    public IslandScript LoadIslands(List<IslandScript> islandList, Vector3 shipPosition)
     {
-        foreach(IslandScript islandScript in islandList)
+        float minDistance = 0;
+        IslandScript closestIsland = null;
+        foreach(IslandScript islandInfo in islandList)
         {
-            GenerateIsland(islandScript.offset, islandScript);
+            IslandScript islandScript = GenerateIsland(islandInfo.offset, islandInfo);
+            float distance = Vector3.Distance(islandScript.transform.position, shipPosition);
+            if(closestIsland == null || minDistance > distance)
+            {
+                minDistance = distance;
+                closestIsland = islandScript;
+            }
         }
+        return closestIsland;
     }
 
-    public void GenerateIsland(Vector2 offset, IslandScript islandInfo = null)
+    public IslandScript GenerateIsland(Vector2 offset, IslandScript islandInfo = null)
     {
         // Part 1: Es genera el GameObject i els seus components
         GameObject island = new GameObject("Island");
@@ -217,6 +226,7 @@ public class IslandGenerator : MonoBehaviour
         }
 
         GameManager.Instance.islandList.Add(islandScript);
+        return islandScript;
     }
 
     /*

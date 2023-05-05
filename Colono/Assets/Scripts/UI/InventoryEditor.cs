@@ -75,11 +75,13 @@ public class InventoryEditor : EditorScript
         {
             tabButtons[i].interactable = tabIndex != i;
 
+            int j = 0;
             foreach(InventoryRowScript row in inventoryRows[i])
             {
                 bool shouldBeActive = tabIndex == i;
-                if (shouldBeActive && tabIndex == 1) shouldBeActive = GameManager.Instance.discoveredCrops[i]; 
+                if (shouldBeActive && tabIndex == 1) shouldBeActive = GameManager.Instance.discoveredCrops[j]; 
                 row.gameObject.SetActive(shouldBeActive);
+                j++;
             }
         }
 

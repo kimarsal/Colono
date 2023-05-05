@@ -12,10 +12,10 @@ public class IslandSelectionScript : MonoBehaviour
 
     private void Update()
     {
-        if (EventSystem.current.IsPointerOverGameObject())
+        /*if (!EventSystem.current.IsPointerOverGameObject())
         {
             return;
-        }
+        }*/
 
         RaycastHit raycastHit;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);

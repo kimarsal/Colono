@@ -323,7 +323,16 @@ public class GameManager : MonoBehaviour
         timePlayed = gameInfo.timePlayed;
         seed = gameInfo.seed;
         ShipScript.Instance.InitializeShip(gameInfo.shipScript);
-        islandGenerator.LoadIslands(gameInfo.islandList);
+        closestIsland = islandGenerator.LoadIslands(gameInfo.islandList, gameInfo.shipScript.position);
+
+        foreach (PeasantScript peasantInfo in gameInfo.shipScript.peasantList)
+        {
+            PeasantScript peasantScript = Instantiate(ResourceScript.Instance.GetPeasantPrefab(peasantInfo.peasantType, peasantInfo.peasantGender),
+                peasantInfo.position, Quaternion.Euler(0, peasantInfo.orientation, 0), closestIsland.npcsTransform);
+            peasantScript.islandScript = closestIsland;
+            peasantScript.InitializePeasant(peasantInfo);
+            closestIsland.peasantList.Add(peasantScript);
+        }
     }
 
     private void StartGame()

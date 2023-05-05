@@ -55,6 +55,7 @@ public class TavernScript : BuildingScript
                     }
                 }
             }
+            if (hungerPoints == 0) hungerPoints = 0.1f;
 
             peasantList.Remove(peasantScript);
             peasantScript.transform.parent = islandScript.npcsTransform;

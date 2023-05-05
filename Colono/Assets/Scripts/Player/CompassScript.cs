@@ -32,10 +32,14 @@ public class CompassScript : MonoBehaviour
             outline.enabled = false;
             return;
         }
-        Debug.Log(raycastHit.transform.gameObject.tag);
+
         if (raycastHit.transform.gameObject.CompareTag("Compass"))
         {
             outline.enabled = true;
+            if (Input.GetMouseButtonDown(0))
+            {
+                CanvasScript.Instance.OpenMap();
+            }
         }
         else outline.enabled = false;
     }
@@ -60,5 +64,4 @@ public class CompassScript : MonoBehaviour
     {
         destination.position = newDestination;
     }
-
 }

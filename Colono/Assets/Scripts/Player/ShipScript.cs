@@ -68,6 +68,7 @@ public class ShipScript : ConstructionScript
             peasantScript.islandScript = shipInterior;
             shipInterior.peasantList.Add(peasantScript);
         }
+        peasantsInside = shipInterior.peasantList.Count;
 
         int animalTypes = ResourceScript.GetEnumLength(ResourceType.Animal);
         for (int i = 0; i < 2; i++)
@@ -97,8 +98,9 @@ public class ShipScript : ConstructionScript
             peasantScript.InitializePeasant(peasantInfo);
             shipInterior.peasantList.Add(peasantScript);
         }
+        peasantsInside = shipInterior.peasantList.Count;
 
-        foreach(AnimalScript animalInfo in shipInfo.shipInteriorPen.animalList)
+        foreach (AnimalScript animalInfo in shipInfo.shipInteriorPen.animalList)
         {
             AnimalScript animalScript = Instantiate(ResourceScript.Instance.GetAnimalPrefab(animalInfo.animalType),
                 shipInteriorPen.transform.position, Quaternion.Euler(0, animalInfo.orientation, 0), shipInteriorPen.animalTransform);
@@ -166,14 +168,9 @@ public class ShipScript : ConstructionScript
         return;
     }
 
-    public void StartFishingSession()
+    public void ToggleFishing()
     {
-        fishingScript.enabled = true;
-    }
-
-    public void EndFishingSession()
-    {
-        fishingScript.enabled = false;
+        fishingScript.enabled = !fishingScript.enabled;
     }
 
     public void CollectBooty(InventoryScript boxInventoryScript)

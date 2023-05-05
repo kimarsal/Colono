@@ -9,10 +9,11 @@ public class CanvasScript : MonoBehaviour
     private ButtonState buttonState = ButtonState.Idle;
 
     [Header("BottomButtons")]
-    [SerializeField] private Animator fishButtonAnimator;
-    [SerializeField] private Animator tradeButtonAnimator;
     [SerializeField] private Animator dockButtonAnimator;
     [SerializeField] private Animator sailButtonAnimator;
+    [SerializeField] private Animator tradeButtonAnimator;
+    [SerializeField] private Animator fishingButtonAnimator;
+    [SerializeField] private TextMeshProUGUI fishingButtonText;
 
     [Header("Tabs")]
     [SerializeField] private Animator serviceButtonsAnimator;
@@ -36,11 +37,11 @@ public class CanvasScript : MonoBehaviour
     [SerializeField] private TradeEditor tradeEditor;
 
     [Header("Others")]
-    [SerializeField] private Animator compassAnimator;
-    [SerializeField] private NewCropPopUpScript newCropPopUpScript;
     public Button dockButton;
-
+    [SerializeField] private Animator compassAnimator;
+    [SerializeField] private PopUpScript mapPopUp;
     [SerializeField] private PopUpScript pauseMenu;
+    [SerializeField] private NewCropPopUpScript newCropPopUpScript;
 
     private bool canPlayerTrade = false;
     private bool canPlayerFish = false;
@@ -278,7 +279,7 @@ public class CanvasScript : MonoBehaviour
         if (!canPlayerFish && !ShipScript.Instance.fishingScript.enabled)
         {
             canPlayerFish = true;
-            fishButtonAnimator.Play("ShowBottomButton");
+            fishingButtonAnimator.Play("ShowFishingButton");
         }
     }
 
@@ -289,19 +290,28 @@ public class CanvasScript : MonoBehaviour
             canPlayerFish = false;
             if (ShipScript.Instance.fishingScript.enabled)
             {
-                ShipScript.Instance.EndFishingSession();
+                ToggleFishing();
             }
-            else
-            {
-                fishButtonAnimator.Play("HideBottomButton");
-            }
+            fishingButtonAnimator.Play("HideFishingButton");
         }
+    }
+
+    public void ToggleFishing()
+    {
+        ShipScript.Instance.ToggleFishing();
+        fishingButtonText.text = ShipScript.Instance.fishingScript.enabled ? "Stop fishing" : "Start fishing";
     }
 
     public void Trade()
     {
         tradeEditor.gameObject.SetActive(true);
         tradeEditor.SetEditor(null);
+    }
+
+    public void OpenMap()
+    {
+        mapPopUp.gameObject.SetActive(true);
+        mapPopUp.ShowPopUp();
     }
 
     public void TogglePauseMenu()

@@ -118,7 +118,7 @@ public class EnemyController : ShipController
 
     public void HideFromMap()
     {
-        transform.position = new Vector3(0, 0, -500);
+        transform.position = new Vector3(0, -0.5f, -500);
         enemyStatus = EnemyStatus.StandBy;
     }
 }
