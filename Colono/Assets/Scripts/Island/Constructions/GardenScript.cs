@@ -190,7 +190,7 @@ public class GardenScript : EnclosureScript
         {
             if(pair.Value.cropState != PatchScript.CropState.Barren)
             {
-                islandScript.AddResource(ResourceScript.ResourceType.Crop, (int)pair.Value.cropType);
+                islandScript.AddResource(Vector3.zero, ResourceScript.ResourceType.Crop, (int)pair.Value.cropType);
             }
         }
     }

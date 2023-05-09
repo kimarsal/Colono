@@ -1,55 +1,40 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SpeechBubbleScript : MonoBehaviour
 {
-    public GameObject wood;
-    public GameObject stone;
-    public GameObject medicine;
-    public GameObject corn;
-    public GameObject cucumber;
-    public GameObject grape;
-    public GameObject pepper;
-    public GameObject potato;
-    public GameObject tomato;
-
-    private GameObject activeSprite;
+    [SerializeField] private Animator bubbleAnimator;
+    [SerializeField] private Image hungryImage;
+    [SerializeField] private Image tiredImage;
 
     void Update()
     {
-        transform.rotation = Quaternion.Euler(0, -transform.parent.rotation.y, 0);
+        transform.rotation = Quaternion.Euler(80, -transform.parent.rotation.y, 0);
     }
 
-    public void DisplayMaterial(ResourceScript.MaterialType materialType)
+    public void IsHungry()
     {
-        if (activeSprite != null) activeSprite.SetActive(false);
-        switch (materialType)
-        {
-            case ResourceScript.MaterialType.Wood: activeSprite = wood; break;
-            case ResourceScript.MaterialType.Stone: activeSprite = stone; break;
-            //case ResourceScript.MaterialType.Medicine: activeSprite = medicine; break;
-        }
-        activeSprite.SetActive(true);
+        hungryImage.gameObject.SetActive(true);
+        if (!tiredImage.gameObject.activeSelf) bubbleAnimator.Play("ShowBubble");
     }
 
-    public void DisplayCrop(ResourceScript.CropType cropType)
+    public void IsNoLongerHungry()
     {
-        if (activeSprite != null) activeSprite.SetActive(false);
-        switch (cropType)
-        {
-            case ResourceScript.CropType.Corn: activeSprite = corn; break;
-            case ResourceScript.CropType.Cucumber: activeSprite = cucumber; break;
-            case ResourceScript.CropType.Pepper: activeSprite = pepper; break;
-            case ResourceScript.CropType.Potato: activeSprite = potato; break;
-            case ResourceScript.CropType.Tomato: activeSprite = tomato; break;
-        }
-        activeSprite.SetActive(true);
+        hungryImage.gameObject.SetActive(false);
+        if (!tiredImage.gameObject.activeSelf) bubbleAnimator.Play("HideBubble");
     }
 
-    public void HideSpeechBubble()
+    public void IsTired()
     {
-        activeSprite.SetActive(false);
-        gameObject.SetActive(false);
+        tiredImage.gameObject.SetActive(true);
+        if (!hungryImage.gameObject.activeSelf) bubbleAnimator.Play("ShowBubble");
+    }
+
+    public void IsNoLongerTired()
+    {
+        tiredImage.gameObject.SetActive(false);
+        if (!hungryImage.gameObject.activeSelf) bubbleAnimator.Play("HideBubble");
     }
 }

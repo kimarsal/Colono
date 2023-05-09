@@ -79,6 +79,8 @@ public class CabinEditor : EditorScript
 
     public void MoveRowToShipList(PeasantRowScript peasantRowScript)
     {
+        if (peasantRows == null) return;
+
         peasantRows[1].Remove(peasantRowScript);
         peasantRows[2].Add(peasantRowScript);
         peasantRowScript.gameObject.SetActive(selectedTab == 2);

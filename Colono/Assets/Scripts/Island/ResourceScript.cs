@@ -102,6 +102,7 @@ public class ResourceScript : MonoBehaviour
     public GameObject coastObstacle;
     public GameObject enclosureCenter;
     public BoxScript box;
+    [SerializeField] private InventoryChangeScript inventoryChange;
 
     [Header("Pooling")]
     [SerializeField] private Vector3 fieldItemsStartPos;
@@ -324,9 +325,9 @@ public class ResourceScript : MonoBehaviour
         return Instantiate(buildings[(int)buildingType]);
     }
 
-    public GameObject GetCoastObstacle()
+    public void ShowInventoryChange(Vector3 position, ResourceType resourceType, int resourceIndex, int amount)
     {
-        return coastObstacle;
+        Instantiate(inventoryChange, position, inventoryChange.transform.rotation, transform).SetInventoryChange(GetResourceSprite(resourceType, resourceIndex), amount);
     }
 
     /*private Color[] skinColorsCaucassian =

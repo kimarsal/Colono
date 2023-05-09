@@ -63,6 +63,7 @@ public class TavernScript : BuildingScript
             peasantScript.isInBuilding = false;
             peasantScript.hunger -= hungerPoints;
             peasantScript.tavern = null;
+            peasantScript.speechBubble.IsNoLongerHungry();
 
             if (peasantScript.peasantType == PeasantScript.PeasantType.Adult)
             {

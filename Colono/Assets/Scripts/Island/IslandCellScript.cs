@@ -155,7 +155,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 EnclosureScript enclosureScript = islandScript.CreateEnclosure(selectedEnclosureType, selectedCells);
                 islandScript.AddConstruction(enclosureScript);
                 GameManager.Instance.islandSelectionScript.enabled = true;
-                GameManager.Instance.islandSelectionScript.SelectConstruction(selectedBuilding);
+                GameManager.Instance.islandSelectionScript.SelectConstruction(enclosureScript);
             }
             else if(selectFunction == SelectFunction.PlantTrees)
             {

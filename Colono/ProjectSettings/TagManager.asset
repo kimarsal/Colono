@@ -21,7 +21,7 @@ TagManager:
   - Construction
   - EnclosureCollider
   - Map
-  - 
+  - SpeechBubble
   - 
   - 
   - 
@@ -46,4 +46,7 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: SpeechBubble
+    uniqueID: 1683552037
     locked: 0

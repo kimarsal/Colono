@@ -71,7 +71,7 @@ public class IslandGenerator : MonoBehaviour
         islandScript.offset = offset;
 
         // Part 3: Es calcula la navegació
-        GameObject coastObstacle = Instantiate(ResourceScript.Instance.GetCoastObstacle());
+        GameObject coastObstacle = Instantiate(ResourceScript.Instance.coastObstacle);
         coastObstacle.transform.parent = island.transform;
         coastObstacle.transform.localPosition = new Vector3(0, -3.5f, 0);
 

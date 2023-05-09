@@ -186,6 +186,7 @@ public abstract class PeasantScript : MonoBehaviour
         else if (tavern == null)
         {
             hunger = 1;
+            speechBubble.IsHungry();
             tavern = (TavernScript)islandScript.GetAvailableBuilding(BuildingScript.BuildingType.Tavern, this);
             if (tavern != null)
             {
@@ -201,6 +202,7 @@ public abstract class PeasantScript : MonoBehaviour
         else if (cabin == null)
         {
             exhaustion = 1;
+            speechBubble.IsTired();
             cabin = (CabinScript)islandScript.GetAvailableBuilding(BuildingScript.BuildingType.Cabin, this);
             if (cabin != null)
             {

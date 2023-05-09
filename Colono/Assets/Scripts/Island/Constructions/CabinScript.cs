@@ -34,6 +34,7 @@ public class CabinScript : BuildingScript
             peasantScript.isInBuilding = false;
             peasantScript.exhaustion = 0;
             peasantScript.cabin = null;
+            peasantScript.speechBubble.IsNoLongerTired();
 
             if (peasantScript.peasantType == PeasantType.Adult)
             {

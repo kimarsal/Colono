@@ -27208,6 +27208,8 @@ MonoBehaviour:
   enclosureCenter: {fileID: 3192485407342391892, guid: 34b7e0ee1989fe24390e94b452610abd,
     type: 3}
   box: {fileID: 7023003054415314654, guid: 46d712ebd12d38c46aedea88d30a59c4, type: 3}
+  inventoryChange: {fileID: 2923338808120152621, guid: 225e979b854e56f479d60bbcca8cd5c2,
+    type: 3}
   fieldItemsStartPos: {x: 0, y: 0, z: 1000}
   hillItemsStartPos: {x: -50, y: 0, z: 1000}
   itemSpacing: 2
@@ -49393,7 +49395,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 471
+    m_Bits: 1495
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
