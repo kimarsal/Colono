@@ -144,7 +144,7 @@ public class AnimalScript : MonoBehaviour
         navMeshAgent.isStopped = true;
         animator.SetTrigger("Death");
         yield return new WaitForSeconds(animator.GetCurrentAnimatorClipInfo(0)[0].clip.length);
-        penScript.islandScript.AddResource(transform.position, ResourceScript.ResourceType.Meat, (int)animalType / 2, meatAmount + penScript.level);
+        penScript.islandScript.AddResource(ResourceScript.ResourceType.Meat, (int)animalType / 2, meatAmount + penScript.level);
         Destroy(gameObject);
     }
 

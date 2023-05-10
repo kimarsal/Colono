@@ -6,12 +6,12 @@ using UnityEngine.UI;
 
 public class OfferButtonScript : MonoBehaviour
 {
-    private ResourceScript.ResourceType givenResourceType;
-    private int givenResourceIndex;
-    private int givenResourceAmount;
-    private ResourceScript.ResourceType receivedResourceType;
-    private int receivedResourceIndex;
-    private int receivedResourceAmount;
+    public ResourceScript.ResourceType givenResourceType;
+    public int givenResourceIndex;
+    public int givenResourceAmount;
+    public ResourceScript.ResourceType receivedResourceType;
+    public int receivedResourceIndex;
+    public int receivedResourceAmount;
 
     [SerializeField] private Image givenResourceImage;
     [SerializeField] private TextMeshProUGUI givenResourceAmountText;
@@ -45,5 +45,10 @@ public class OfferButtonScript : MonoBehaviour
         givenResourceAmountText.text = givenResourceAmount.ToString();
         receivedResourceImage.sprite = ResourceScript.Instance.GetResourceSprite(receivedResourceType, receivedResourceIndex);
         receivedResourceAmountText.text = receivedResourceAmount.ToString();
+    }
+
+    public void AcceptOffer()
+    {
+        CanvasScript.Instance.tradeEditor.AcceptOffer(this);
     }
 }

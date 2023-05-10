@@ -57,7 +57,7 @@ public class ItemScript : TaskScript
     public override void TaskProgress()
     {
         materialAmount--;
-        islandScript.AddResource(center, ResourceScript.ResourceType.Material, (int)materialType);
+        islandScript.AddResource(ResourceScript.ResourceType.Material, (int)materialType);
         if (materialAmount == 0)
         {
             islandScript.RemoveItemToClear(this);

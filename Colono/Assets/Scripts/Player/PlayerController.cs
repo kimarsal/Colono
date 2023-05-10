@@ -88,12 +88,11 @@ public class PlayerController : ShipController
 		return position;
     }
 
-    protected override IEnumerator Sink()
+    protected override void Sink()
     {
-		GameManager.Instance.GameOver();
         base.Sink();
 		rb.constraints = RigidbodyConstraints.FreezeAll;
-        return null;
+		GameManager.Instance.GameOver();
     }
 
 	public void Repair(int position)

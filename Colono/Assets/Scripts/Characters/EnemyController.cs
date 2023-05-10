@@ -39,7 +39,7 @@ public class EnemyController : ShipController
 
     protected override void ManageInput()
     {
-        if(enemyStatus == EnemyStatus.Trading)
+        if(enemyStatus == EnemyStatus.Trading || enemyStatus == EnemyStatus.StandBy)
         {
             verticalInput = 0;
             horizontalInput = 0;
@@ -108,12 +108,19 @@ public class EnemyController : ShipController
         }
     }
 
-    protected override IEnumerator Sink()
+    private IEnumerator SinkCoroutine()
     {
-        base.Sink();
+        yield return new WaitForSeconds(1);
+        Instantiate(ResourceScript.Instance.box, transform.position, Quaternion.identity, transform.parent).inventoryScript = GetComponent<EnemyShipScript>().inventoryScript;
         HideFromMap();
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ | RigidbodyConstraints.FreezePositionY;
-        return null;
+    }
+
+    protected override void Sink()
+    {
+        base.Sink();
+        rb.constraints = RigidbodyConstraints.FreezeRotation;
+        StartCoroutine(SinkCoroutine());
     }
 
     public void HideFromMap()

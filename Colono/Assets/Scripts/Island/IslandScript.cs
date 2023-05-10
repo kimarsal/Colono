@@ -180,7 +180,7 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
         return closestBuildingScript;
     }
 
-    public void AddResource(Vector3 position, ResourceScript.ResourceType resourceType, int resourceIndex, int amount = 1)
+    public void AddResource(ResourceScript.ResourceType resourceType, int resourceIndex, int amount = 1)
     {
         int remainingAmount = amount;
         if (resourceType == ResourceScript.ResourceType.Crop)
@@ -204,9 +204,9 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
             ShipScript.Instance.shipInterior.inventoryScript.AddResource(resourceType, resourceIndex, remainingAmount);
         }
 
-        if(position != Vector3.zero) ResourceScript.Instance.ShowInventoryChange(position, resourceType, resourceIndex, amount);
-
         if (!(GameManager.Instance.isInIsland && GameManager.Instance.closestIsland == this)) return;
+
+        CanvasScript.Instance.ShowInventoryChange(resourceType, resourceIndex, amount);
 
         CanvasScript.Instance.UpdateInventoryRow(resourceType, resourceIndex);
 
@@ -239,6 +239,9 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
         {
             ShipScript.Instance.shipInterior.inventoryScript.RemoveResource(resourceType, resourceIndex, remainingAmount);
         }
+
+        CanvasScript.Instance.ShowInventoryChange(resourceType, resourceIndex, -amount);
+
         return true;
     }
 

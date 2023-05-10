@@ -18,10 +18,10 @@ public class MineScript : BuildingScript
             timeSinceLastExtraction = 0;
             if (peasantsInside == 0) return;
 
-            islandScript.AddResource(entry.position, ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Stone, peasantsInside);
+            islandScript.AddResource(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Stone, peasantsInside);
             if (Random.Range(0f,1f) < 0.1)
             {
-                islandScript.AddResource(entry.position + new Vector3(0, 10, 0), ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Gem);
+                islandScript.AddResource(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Gem);
             }
         }
     }

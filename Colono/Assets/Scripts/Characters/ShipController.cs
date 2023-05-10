@@ -142,7 +142,6 @@ public abstract class ShipController : MonoBehaviour
 
     protected virtual int LoseHealth()
     {
-
         int i = Random.Range(0, health.Length);
         int j = (i + 1) % health.Length;
         while (i != j)
@@ -157,7 +156,7 @@ public abstract class ShipController : MonoBehaviour
 
         if (i == j)
         {
-            StartCoroutine(Sink());
+            Sink();
         }
 
         return j;
@@ -172,11 +171,8 @@ public abstract class ShipController : MonoBehaviour
         Destroy(audioSource);
     }
 
-    protected virtual IEnumerator Sink()
+    protected virtual void Sink()
     {
-        rb.constraints = RigidbodyConstraints.FreezeRotation;
         rb.useGravity = true;
-        yield return new WaitForSeconds(1);
-        Instantiate(ResourceScript.Instance.box, transform.position, Quaternion.identity, transform.parent).inventoryScript = GetComponent<EnemyShipScript>().inventoryScript;
     }
 }

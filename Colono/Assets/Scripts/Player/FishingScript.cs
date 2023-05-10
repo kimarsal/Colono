@@ -13,11 +13,11 @@ public class FishingScript : MonoBehaviour
         if (timeSinceLastCatch > 1)
         {
             timeSinceLastCatch = 0;
-            int fishAmount = Random.Range(0, ShipScript.Instance.level);
+            int fishAmount = Random.Range(0, ShipScript.Instance.level + 1);
 
             if(fishAmount > 0)
             {
-                ShipScript.Instance.shipInterior.AddResource(ShipScript.Instance.position, ResourceScript.ResourceType.Meat, (int)ResourceScript.MeatType.Fish, fishAmount);
+                ShipScript.Instance.shipInterior.AddResource(ResourceScript.ResourceType.Meat, (int)ResourceScript.MeatType.Fish, fishAmount);
             }
         }
     }

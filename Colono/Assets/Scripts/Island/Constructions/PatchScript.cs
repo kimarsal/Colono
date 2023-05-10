@@ -76,7 +76,7 @@ public class PatchScript : TaskScript
         }
         else if (cropState == CropState.Blossomed) // Es cullen els fruits
         {
-            gardenScript.islandScript.AddResource(center, ResourceScript.ResourceType.Crop, (int)cropType, 3);
+            gardenScript.islandScript.AddResource(ResourceScript.ResourceType.Crop, (int)cropType, 3);
             cropState = CropState.Grown;
             ChangeCropState();
         }
@@ -91,7 +91,7 @@ public class PatchScript : TaskScript
         base.CancelTask();
         if (cropState == CropState.Barren)
         {
-            ((GardenScript)taskSourceScript).islandScript.AddResource(Vector3.zero, ResourceScript.ResourceType.Crop, (int)cropType);
+            ((GardenScript)taskSourceScript).islandScript.AddResource(ResourceScript.ResourceType.Crop, (int)cropType);
         }
     }
 }

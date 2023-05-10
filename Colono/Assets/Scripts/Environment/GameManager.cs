@@ -98,7 +98,8 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            
+            CanvasScript.Instance.CannotTrade();
+
             float minDistance = -1;
             foreach (IslandScript islandScript in islandList)
             {

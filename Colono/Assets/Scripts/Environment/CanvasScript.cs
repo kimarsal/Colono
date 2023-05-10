@@ -34,10 +34,11 @@ public class CanvasScript : MonoBehaviour
     public CabinEditor cabinEditor;
     public InventoryEditor inventoryEditor;
     public MineEditor mineEditor;
-    [SerializeField] private TradeEditor tradeEditor;
+    public TradeEditor tradeEditor;
 
     [Header("Others")]
     public Button dockButton;
+    [SerializeField] private Transform inventoryChangeList;
     [SerializeField] private Animator compassAnimator;
     [SerializeField] private PopUpScript mapPopUp;
     [SerializeField] private PopUpScript pauseMenu;
@@ -220,6 +221,11 @@ public class CanvasScript : MonoBehaviour
         constructionDetailsScript.HideDetails();
 
         ShowDefaultButtons();
+    }
+
+    public void ShowInventoryChange(ResourceScript.ResourceType resourceType, int resourceIndex, int amount)
+    {
+        Instantiate(ResourceScript.Instance.inventoryChange, inventoryChangeList).SetInventoryChange(ResourceScript.Instance.GetResourceSprite(resourceType, resourceIndex), amount);
     }
 
     public void CropIsDiscovered(int cropType)
