@@ -43,6 +43,8 @@ public class CanvasScript : MonoBehaviour
     [SerializeField] private PopUpScript mapPopUp;
     [SerializeField] private PopUpScript pauseMenu;
     [SerializeField] private NewCropPopUpScript newCropPopUpScript;
+    [SerializeField] private AudioSource soundSource;
+    [SerializeField] private AudioClip pageFlipClip;
 
     private bool canPlayerTrade = false;
     private bool canPlayerFish = false;
@@ -75,6 +77,7 @@ public class CanvasScript : MonoBehaviour
         compassAnimator.Play("HideCompass");
         dockButtonAnimator.Play("HideBottomButton");
         ShowDefaultButtons();
+        UpdateTopButtons();
     }
 
     public void ShowDefaultButtons()
@@ -85,6 +88,8 @@ public class CanvasScript : MonoBehaviour
         serviceButtonsAnimator.Play("ShowTabHeader");
 
         buttonState = ButtonState.Idle;
+
+        soundSource.PlayOneShot(pageFlipClip);
     }
 
     public void HideTopButtons()
@@ -124,6 +129,7 @@ public class CanvasScript : MonoBehaviour
             itemButtonsAnimator.Play("ShowTabHeader");
             buttonState = ButtonState.Idle;
         }
+        soundSource.PlayOneShot(pageFlipClip);
     }
 
     public void ToggleWorkButtons()
@@ -142,6 +148,7 @@ public class CanvasScript : MonoBehaviour
             itemButtonsAnimator.Play("ShowTabHeader");
             buttonState = ButtonState.Idle;
         }
+        soundSource.PlayOneShot(pageFlipClip);
     }
 
     public void ToggleItemButtons()
@@ -160,6 +167,7 @@ public class CanvasScript : MonoBehaviour
             itemButtonsAnimator.Play("HideTabContent");
             buttonState = ButtonState.Idle;
         }
+        soundSource.PlayOneShot(pageFlipClip);
     }
 
     public void ChooseTopButton()
@@ -188,6 +196,8 @@ public class CanvasScript : MonoBehaviour
 
             peasantDetailsAnimator.Play("ShowDetails");
             buttonState = ButtonState.PeasantDetails;
+
+            soundSource.PlayOneShot(pageFlipClip);
         }
     }
 
@@ -211,6 +221,8 @@ public class CanvasScript : MonoBehaviour
         {
             sailButtonAnimator.Play("HideBottomButton");
             constructionDetailsScript.ShowDetails();
+
+            soundSource.PlayOneShot(pageFlipClip);
         }
 
         buttonState = ButtonState.ConstructionDetails;
@@ -223,9 +235,23 @@ public class CanvasScript : MonoBehaviour
         ShowDefaultButtons();
     }
 
-    public void ShowInventoryChange(ResourceScript.ResourceType resourceType, int resourceIndex, int amount)
+    public void InventoryChange(ResourceScript.ResourceType resourceType, int resourceIndex, int amount)
     {
         Instantiate(ResourceScript.Instance.inventoryChange, inventoryChangeList).SetInventoryChange(ResourceScript.Instance.GetResourceSprite(resourceType, resourceIndex), amount);
+        
+        UpdateInventoryRow(resourceType, resourceIndex);
+
+        if (resourceType == ResourceScript.ResourceType.Material)
+        {
+            if (resourceIndex == (int)ResourceScript.MaterialType.Gem)
+            {
+                constructionDetailsScript.UpdateUpgradeButton();
+            }
+            else
+            {
+                UpdateTopButtons();
+            }
+        }
     }
 
     public void CropIsDiscovered(int cropType)
@@ -312,6 +338,7 @@ public class CanvasScript : MonoBehaviour
     {
         tradeEditor.gameObject.SetActive(true);
         tradeEditor.SetEditor(null);
+        soundSource.PlayOneShot(pageFlipClip);
     }
 
     public void OpenMap()
@@ -331,5 +358,6 @@ public class CanvasScript : MonoBehaviour
             pauseMenu.gameObject.SetActive(true);
             pauseMenu.ShowPopUp();
         }
+        soundSource.PlayOneShot(pageFlipClip);
     }
 }

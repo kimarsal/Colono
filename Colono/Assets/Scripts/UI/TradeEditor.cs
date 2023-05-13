@@ -53,8 +53,8 @@ public class TradeEditor : EditorScript
             shipInventory.AddResource(offerButton.receivedResourceType, offerButton.receivedResourceIndex, offerButton.receivedResourceAmount);
             enemyInventory.AddResource(offerButton.givenResourceType, offerButton.givenResourceIndex, offerButton.givenResourceAmount);
 
-            CanvasScript.Instance.ShowInventoryChange(offerButton.givenResourceType, offerButton.givenResourceIndex, -offerButton.givenResourceAmount);
-            CanvasScript.Instance.ShowInventoryChange(offerButton.receivedResourceType, offerButton.receivedResourceIndex, offerButton.receivedResourceAmount);
+            CanvasScript.Instance.InventoryChange(offerButton.givenResourceType, offerButton.givenResourceIndex, -offerButton.givenResourceAmount);
+            CanvasScript.Instance.InventoryChange(offerButton.receivedResourceType, offerButton.receivedResourceIndex, offerButton.receivedResourceAmount);
         }
         offerButton.GetComponent<Button>().interactable = false;
     }

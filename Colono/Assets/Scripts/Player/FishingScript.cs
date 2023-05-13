@@ -18,6 +18,7 @@ public class FishingScript : MonoBehaviour
             if(fishAmount > 0)
             {
                 ShipScript.Instance.shipInterior.AddResource(ResourceScript.ResourceType.Meat, (int)ResourceScript.MeatType.Fish, fishAmount);
+                CanvasScript.Instance.InventoryChange(ResourceScript.ResourceType.Meat, (int)ResourceScript.MeatType.Fish, fishAmount);
             }
         }
     }

@@ -1,9 +1,11 @@
+using Newtonsoft.Json;
 using System.Collections;
 using UnityEngine;
 
+[JsonObject(MemberSerialization.OptIn)]
 public abstract class ShipController : MonoBehaviour
 {
-    protected int[] health;
+    [JsonProperty] protected int[] health;
     protected const int maxHealth = 3;
     public float speed = 1.0f;
     public float steerSpeed = 5.0f;
@@ -12,20 +14,21 @@ public abstract class ShipController : MonoBehaviour
     protected float verticalInput;
     protected float horizontalInput;
 
-    public ParticleSystem MovingWaves;
-    //public ParticleSystem StillWaves;
-    public AudioSource WavesSound;
     private bool isStopped = true;
-    public AudioClip[] cannonballHitSounds;
-    public ParticleSystem explosionPrefab;
+    [SerializeField] private ParticleSystem MovingWaves;
+    //[SerializeField] private ParticleSystem StillWaves;
+    [SerializeField] private AudioSource WavesSound;
+    [SerializeField] private AudioClip[] cannonballHitSounds;
+    [SerializeField] private ParticleSystem explosionPrefab;
 
     protected bool wantsToShoot;
-    public LeftCannonballScript leftCannonball;
-    public RightCannonballScript rightCannonball;
-    public Transform[] leftCannons;
-    public Transform[] rightCannons;
-    public AudioSource fireSound;
-    public ParticleSystem smokePrefab;
+    [SerializeField] private LeftCannonballScript leftCannonball;
+    [SerializeField] private RightCannonballScript rightCannonball;
+    [SerializeField] private Transform[] leftCannons;
+    [SerializeField] private Transform[] rightCannons;
+    [SerializeField] private AudioSource soundSource;
+    [SerializeField] private AudioClip cannonClip;
+    [SerializeField] private ParticleSystem smokePrefab;
     private float timeTillLastShot = 0f;
     private float timeBetweenShots = 2f;
     protected Rigidbody rb;
@@ -60,7 +63,7 @@ public abstract class ShipController : MonoBehaviour
 
     void SoundAndParticles()
     {
-        if (verticalInput > 0)
+        if (verticalInput > 0 && !GameManager.Instance.isInIsland)
         {
             MovingWaves.Play();
             //StillWaves.Stop();
@@ -101,7 +104,7 @@ public abstract class ShipController : MonoBehaviour
         timeTillLastShot += Time.deltaTime;
         if (wantsToShoot && timeTillLastShot > timeBetweenShots)
         {
-            fireSound.Play();
+            soundSource.PlayOneShot(cannonClip);
             StartCoroutine(FireCannonballs());
             timeTillLastShot = 0;
 

@@ -20,12 +20,6 @@ public class PlayerController : ShipController
 
 	private void Start()
     {
-		health = new int[4];
-		for(int i = 0; i < health.Length; i++)
-		{
-			health[i] = maxHealth;
-		}
-
         rb = GetComponent<Rigidbody>();
 
         //S'obtenen les mides del mar
@@ -37,7 +31,26 @@ public class PlayerController : ShipController
 		xRightBounds = sea.transform.position.x + seaBounds.size.x / 2 - xRightMargin;
 		zLowerBounds = sea.transform.position.z - seaBounds.size.z / 2 + zLowerMargin;
 		zUpperBounds = sea.transform.position.z + seaBounds.size.z / 2 - zUpperMargin;
-	}    
+	}
+	
+	public void Initialize(PlayerController playerInfo)
+	{
+        health = new int[4];
+		if(playerInfo == null)
+		{
+            for (int i = 0; i < health.Length; i++)
+            {
+                health[i] = maxHealth;
+            }
+        }
+		else
+		{
+            for (int i = 0; i < health.Length; i++)
+            {
+                health[i] = playerInfo.health[i];
+            }
+        }
+	}
 
     protected override void ManageInput()
     {

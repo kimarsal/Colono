@@ -210,16 +210,16 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void DockOntoIsland()
+    public void Dock()
     {
         isInIsland = true;
+        islandCellScript.islandScript = closestIsland;
+        islandSelectionScript.enabled = true;
 
         CameraScript.Instance.SetIslandCamera(closestIsland.transform.position);
         CanvasScript.Instance.Dock();
 
-        ShipScript.Instance.islandScript = closestIsland;
-        islandCellScript.islandScript = closestIsland;
-        islandSelectionScript.enabled = true;
+        ShipScript.Instance.Dock(closestIsland);
     }
 
     public void DisableIslandCellScript()
@@ -291,13 +291,13 @@ public class GameManager : MonoBehaviour
     {
         isInIsland = false;
 
-        CameraScript.Instance.ResetPlayerCamera();
-        CanvasScript.Instance.Sail();
-
         islandSelectionScript.enabled = false;
         islandCellScript.enabled = false;
 
-        ShipScript.Instance.SendAllPeasantsBack();
+        CameraScript.Instance.ResetPlayerCamera();
+        CanvasScript.Instance.Sail();
+
+        ShipScript.Instance.Sail();
     }
 
     public void SaveGame()
@@ -323,6 +323,11 @@ public class GameManager : MonoBehaviour
 
         timePlayed = gameInfo.timePlayed;
         seed = gameInfo.seed;
+
+        EnemyController.Instance.Initialize(gameInfo.enemyController);
+        EnemyShipScript enemyShipScript = EnemyController.Instance.GetComponent<EnemyShipScript>();
+        enemyShipScript.Initialize(gameInfo.enemyShipScript);
+
         ShipScript.Instance.InitializeShip(gameInfo.shipScript);
         closestIsland = islandGenerator.LoadIslands(gameInfo.islandList, gameInfo.shipScript.position);
 
@@ -333,12 +338,21 @@ public class GameManager : MonoBehaviour
             peasantScript.islandScript = closestIsland;
             peasantScript.InitializePeasant(peasantInfo);
             closestIsland.peasantList.Add(peasantScript);
+            if (peasantScript.peasantType == PeasantScript.PeasantType.Adult)
+            {
+                closestIsland.GetNextPendingTask((PeasantAdultScript)peasantScript);
+            }
+            else peasantScript.UpdateTask();
         }
     }
 
     private void StartGame()
     {
         islandGenerator.GenerateIsland(new Vector2(0, 40));
+
+        EnemyController.Instance.Initialize();
+        EnemyShipScript enemyShipScript = EnemyController.Instance.GetComponent<EnemyShipScript>();
+        enemyShipScript.Initialize();
 
         discoveredCrops = new bool[Enum.GetValues(typeof(ResourceScript.CropType)).Length];
         for (int i = 0; i < discoveredCrops.Length/2; i++)
@@ -386,6 +400,9 @@ public class GameInfo
 {
     public float timePlayed;
     public int seed;
+    public PlayerController playerController;
+    public EnemyController enemyController;
+    public EnemyShipScript enemyShipScript;
     public ShipScript shipScript;
     public List<IslandScript> islandList = new List<IslandScript>();
 }

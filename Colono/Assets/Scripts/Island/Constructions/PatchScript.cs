@@ -21,6 +21,7 @@ public class PatchScript : TaskScript
     {
         orientation = patchInfo.orientation;
         crop = Instantiate(ResourceScript.Instance.GetCropPrefab(cropType, patchInfo.cropState), center, Quaternion.Euler(0, orientation, 0), transform);
+        crop.transform.localScale = Vector3.one * 0.4f;
     }
 
     private void Start()
@@ -73,6 +74,7 @@ public class PatchScript : TaskScript
             orientation = Random.Range(0, 359);
             cropState = CropState.Planted;
             crop = Instantiate(ResourceScript.Instance.GetCropPrefab(cropType, cropState), center, Quaternion.Euler(0, orientation, 0), transform);
+            crop.transform.localScale = Vector3.one * 0.4f;
         }
         else if (cropState == CropState.Blossomed) // Es cullen els fruits
         {

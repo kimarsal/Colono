@@ -112,6 +112,16 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
     {
         constructionScript.SendAllPeasantsBack();
         constructionScript.FinishUpBusiness();
+        if(constructionScript.constructionType == ConstructionScript.ConstructionType.Building)
+        {
+            AddResource(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Wood, ((BuildingScript)constructionScript).requiredWood);
+            AddResource(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Stone, ((BuildingScript)constructionScript).requiredStone);
+        }
+        else
+        {
+            int fenceAmount = constructionScript.width * 2 + (constructionScript.length - 2) * 2;
+            AddResource(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Wood, fenceAmount);
+        }
 
         InvertRegions(constructionScript.cells);
         constructionList.Remove(constructionScript);
@@ -206,21 +216,7 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
 
         if (!(GameManager.Instance.isInIsland && GameManager.Instance.closestIsland == this)) return;
 
-        CanvasScript.Instance.ShowInventoryChange(resourceType, resourceIndex, amount);
-
-        CanvasScript.Instance.UpdateInventoryRow(resourceType, resourceIndex);
-
-        if (resourceType == ResourceScript.ResourceType.Material)
-        {
-            if (resourceIndex == (int)ResourceScript.MaterialType.Gem)
-            {
-                CanvasScript.Instance.constructionDetailsScript.UpdateUpgradeButton();
-            }
-            else
-            {
-                CanvasScript.Instance.UpdateTopButtons();
-            }
-        }
+        CanvasScript.Instance.InventoryChange(resourceType, resourceIndex, amount);
     }
 
     public int GetResourceAmount(ResourceScript.ResourceType resourceType, int resourceIndex)
@@ -240,7 +236,10 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
             ShipScript.Instance.shipInterior.inventoryScript.RemoveResource(resourceType, resourceIndex, remainingAmount);
         }
 
-        CanvasScript.Instance.ShowInventoryChange(resourceType, resourceIndex, -amount);
+        if (GameManager.Instance.isInIsland && GameManager.Instance.closestIsland == this)
+        {
+            CanvasScript.Instance.InventoryChange(resourceType, resourceIndex, -amount);
+        }
 
         return true;
     }

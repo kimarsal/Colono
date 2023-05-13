@@ -959,10 +959,20 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1021956064083068059, guid: dab134a502aef09438779cfeef9389fa,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1515988647305555433, guid: dab134a502aef09438779cfeef9389fa,
         type: 3}
       propertyPath: m_Name
       value: TopButton
+      objectReference: {fileID: 0}
+    - target: {fileID: 1616782895451166778, guid: dab134a502aef09438779cfeef9389fa,
+        type: 3}
+      propertyPath: m_Color.a
+      value: 0.5882353
       objectReference: {fileID: 0}
     - target: {fileID: 2641616597947366832, guid: dab134a502aef09438779cfeef9389fa,
         type: 3}
@@ -1084,6 +1094,16 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3166987565691432730, guid: dab134a502aef09438779cfeef9389fa,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3166987565691432730, guid: dab134a502aef09438779cfeef9389fa,
+        type: 3}
+      propertyPath: m_ShowMaskGraphic
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4899785521708846380, guid: dab134a502aef09438779cfeef9389fa,
         type: 3}
       propertyPath: m_AnchorMax.x
@@ -1139,6 +1159,7 @@ MonoBehaviour:
   enclosureType: 0
   requiredWoodText: {fileID: 3837593126590055960}
   requiredStoneText: {fileID: 272410314821857781}
+  requiredSproutsText: {fileID: 6178017152089410170}
 --- !u!224 &4172713581906563652 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2641616597947366832, guid: dab134a502aef09438779cfeef9389fa,

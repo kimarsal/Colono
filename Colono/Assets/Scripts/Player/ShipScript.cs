@@ -17,6 +17,9 @@ public class ShipScript : ConstructionScript
 
     public Transform nextIslandTransform;
     public Transform enemyShipTransform;
+    [SerializeField] private AudioSource soundSource;
+    [SerializeField] private AudioClip dockClip;
+    [SerializeField] private AudioClip sailClip;
 
     public override Sprite sprite { get { return ResourceScript.Instance.shipSprite; } }
     public override bool canBeRemoved { get { return false; } }
@@ -54,6 +57,7 @@ public class ShipScript : ConstructionScript
             new Recipe(-1, -1, (int)MeatType.Mutton),
             new Recipe(-1, -1, (int)MeatType.Pork),
             new Recipe(-1, -1, (int)MeatType.Cow),
+            new Recipe(-1, -1, (int)MeatType.Fish),
         };
 
         for (int i = 0; i < 20; i++)
@@ -97,6 +101,7 @@ public class ShipScript : ConstructionScript
             peasantScript.islandScript = shipInterior;
             peasantScript.InitializePeasant(peasantInfo);
             shipInterior.peasantList.Add(peasantScript);
+            peasantScript.UpdateTask();
         }
         peasantsInside = shipInterior.peasantList.Count;
 
@@ -187,5 +192,17 @@ public class ShipScript : ConstructionScript
         {
             shipInterior.inventoryScript.AddResource(ResourceType.Meat, i, boxInventoryScript.GetResourceAmount(ResourceType.Meat, i));
         }
+    }
+
+    internal void Dock(IslandScript closestIsland)
+    {
+        islandScript = closestIsland;
+        soundSource.PlayOneShot(dockClip);
+    }
+
+    internal void Sail()
+    {
+        SendAllPeasantsBack();
+        soundSource.PlayOneShot(sailClip);
     }
 }

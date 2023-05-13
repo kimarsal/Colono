@@ -33,9 +33,11 @@ public class ResourceDropdownScript : MonoBehaviour
     {
         if (resourceType != ResourceType.Crop) return;
 
-        for(int i = 0; i < contentTransform.childCount; i++)
+        int i = -1;
+        foreach(Transform item in transform.GetChild(transform.childCount - 1).GetChild(0).GetChild(0))
         {
-            contentTransform.GetChild(i).gameObject.SetActive(GameManager.Instance.discoveredCrops[i]);
+            if (i != -1) item.gameObject.SetActive(GameManager.Instance.discoveredCrops[i]);
+            i++;
         }
     }
 }

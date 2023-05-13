@@ -1,6 +1,7 @@
 using UnityEngine;
 using static ResourceScript;
 
+[System.Serializable]
 public class EnemyShipScript : MonoBehaviour
 {
     public Vector3 position;
@@ -10,6 +11,20 @@ public class EnemyShipScript : MonoBehaviour
     private void Start()
     {
         RandomizeInventory();
+    }
+
+    public void Initialize(EnemyShipScript enemyShipInfo = null)
+    {
+        if (enemyShipInfo == null)
+        {
+            RandomizeInventory();
+        }
+        else
+        {
+            transform.position = enemyShipInfo.position;
+            transform.rotation = Quaternion.Euler(0, enemyShipInfo.orientation, 0);
+            inventoryScript = enemyShipInfo.inventoryScript;
+        }
     }
 
     void Update()

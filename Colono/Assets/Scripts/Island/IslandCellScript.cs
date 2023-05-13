@@ -24,6 +24,9 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     private BuildingScript selectedBuilding;
     private List<ItemScript> selectedItems;
 
+    [SerializeField] private AudioSource thudSource;
+    [SerializeField] private ParticleSystem puffPrefab;
+
     private void Start()
     {
         islandGenerator = GetComponent<IslandGenerator>();
@@ -107,6 +110,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 GameManager.Instance.islandSelectionScript.enabled = true;
                 GameManager.Instance.islandSelectionScript.SelectConstruction(selectedBuilding);
 
+                Instantiate(puffPrefab, selectedBuilding.entry.position, puffPrefab.transform.rotation);
             }
             GameManager.Instance.DisableIslandCellScript();
         }
@@ -126,13 +130,14 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 {
                     isSelectionValid = false;
                 }
-                else if (islandScript.isCellTaken(selectedCell))
+                else
                 {
-                    selectedItems = new List<ItemScript>() { islandScript.itemDictionary[selectedCell] };
+                    if (islandScript.isCellTaken(selectedCell)) selectedItems = new List<ItemScript>() { islandScript.itemDictionary[selectedCell] };
+                    else selectedItems = new List<ItemScript>();
 
-                    if (selectFunction == SelectFunction.PlantTrees) isSelectionValid = false;
+                    isSelectionValid = selectedItems.Count == 0 && selectFunction != SelectFunction.ClearItems && selectFunction != SelectFunction.CancelItemClearing
+                        || selectedItems.Count > 0 && (selectFunction == SelectFunction.ClearItems || selectFunction == SelectFunction.CancelItemClearing);
                 }
-                else if (selectFunction != SelectFunction.PlantTrees) isSelectionValid = false;
 
                 cells[(int)selectedCell.x, (int)selectedCell.y].GetComponent<MeshRenderer>().material = ResourceScript.Instance.selectingFirstCellMaterial;
             }
@@ -150,12 +155,14 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         {
             if (selectFunction == SelectFunction.CreateEnclosure)
             {
-                int fenceAmount = (int)((selectedCells[selectedCells.Length - 1].x - selectedCells[0].x) * 2 + (selectedCells[selectedCells.Length - 1].y - selectedCells[0].y - 2) * 2);
+                int fenceAmount = (int)((selectedCells[selectedCells.Length - 1].x - selectedCells[0].x + 1) * 2 + (selectedCells[selectedCells.Length - 1].y - selectedCells[0].y - 1) * 2);
                 islandScript.UseResource(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Wood, fenceAmount);
                 EnclosureScript enclosureScript = islandScript.CreateEnclosure(selectedEnclosureType, selectedCells);
                 islandScript.AddConstruction(enclosureScript);
                 GameManager.Instance.islandSelectionScript.enabled = true;
                 GameManager.Instance.islandSelectionScript.SelectConstruction(enclosureScript);
+
+                Instantiate(puffPrefab, enclosureScript.entry.position, puffPrefab.transform.rotation);
             }
             else if(selectFunction == SelectFunction.PlantTrees)
             {
@@ -185,23 +192,24 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         int x, y;
         GetPointerCoordinates(eventData, out x, out y);
         
-        if (wasOtherCellHovered && hoveredCell.x == x && hoveredCell.y == y) return; //La cel·la és la mateixa a la hovered
+        if ((wasOtherCellHovered || selectMode != SelectMode.None) && hoveredCell.x == x && hoveredCell.y == y) return; //La cel·la és la mateixa a la hovered
 
         DestroyAllCells();
         hoveredCell = new Vector2(x, y);
 
         if (selectMode == SelectMode.None)
         {
-            if (islandScript.regionMap[x, y] < 0 // No està disponible
-                || islandGenerator.regions[islandScript.regionMap[x, y]].type == Terrain.TerrainType.Field
+            if (islandGenerator.regions[islandScript.regionMap[x, y]].type == Terrain.TerrainType.Field
                 || islandGenerator.regions[islandScript.regionMap[x, y]].type == Terrain.TerrainType.Hill) //Si la cel·la és gespa
             {
                 CreateCell(hoveredCell, ResourceScript.Instance.hoverMaterial);
                 wasOtherCellHovered = true;
+
+                thudSource.Play();
             }
             return;
         }
-
+        
         Vector2 startCell = hoveredCell;
         Vector2 endCell = hoveredCell;
         int vertexIndex = 0; //vèrtex en el qual col·locar l'edifici
@@ -301,6 +309,8 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             CreateCell(cell, isSelectionValid ? ResourceScript.Instance.selectingMaterial : ResourceScript.Instance.invalidSelectionMaterial);
         }
         cells[(int)selectedCell.x, (int)selectedCell.y].GetComponent<MeshRenderer>().material = ResourceScript.Instance.selectingFirstCellMaterial;
+
+        thudSource.Play();
     }
 
     private void CreateCell(Vector2 position, Material cellMaterial)

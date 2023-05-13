@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System.Collections;
 using UnityEngine;
 
@@ -5,7 +6,7 @@ public class EnemyController : ShipController
 {
     public static EnemyController Instance { get; private set; }
     public enum EnemyStatus { Trading, Attacking, Fleeing, StandBy }
-    public EnemyStatus enemyStatus = EnemyStatus.Attacking;
+    [JsonProperty] public EnemyStatus enemyStatus = EnemyStatus.Attacking;
     public float distanceToShoot = 12;
     public float angleToShoot = 10;
 
@@ -21,20 +22,28 @@ public class EnemyController : ShipController
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
-
-        health = new int[4];
-        Initialize();
     }
 
-    public void Initialize()
+    public void Initialize(EnemyController enemyInfo = null)
     {
-        for (int i = 0; i < health.Length; i++)
+        health = new int[4];
+        if(enemyInfo == null)
         {
-            health[i] = 2;
+            for (int i = 0; i < health.Length; i++)
+            {
+                health[i] = 2;
+            }
+
+            HideFromMap();
         }
-        enemyStatus = Random.Range(0, 2) % 2 == 0 ? EnemyStatus.Trading : EnemyStatus.Attacking;
-        GetComponent<EnemyShipScript>().RandomizeInventory();
-        currentTime = 0;
+        else
+        {
+            for (int i = 0; i < health.Length; i++)
+            {
+                health[i] = enemyInfo.health[i];
+            }
+            enemyStatus = enemyInfo.enemyStatus;
+        }
     }
 
     protected override void ManageInput()
