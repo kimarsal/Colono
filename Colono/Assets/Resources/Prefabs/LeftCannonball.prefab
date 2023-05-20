@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7217484259908261524}
   - component: {fileID: 796549887992896232}
   - component: {fileID: 3894666448639719523}
-  - component: {fileID: -4673642296771408802}
+  - component: {fileID: 6112431048783964917}
   - component: {fileID: -1288542766331667564}
   - component: {fileID: 4864490864095705977}
   m_Layer: 0
@@ -117,7 +117,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &-4673642296771408802
+--- !u!114 &6112431048783964917
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -126,7 +126,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2762800722222629247}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 69bcc6545b2793148a07df50133d58be, type: 3}
+  m_Script: {fileID: 11500000, guid: 8f0f25c889f300f4698c6439a38a1e17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   shipController: {fileID: 0}

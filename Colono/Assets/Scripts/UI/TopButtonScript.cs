@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class TopButtonScript : MonoBehaviour
 {
-    public IslandCellScript.SelectFunction function;
+    public IslandCellScript.SelectAction function;
     public BuildingScript buildingScript;
     public EnclosureScript.EnclosureType enclosureType;
     private Button button;
@@ -19,7 +19,7 @@ public class TopButtonScript : MonoBehaviour
         button = GetComponent<Button>();
         button.onClick.AddListener(ButtonClick);
 
-        if(function == IslandCellScript.SelectFunction.PlaceBuilding)
+        if(function == IslandCellScript.SelectAction.PlaceBuilding)
         {
             requiredWoodText.text = buildingScript.requiredWood.ToString();
             requiredStoneText.text = buildingScript.requiredStone.ToString();
@@ -34,18 +34,18 @@ public class TopButtonScript : MonoBehaviour
         IslandScript islandScript = GameManager.Instance.closestIsland;
         switch(function)
         {
-            case IslandCellScript.SelectFunction.PlaceBuilding:
+            case IslandCellScript.SelectAction.PlaceBuilding:
                 hasEnoughWood = islandScript.GetResourceAmount(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Wood) >= buildingScript.requiredWood;
                 hasEnoughStone = islandScript.GetResourceAmount(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Stone) >= buildingScript.requiredStone;
                 button.interactable = hasEnoughWood && hasEnoughStone;
                 break;
-            case IslandCellScript.SelectFunction.CreateEnclosure:
+            case IslandCellScript.SelectAction.CreateEnclosure:
                 button.interactable = hasEnoughWood = islandScript.GetResourceAmount(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Wood) >= 8;
                 break;
-            case IslandCellScript.SelectFunction.PlantTrees:
+            case IslandCellScript.SelectAction.PlantTrees:
                 button.interactable = hasEnoughSprouts = islandScript.GetResourceAmount(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Sprout) > 0;
                 break;
-            case IslandCellScript.SelectFunction.ClearItems: case IslandCellScript.SelectFunction.CancelItemClearing:
+            case IslandCellScript.SelectAction.ClearItems: case IslandCellScript.SelectAction.CancelItemClearing:
                 button.interactable = true;
                 break;
         }

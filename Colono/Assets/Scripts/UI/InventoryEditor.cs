@@ -10,8 +10,8 @@ public class InventoryEditor : EditorScript
 
     [SerializeField] private TextMeshProUGUI shipInventoryText;
     [SerializeField] private TextMeshProUGUI islandInventoryText;
-    [SerializeField] private Button upgradeShipInventoryCategoryButton;
-    [SerializeField] private Button upgradeIslandInventoryCategoryButton;
+    [SerializeField] private UpgradeButtonScript upgradeShipInventoryCategoryButton;
+    [SerializeField] private UpgradeButtonScript upgradeIslandInventoryCategoryButton;
 
     [SerializeField] private Transform rows;
     [SerializeField] private ScrollRect scrollRect;
@@ -36,6 +36,8 @@ public class InventoryEditor : EditorScript
 
     public override void SetEditor(ConstructionScript constructionScript)
     {
+        this.constructionScript = constructionScript;
+
         islandInventoryScript = constructionScript.islandScript.inventoryScript;
 
         foreach (Transform row in rows)
@@ -85,23 +87,31 @@ public class InventoryEditor : EditorScript
             }
         }
 
-        upgradeShipInventoryCategoryButton.interactable = shipInventoryScript.CanLevelUpCategory(selectedTab);
-        upgradeIslandInventoryCategoryButton.interactable = islandInventoryScript.CanLevelUpCategory(selectedTab);
+        UpdateUpgradeButton();
         UpdateInventoryText();
         scrollRect.normalizedPosition = new Vector2(0, 1);
+    }
+
+    public override void UpdateUpgradeButton()
+    {
+        int availableGems = constructionScript.islandScript.GetResourceAmount(ResourceType.Material, (int)MaterialType.Gem);
+        upgradeShipInventoryCategoryButton.UpdateButton(shipInventoryScript.GetCategoryLevel(selectedTab), availableGems);
+        upgradeIslandInventoryCategoryButton.UpdateButton(islandInventoryScript.GetCategoryLevel(selectedTab), availableGems);
     }
 
     public void UpgradeShipInventoryCategory()
     {
         shipInventoryScript.LevelUpInventoryCategory(selectedTab);
-        upgradeShipInventoryCategoryButton.interactable = shipInventoryScript.CanLevelUpCategory(selectedTab);
+        int availableGems = constructionScript.islandScript.GetResourceAmount(ResourceType.Material, (int)MaterialType.Gem);
+        upgradeShipInventoryCategoryButton.UpdateButton(shipInventoryScript.GetCategoryLevel(selectedTab), availableGems);
         shipInventoryText.text = shipInventoryScript.GetUsedCapacity(selectedTab);
     }
 
     public void UpgradeIslandInventoryCategory()
     {
         islandInventoryScript.LevelUpInventoryCategory(selectedTab);
-        upgradeIslandInventoryCategoryButton.interactable = islandInventoryScript.CanLevelUpCategory(selectedTab);
+        int availableGems = constructionScript.islandScript.GetResourceAmount(ResourceType.Material, (int)MaterialType.Gem);
+        upgradeIslandInventoryCategoryButton.UpdateButton(islandInventoryScript.GetCategoryLevel(selectedTab), availableGems);
         islandInventoryText.text = islandInventoryScript.GetUsedCapacity(selectedTab);
     }
 

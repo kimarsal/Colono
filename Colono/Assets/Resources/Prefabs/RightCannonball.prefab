@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7217484259908261524}
   - component: {fileID: 796549887992896232}
   - component: {fileID: 3894666448639719523}
-  - component: {fileID: -8517318411403351618}
+  - component: {fileID: 4431764616360069202}
   - component: {fileID: 1255107936499633066}
   - component: {fileID: -7633751109605731572}
   m_Layer: 0
@@ -117,7 +117,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &-8517318411403351618
+--- !u!114 &4431764616360069202
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -126,9 +126,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 2762800722222629247}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 97b0b4ead73570048bc53e66e407ebfc, type: 3}
+  m_Script: {fileID: 11500000, guid: 8f0f25c889f300f4698c6439a38a1e17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isRightCannonball: 1
   shipController: {fileID: 0}
   splashAudioSource: {fileID: -7633751109605731572}
   splashPrefab: {fileID: 9125212449759046732, guid: 001931df25717b147a7aee75662e340a,

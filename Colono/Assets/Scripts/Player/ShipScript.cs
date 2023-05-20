@@ -49,8 +49,8 @@ public class ShipScript : ConstructionScript
             shipInterior.inventoryScript.AddResource(ResourceType.Meat, i, 10);
         }
 
-        shipInterior.inventoryScript.AddResource(ResourceType.Material, (int)MaterialType.Wood, 45);
-        shipInterior.inventoryScript.AddResource(ResourceType.Material, (int)MaterialType.Gem, 5);
+        shipInterior.inventoryScript.AddResource(ResourceType.Material, (int)MaterialType.Wood, 30);
+        shipInterior.inventoryScript.AddResource(ResourceType.Material, (int)MaterialType.Stone, 20);
 
         ((TavernScript)shipInterior.constructionList[1]).recipeList = new List<Recipe> {
             new Recipe(-1, -1, (int)MeatType.Chicken),
@@ -88,6 +88,12 @@ public class ShipScript : ConstructionScript
 
     public void InitializeShip(ShipScript shipInfo)
     {
+        if(shipInfo == null)
+        {
+            AddDefaultElements();
+            return;
+        }
+
         transform.position = shipInfo.position;
         transform.rotation = Quaternion.Euler(0, shipInfo.orientation, 0);
         shipInterior.inventoryScript = shipInfo.shipInterior.inventoryScript;

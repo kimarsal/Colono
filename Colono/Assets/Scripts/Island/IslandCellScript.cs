@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 
 public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerMoveHandler
 {
-    public enum SelectFunction { PlantTrees, ClearItems, CancelItemClearing, CreateEnclosure, PlaceBuilding };
+    public enum SelectAction { CreateEnclosure, PlaceBuilding, PlantTrees, ClearItems, CancelItemClearing };
     private enum SelectMode { None, Selecting, Building };
     private IslandGenerator islandGenerator;
     public IslandScript islandScript;
@@ -12,7 +12,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     [SerializeField] private Transform cellsTransform;
     private GameObject[,] cells;
 
-    private SelectFunction selectFunction;
+    private SelectAction selectAction;
     private SelectMode selectMode;
     private Vector2 hoveredCell;
     private Vector2 selectedCell;
@@ -135,8 +135,8 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                     if (islandScript.isCellTaken(selectedCell)) selectedItems = new List<ItemScript>() { islandScript.itemDictionary[selectedCell] };
                     else selectedItems = new List<ItemScript>();
 
-                    isSelectionValid = selectedItems.Count == 0 && selectFunction != SelectFunction.ClearItems && selectFunction != SelectFunction.CancelItemClearing
-                        || selectedItems.Count > 0 && (selectFunction == SelectFunction.ClearItems || selectFunction == SelectFunction.CancelItemClearing);
+                    isSelectionValid = selectedItems.Count == 0 && selectAction != SelectAction.ClearItems && selectAction != SelectAction.CancelItemClearing
+                        || selectedItems.Count > 0 && (selectAction == SelectAction.ClearItems || selectAction == SelectAction.CancelItemClearing);
                 }
 
                 cells[(int)selectedCell.x, (int)selectedCell.y].GetComponent<MeshRenderer>().material = ResourceScript.Instance.selectingFirstCellMaterial;
@@ -153,7 +153,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     {
         if (isSelectionValid)
         {
-            if (selectFunction == SelectFunction.CreateEnclosure)
+            if (selectAction == SelectAction.CreateEnclosure)
             {
                 int fenceAmount = (int)((selectedCells[selectedCells.Length - 1].x - selectedCells[0].x + 1) * 2 + (selectedCells[selectedCells.Length - 1].y - selectedCells[0].y - 1) * 2);
                 islandScript.UseResource(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Wood, fenceAmount);
@@ -164,7 +164,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
                 Instantiate(puffPrefab, enclosureScript.entry.position, puffPrefab.transform.rotation);
             }
-            else if(selectFunction == SelectFunction.PlantTrees)
+            else if(selectAction == SelectAction.PlantTrees)
             {
                 islandScript.UseResource(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Sprout, selectedCells.Length);
                 islandScript.PlantTrees(selectedCells);
@@ -174,7 +174,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
             {
                 foreach (ItemScript item in selectedItems)
                 {
-                    item.ChangeItemClearingState(selectFunction == SelectFunction.ClearItems);
+                    item.ChangeItemClearingState(selectAction == SelectAction.ClearItems);
                 }
                 CanvasScript.Instance.ShowDefaultButtons();
             }
@@ -272,7 +272,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
         }
 
         // Es comprova la validesa de la selecció segons la funció
-        if(selectFunction == SelectFunction.PlantTrees)
+        if(selectAction == SelectAction.PlantTrees)
         {
             int availableSprouts = islandScript.GetResourceAmount(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Sprout);
             if (selectedItems.Count > 0 || availableSprouts < selectedCells.Length)
@@ -280,11 +280,11 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 isSelectionValid = false;
             }
         }
-        if (selectFunction == SelectFunction.ClearItems || selectFunction == SelectFunction.CancelItemClearing)
+        if (selectAction == SelectAction.ClearItems || selectAction == SelectAction.CancelItemClearing)
         {
             if (selectedItems.Count == 0) isSelectionValid = false;
         }
-        else if (selectFunction == SelectFunction.CreateEnclosure)
+        else if (selectAction == SelectAction.CreateEnclosure)
         {
             int availableWood = islandScript.GetResourceAmount(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Wood);
             int fenceAmount = (int)((endCell.x - startCell.x) * 2 + (endCell.y - startCell.y - 2) * 2);
@@ -294,7 +294,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
                 isSelectionValid = false;
             }
         }
-        else if (selectFunction == SelectFunction.PlaceBuilding)
+        else if (selectAction == SelectAction.PlaceBuilding)
         {
             if (selectedItems.Count > 0) isSelectionValid = false;
 
@@ -350,7 +350,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     public void ChooseEnclosure(EnclosureScript.EnclosureType enclosureType)
     {
-        selectFunction = SelectFunction.CreateEnclosure;
+        selectAction = SelectAction.CreateEnclosure;
         selectedEnclosureType = enclosureType;
         selectMode = SelectMode.None;
     }
@@ -361,7 +361,7 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
     {
         selectedBuilding = Instantiate(buildingScript, islandScript.constructionsTransform.transform);
         selectMode = SelectMode.Building;
-        selectFunction = SelectFunction.PlaceBuilding;
+        selectAction = SelectAction.PlaceBuilding;
     }
 
     private void ChangeSelectedBuildingColor(Color color)
@@ -374,9 +374,9 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
     //
 
-    public void ManageItems(SelectFunction selectFunction)
+    public void ManageItems(SelectAction selectFunction)
     {
-        this.selectFunction = selectFunction;
+        this.selectAction = selectFunction;
         selectMode = SelectMode.None;
     }
 

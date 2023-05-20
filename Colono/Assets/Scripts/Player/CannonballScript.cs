@@ -1,9 +1,9 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class CannonballScript : MonoBehaviour
 {
+    public bool isRightCannonball;
     protected float speed = 15;
     public ShipController shipController;
     protected Rigidbody rb;
@@ -11,9 +11,10 @@ public class CannonballScript : MonoBehaviour
     [SerializeField] private AudioSource splashAudioSource;
     [SerializeField] private ParticleSystem splashPrefab;
 
-    protected void Setup()
+    private void Start()
     {
         rb = GetComponent<Rigidbody>();
+        rb.velocity = speed * ((isRightCannonball ? 1 : -1) * shipController.transform.right + new Vector3(0, 0.2f, 0));
     }
 
     private void Update()
@@ -21,7 +22,6 @@ public class CannonballScript : MonoBehaviour
         if (transform.position.y <= -0.5 && !isBeingDestroyed)
         {
             isBeingDestroyed = true;
-            //GetComponent<MeshRenderer>().enabled = false;
             GetComponent<SphereCollider>().enabled = false;
             StartCoroutine(CannonballMiss());
         }

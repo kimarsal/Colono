@@ -1,11 +1,7 @@
-using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class PlayerController : ShipController
 {
-	[SerializeField] private Button[] repairButtons;
-
 	//Distància màxima amb les vores
 	private float xLeftMargin = 20f;
 	private float xRightMargin = 20f;
@@ -68,20 +64,14 @@ public class PlayerController : ShipController
         wantsToShoot = Input.GetKeyDown(KeyCode.Space);
     }
 
+	//Es manté el jugador dins els marges
 	protected override void Movement()
 	{
 		base.Movement();
 
-		//Es manté el jugador dins els marges
-		if (transform.position.x < xLeftBounds)
-			transform.position = new Vector3(xLeftBounds, transform.position.y, transform.position.z);
-		else if (transform.position.x > xRightBounds)
-			transform.position = new Vector3(xRightBounds, transform.position.y, transform.position.z);
-
-		if (transform.position.z < zLowerBounds)
-			transform.position = new Vector3(transform.position.x, transform.position.y, zLowerBounds);
-		else if (transform.position.z > zUpperBounds)
-			transform.position = new Vector3(transform.position.x, transform.position.y, zUpperBounds);
+		transform.position = new Vector3(Mathf.Clamp(transform.position.x, xLeftBounds, xRightBounds),
+										transform.position.y,
+										Mathf.Clamp(transform.position.z, zLowerBounds, zUpperBounds));
 	}
 
     protected override void Shoot()
@@ -96,8 +86,6 @@ public class PlayerController : ShipController
     {
         int position = base.LoseHealth();
 
-		repairButtons[position].interactable = true;
-
 		return position;
     }
 
@@ -108,10 +96,14 @@ public class PlayerController : ShipController
 		GameManager.Instance.GameOver();
     }
 
-	public void Repair(int position)
+	public bool Repair(int position)
 	{
 		health[position]++;
-		repairButtons[position].interactable = health[position] < maxHealth;
+		return CanRepair(position);
 	}
 
+	public bool CanRepair(int position)
+    {
+        return health[position] < maxHealth;
+    }
 }

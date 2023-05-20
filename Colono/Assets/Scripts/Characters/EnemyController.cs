@@ -86,14 +86,13 @@ public class EnemyController : ShipController
         }
         else
         {
-            bool canShoot = false;
             if (isToTheRight)
             {
                 if (180 - Mathf.Abs(angleDiff) > angleToShoot)
                 {
                     horizontalInput = -1;
                 }
-                else canShoot = true;
+                else wantsToShoot = true;
             }
             else
             {
@@ -101,19 +100,10 @@ public class EnemyController : ShipController
                 {
                     horizontalInput = 1;
                 }
-                else canShoot = true;
+                else wantsToShoot = true;
             }
             
-            if(canShoot)
-            {
-                verticalInput = 0;
-                wantsToShoot = true;
-            }
-            else
-            {
-                verticalInput = 1;
-                wantsToShoot = false;
-            }
+            verticalInput = wantsToShoot ? 0 : 1;
         }
     }
 

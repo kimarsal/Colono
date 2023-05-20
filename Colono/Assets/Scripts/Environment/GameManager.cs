@@ -248,8 +248,8 @@ public class GameManager : MonoBehaviour
         islandCellScript.enabled = true;
         switch (topButtonScript.function)
         {
-            case IslandCellScript.SelectFunction.PlaceBuilding: islandCellScript.ChooseBuilding(topButtonScript.buildingScript); break;
-            case IslandCellScript.SelectFunction.CreateEnclosure: islandCellScript.ChooseEnclosure(topButtonScript.enclosureType); break;
+            case IslandCellScript.SelectAction.PlaceBuilding: islandCellScript.ChooseBuilding(topButtonScript.buildingScript); break;
+            case IslandCellScript.SelectAction.CreateEnclosure: islandCellScript.ChooseEnclosure(topButtonScript.enclosureType); break;
             default: islandCellScript.ManageItems(topButtonScript.function); break;
         }
     }
@@ -268,7 +268,6 @@ public class GameManager : MonoBehaviour
     public void RemoveConstruction()
     {
         ConstructionScript constructionScript = islandSelectionScript.selectedConstruction;
-        constructionScript.FinishUpBusiness();
         closestIsland.RemoveConstruction(constructionScript);
         CanvasScript.Instance.HideConstructionDetails();
     }
@@ -325,10 +324,10 @@ public class GameManager : MonoBehaviour
         seed = gameInfo.seed;
 
         EnemyController.Instance.Initialize(gameInfo.enemyController);
-        EnemyShipScript enemyShipScript = EnemyController.Instance.GetComponent<EnemyShipScript>();
-        enemyShipScript.Initialize(gameInfo.enemyShipScript);
+        EnemyController.Instance.GetComponent<EnemyShipScript>().Initialize(gameInfo.enemyShipScript);
 
         ShipScript.Instance.InitializeShip(gameInfo.shipScript);
+        ShipScript.Instance.GetComponent<PlayerController>().Initialize(gameInfo.playerController);
         closestIsland = islandGenerator.LoadIslands(gameInfo.islandList, gameInfo.shipScript.position);
 
         foreach (PeasantScript peasantInfo in gameInfo.shipScript.peasantList)
@@ -348,19 +347,19 @@ public class GameManager : MonoBehaviour
 
     private void StartGame()
     {
-        islandGenerator.GenerateIsland(new Vector2(0, 40));
-
-        EnemyController.Instance.Initialize();
-        EnemyShipScript enemyShipScript = EnemyController.Instance.GetComponent<EnemyShipScript>();
-        enemyShipScript.Initialize();
-
         discoveredCrops = new bool[Enum.GetValues(typeof(ResourceScript.CropType)).Length];
         for (int i = 0; i < discoveredCrops.Length/2; i++)
         {
             discoveredCrops[i] = true;
         }
 
-        ShipScript.Instance.AddDefaultElements();
+        islandGenerator.GenerateIsland(new Vector2(0, 40));
+
+        EnemyController.Instance.Initialize();
+        EnemyController.Instance.GetComponent<EnemyShipScript>().Initialize();
+
+        ShipScript.Instance.InitializeShip(null);
+        ShipScript.Instance.GetComponent<PlayerController>().Initialize(null);
     }
 
     public void GameOver()

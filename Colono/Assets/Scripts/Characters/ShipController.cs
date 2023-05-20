@@ -13,17 +13,16 @@ public abstract class ShipController : MonoBehaviour
 
     protected float verticalInput;
     protected float horizontalInput;
+    protected bool wantsToShoot;
 
     private bool isStopped = true;
     [SerializeField] private ParticleSystem MovingWaves;
-    //[SerializeField] private ParticleSystem StillWaves;
     [SerializeField] private AudioSource WavesSound;
     [SerializeField] private AudioClip[] cannonballHitSounds;
     [SerializeField] private ParticleSystem explosionPrefab;
 
-    protected bool wantsToShoot;
-    [SerializeField] private LeftCannonballScript leftCannonball;
-    [SerializeField] private RightCannonballScript rightCannonball;
+    [SerializeField] private CannonballScript leftCannonball;
+    [SerializeField] private CannonballScript rightCannonball;
     [SerializeField] private Transform[] leftCannons;
     [SerializeField] private Transform[] rightCannons;
     [SerializeField] private AudioSource soundSource;
@@ -36,11 +35,11 @@ public abstract class ShipController : MonoBehaviour
     private void Update()
     {
         ManageInput();
-        Balance();
         Movement();
         Steer();
-        SoundAndParticles();
         TryToShoot();
+        Balance();
+        SoundAndParticles();
     }
 
     protected abstract void ManageInput();
@@ -61,27 +60,25 @@ public abstract class ShipController : MonoBehaviour
         rb.AddTorque(transform.up * steerSpeed * horizontalInput * verticalInput);
     }
 
-    void SoundAndParticles()
+    private void SoundAndParticles()
     {
-        if (verticalInput > 0 && !GameManager.Instance.isInIsland)
+        if (verticalInput > 0)
         {
-            MovingWaves.Play();
-            //StillWaves.Stop();
             if (isStopped)
             {
                 isStopped = false;
                 StartCoroutine(StartFade(WavesSound, 0.5f, 0.15f));
+                MovingWaves.Play();
             }
 
         }
         else
         {
-            MovingWaves.Stop();
-            //StillWaves.Play();
             if (!isStopped)
             {
                 isStopped = true;
                 StartCoroutine(StartFade(WavesSound, 1.5f, 0f));
+                MovingWaves.Stop();
             }
         }
     }

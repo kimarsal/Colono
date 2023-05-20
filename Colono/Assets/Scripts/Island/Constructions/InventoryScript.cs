@@ -7,7 +7,6 @@ public class InventoryScript
     private const int materialCapacity = 50;
     private const int cropCapacity = 20;
     private const int meatCapacity = 20;
-    private const int maxLevel = 10;
     [JsonProperty] private InventoryCategory[] inventoryCategories = null;
 
     private void InitializeResources()
@@ -98,9 +97,9 @@ public class InventoryScript
         inventoryCategories[2].AddCapacity(-meatCapacity);
     }
 
-    public bool CanLevelUpCategory(int type)
+    public int GetCategoryLevel(int type)
     {
-        return inventoryCategories[type].capacity > 0 && inventoryCategories[type].level < maxLevel;
+        return inventoryCategories[type].level;
     }
 
     public void LevelUpInventoryCategory(int type)
