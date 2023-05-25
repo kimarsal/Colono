@@ -102,7 +102,8 @@ public class AnimalScript : MonoBehaviour
 
     private void CheckIfArrivedAtDestination()
     {
-        if (navMeshAgent.isActiveAndEnabled && !navMeshAgent.pathPending
+        if (navMeshAgent.isActiveAndEnabled
+            && navMeshAgent.isOnNavMesh && !navMeshAgent.pathPending
             && navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance
             && (!navMeshAgent.hasPath || navMeshAgent.velocity.sqrMagnitude == 0f))
         {

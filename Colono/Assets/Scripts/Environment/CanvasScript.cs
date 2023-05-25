@@ -38,6 +38,7 @@ public class CanvasScript : MonoBehaviour
 
     [Header("Others")]
     public Button dockButton;
+    [SerializeField] private NameIslandPopUpScript nameIslandPopUpScript;
     [SerializeField] private Transform inventoryChangeList;
     [SerializeField] private Animator compassAnimator;
     [SerializeField] private PopUpScript mapPopUp;
@@ -62,14 +63,19 @@ public class CanvasScript : MonoBehaviour
 
     public void PlayerIsNearIsland(IslandScript islandScript)
     {
-        //TODO: Change button text to include island name
-        dockButton.GetComponentInChildren<TextMeshProUGUI>().text = "Dock onto the island";
+        dockButton.GetComponentInChildren<TextMeshProUGUI>().text = "Dock onto " + (islandScript.islandName == null ? "unknown island" : islandScript.islandName);
         dockButtonAnimator.Play("ShowBottomButton");
     }
 
     public void PlayerIsFarFromIsland()
     {
         dockButtonAnimator.Play("HideBottomButton");
+    }
+
+    public void NameIsland()
+    {
+        nameIslandPopUpScript.gameObject.SetActive(true);
+        nameIslandPopUpScript.ShowPopUp();
     }
 
     public void Dock()

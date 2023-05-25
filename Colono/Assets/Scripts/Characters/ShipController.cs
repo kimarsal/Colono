@@ -14,6 +14,7 @@ public abstract class ShipController : MonoBehaviour
     protected float verticalInput;
     protected float horizontalInput;
     protected bool wantsToShoot;
+    public bool canShoot;
 
     private bool isStopped = true;
     [SerializeField] private ParticleSystem MovingWaves;
@@ -99,6 +100,7 @@ public abstract class ShipController : MonoBehaviour
     private void TryToShoot()
     {
         timeTillLastShot += Time.deltaTime;
+        if (!canShoot) return;
         if (wantsToShoot && timeTillLastShot > timeBetweenShots)
         {
             soundSource.PlayOneShot(cannonClip);

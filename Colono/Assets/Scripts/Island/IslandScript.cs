@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
@@ -11,10 +12,10 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
 {
     [JsonProperty] public string islandName;
     [JsonProperty] [JsonConverter(typeof(VectorConverter))] public Vector2 offset;
-    [JsonProperty] public bool hasBeenDiscovered;
     public MeshData meshData;
     public int[,] regionMap;
 
+    public TextMeshProUGUI islandNameText;
     public NavMeshSurface navMeshSurface;
     public Transform itemsTransform;
     public Transform constructionsTransform;

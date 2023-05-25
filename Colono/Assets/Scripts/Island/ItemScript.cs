@@ -60,9 +60,18 @@ public class ItemScript : TaskScript
         islandScript.AddResource(ResourceScript.ResourceType.Material, (int)materialType);
         if (materialAmount == 0)
         {
+            if(name.Substring(0, 4).ToLower().Equals("tree"))
+            {
+                islandScript.AddResource(ResourceScript.ResourceType.Material, (int)ResourceScript.MaterialType.Sprout);
+            }
             islandScript.RemoveItemToClear(this);
             islandScript.RemoveItemAtCell(cell);
             Destroy(gameObject);
         }
+    }
+
+    public override void CancelTask()
+    {
+        return;
     }
 }

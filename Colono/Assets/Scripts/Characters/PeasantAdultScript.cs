@@ -5,9 +5,6 @@ using UnityEngine;
 [JsonObject(MemberSerialization.OptIn)]
 public class PeasantAdultScript : PeasantScript
 {
-    public TaskScript task;
-    [JsonProperty] [JsonConverter(typeof(VectorConverter))] public Vector2 taskCell;
-
     [Header("Tools")]
     public GameObject axe;
     public GameObject shovel;
@@ -16,6 +13,8 @@ public class PeasantAdultScript : PeasantScript
 
     [JsonProperty] public int childrenAmount = 0;
 
+    public TaskScript task;
+    [JsonProperty] [JsonConverter(typeof(VectorConverter))] public Vector2 taskCell;
     public TaskSourceInterface taskSourceInterface
     {
         get
@@ -120,7 +119,7 @@ public class PeasantAdultScript : PeasantScript
     public void AssignTask(TaskScript taskScript)
     {
         task = taskScript;
-        if (task != null) task.AssignPeasant(this);
+        if (task != null) task.peasantAdultScript = this;
         UpdateTask();
     }
 
@@ -195,30 +194,6 @@ public class PeasantAdultScript : PeasantScript
                 }
             }
         }
-        //transform.LookAt(task.center);
-        //StartCoroutine(PointTowardsTaskCenter());
-    }
-
-    /*private IEnumerator PointTowardsTaskCenter()
-    {
-        do
-        {
-            Vector3 direction = (task.center - transform.position).normalized;
-            Quaternion lookRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * navMeshAgent.angularSpeed);
-            yield return new WaitForSeconds(0.1f);
-        }
-        while (Vector3.Angle(transform.forward, task.center - transform.position) > 10);
-    }*/
-
-    public void CancelTask()
-    {
-        if (task != null)
-        {
-            animator.SetTrigger("CancelTask");
-            task.CancelTask();
-            task = null;
-        }
     }
 
     private void TaskProgress()
@@ -228,6 +203,16 @@ public class PeasantAdultScript : PeasantScript
             task.TaskProgress();
             hunger += 0.05f;
             exhaustion += 0.05f;
+        }
+    }
+
+    public void CancelTask()
+    {
+        if (task != null)
+        {
+            animator.SetTrigger("CancelTask");
+            task.CancelTask();
+            task = null;
         }
     }
 

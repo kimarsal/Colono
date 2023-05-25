@@ -1,6 +1,5 @@
 using Newtonsoft.Json;
 using UnityEngine;
-using static PatchScript;
 
 public class PatchScript : TaskScript
 {
@@ -85,12 +84,14 @@ public class PatchScript : TaskScript
         isBeingTakenCareOf = false;
         timeSinceLastTakenCareOf = 0;
 
-        base.TaskProgress();
+        peasantAdultScript.task = null;
+        taskSourceScript.GetNextPendingTask(peasantAdultScript);
+        peasantAdultScript = null;
     }
 
     public override void CancelTask()
     {
-        base.CancelTask();
+        isBeingTakenCareOf = false;
         if (cropState == CropState.Barren)
         {
             ((GardenScript)taskSourceScript).islandScript.AddResource(ResourceScript.ResourceType.Crop, (int)cropType);

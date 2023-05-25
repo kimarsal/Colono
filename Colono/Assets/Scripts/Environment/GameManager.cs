@@ -197,6 +197,7 @@ public class GameManager : MonoBehaviour
         if (!isPlayerNearIsland)
         {
             isPlayerNearIsland = true;
+            ShipScript.Instance.GetComponent<PlayerController>().canShoot = false;
             CanvasScript.Instance.PlayerIsNearIsland(closestIsland);
         }
     }
@@ -205,6 +206,7 @@ public class GameManager : MonoBehaviour
     {
         if (isPlayerNearIsland)
         {
+            ShipScript.Instance.GetComponent<PlayerController>().canShoot = true;
             CanvasScript.Instance.PlayerIsFarFromIsland();
             isPlayerNearIsland = false;
         }
@@ -212,6 +214,12 @@ public class GameManager : MonoBehaviour
 
     public void Dock()
     {
+        if(closestIsland.islandName == null)
+        {
+            CanvasScript.Instance.NameIsland();
+            return;
+        }
+
         isInIsland = true;
         islandCellScript.islandScript = closestIsland;
         islandSelectionScript.enabled = true;

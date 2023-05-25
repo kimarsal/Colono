@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.AI;
 using static BuildingScript;
 using System.Collections;
+using TMPro;
 
 public class IslandGenerator : MonoBehaviour
 {
@@ -109,7 +110,7 @@ public class IslandGenerator : MonoBehaviour
         islandScript.npcsTransform.parent = island.transform;
         islandScript.npcsTransform.localPosition = Vector3.zero;
 
-        Instantiate(ResourceScript.Instance.islandMapIcon, island.transform);
+        islandScript.islandNameText = Instantiate(ResourceScript.Instance.islandMapIcon, island.transform).GetComponentInChildren<TextMeshProUGUI>();
         
         // Part 8: S'afegeixen els elements de joc
         if (islandInfo is null)
@@ -150,6 +151,7 @@ public class IslandGenerator : MonoBehaviour
         }
         else
         {
+            islandScript.islandNameText.text = islandScript.islandName = islandInfo.islandName;
             islandScript.inventoryScript = islandInfo.inventoryScript;
 
             foreach (KeyValuePair<Vector2, ItemScript> pair in islandInfo.itemDictionary)

@@ -218,8 +218,8 @@ public abstract class PeasantScript : MonoBehaviour
 
     protected void CheckIfArrivedAtDestination()
     {
-        if (!isInBuilding
-            && navMeshAgent.isActiveAndEnabled && !navMeshAgent.pathPending
+        if (!isInBuilding && navMeshAgent.isActiveAndEnabled
+            && navMeshAgent.isOnNavMesh && !navMeshAgent.pathPending
             && navMeshAgent.remainingDistance <= navMeshAgent.stoppingDistance
             && (!navMeshAgent.hasPath || navMeshAgent.velocity.sqrMagnitude == 0f))
         {
