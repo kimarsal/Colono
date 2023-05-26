@@ -24,8 +24,17 @@ public class TradeEditor : EditorScript
             {
                 if ((ResourceScript.ResourceType)i == ResourceScript.ResourceType.Material && (ResourceScript.MaterialType)j == ResourceScript.MaterialType.Gem) continue;
 
-                int amountInShip = shipInventory.GetResourceAmount((ResourceScript.ResourceType)i, j);
-                int amountInEnemyShip = enemyInventory.GetResourceAmount((ResourceScript.ResourceType)i, j);
+                int amountInShip, amountInEnemyShip;
+                if ((ResourceScript.ResourceType)i == ResourceScript.ResourceType.Animal)
+                {
+                    amountInShip = ShipScript.Instance.shipInteriorPen.animals[j];
+                    amountInEnemyShip = Random.Range(0, 4);
+                }
+                else
+                {
+                    amountInShip = shipInventory.GetResourceAmount((ResourceScript.ResourceType)i, j);
+                    amountInEnemyShip = enemyInventory.GetResourceAmount((ResourceScript.ResourceType)i, j);
+                }
 
                 if (amountInShip > 0)
                 {
@@ -47,11 +56,27 @@ public class TradeEditor : EditorScript
     {
         if(shipInventory.GetResourceAmount(offerButton.givenResourceType, offerButton.givenResourceIndex) >= offerButton.givenResourceAmount)
         {
-            shipInventory.RemoveResource(offerButton.givenResourceType, offerButton.givenResourceIndex, offerButton.givenResourceAmount);
-            enemyInventory.RemoveResource(offerButton.receivedResourceType, offerButton.receivedResourceIndex, offerButton.receivedResourceAmount);
+            if (offerButton.givenResourceType == ResourceScript.ResourceType.Animal)
+            {
+                ShipScript.Instance.shipInteriorPen.RemoveAnimal((ResourceScript.AnimalType)offerButton.givenResourceIndex);
+            }
+            else
+            {
+                shipInventory.RemoveResource(offerButton.givenResourceType, offerButton.givenResourceIndex, offerButton.givenResourceAmount);
+                enemyInventory.AddResource(offerButton.givenResourceType, offerButton.givenResourceIndex, offerButton.givenResourceAmount);
+            }
 
-            shipInventory.AddResource(offerButton.receivedResourceType, offerButton.receivedResourceIndex, offerButton.receivedResourceAmount);
-            enemyInventory.AddResource(offerButton.givenResourceType, offerButton.givenResourceIndex, offerButton.givenResourceAmount);
+            if(offerButton.receivedResourceType == ResourceScript.ResourceType.Animal)
+            {
+                AnimalScript animalScript = Instantiate(ResourceScript.Instance.GetAnimalPrefab((ResourceScript.AnimalType)offerButton.givenResourceIndex),
+                       ShipScript.Instance.shipInteriorPen.transform.position, Quaternion.identity, ShipScript.Instance.shipInteriorPen.animalTransform);
+                ShipScript.Instance.shipInteriorPen.AddAnimal(animalScript);
+            }
+            else
+            {
+                enemyInventory.RemoveResource(offerButton.receivedResourceType, offerButton.receivedResourceIndex, offerButton.receivedResourceAmount);
+                shipInventory.AddResource(offerButton.receivedResourceType, offerButton.receivedResourceIndex, offerButton.receivedResourceAmount);
+            }
 
             CanvasScript.Instance.InventoryChange(offerButton.givenResourceType, offerButton.givenResourceIndex, -offerButton.givenResourceAmount);
             CanvasScript.Instance.InventoryChange(offerButton.receivedResourceType, offerButton.receivedResourceIndex, offerButton.receivedResourceAmount);

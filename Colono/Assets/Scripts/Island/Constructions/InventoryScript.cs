@@ -4,9 +4,9 @@ using Newtonsoft.Json;
 [JsonObject(MemberSerialization.OptIn)]
 public class InventoryScript
 {
-    private const int materialCapacity = 50;
-    private const int cropCapacity = 20;
-    private const int meatCapacity = 20;
+    private const int materialCapacity = 100;
+    private const int cropCapacity = 50;
+    private const int meatCapacity = 50;
     [JsonProperty] private InventoryCategory[] inventoryCategories = null;
 
     private void InitializeResources()

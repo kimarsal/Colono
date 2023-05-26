@@ -75,9 +75,9 @@ public class ShipScript : ConstructionScript
         peasantsInside = shipInterior.peasantList.Count;
 
         int animalTypes = ResourceScript.GetEnumLength(ResourceType.Animal);
-        for (int i = 0; i < 2; i++)
+        for (int i = 0; i < animalTypes; i++)
         {
-            for(int j = 0; j < 10; j++)
+            for(int j = 0; j < 4; j++)
             {
                 AnimalScript animalScript = Instantiate(ResourceScript.Instance.GetAnimalPrefab((AnimalType)i),
                     shipInteriorPen.transform.position, Quaternion.identity, shipInteriorPen.animalTransform);
@@ -124,6 +124,12 @@ public class ShipScript : ConstructionScript
     {
         position = transform.position;
         orientation = (int)transform.rotation.eulerAngles.y % 360;
+
+        if(!GameManager.Instance.isInIsland && entry.position != transform.position)
+        {
+            Vector3 forceVector = transform.position - entry.position;
+            if(forceVector.magnitude < 5) GetComponent<Rigidbody>().AddForce(forceVector.normalized / forceVector.magnitude * 10);
+        }
     }
 
     public bool FindEntryPosition(float distanceToDock)
@@ -134,6 +140,7 @@ public class ShipScript : ConstructionScript
             entry.position = hit.position;
             return true;
         }
+        entry.position = transform.position;
         return false;
     }
 

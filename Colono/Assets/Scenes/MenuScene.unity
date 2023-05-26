@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.1775787, g: 0.22232205, b: 0.30451825, a: 1}
+  m_IndirectSpecularColor: {r: 0.17757899, g: 0.22232248, b: 0.30451906, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -4231,7 +4231,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &534564130
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4691,10 +4691,10 @@ RectTransform:
   m_Father: {fileID: 534564130}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 300, y: 100}
+  m_SizeDelta: {x: -200, y: -200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &621499304
 MonoBehaviour:
@@ -4716,11 +4716,17 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'You are tasked with exploring the uncharted waters
+  m_text: 'It is the Age of Discovery. As a high ranking captain, you are tasked
+    with exploring the uncharted waters. Make sure to conquer every piece of land
+    in the sea in the name of the king.
 
 
-    Press any key
-    to start...'
+    The ship and the crew are your most
+    valuable assets. Take care of them and you''ll rewarded with needful resources.
+
+
+    Press
+    any key to set sail...'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: bbc7df20dfecb74489d162159e899119, type: 2}
   m_sharedMaterial: {fileID: -1879514799324475243, guid: bbc7df20dfecb74489d162159e899119,
@@ -4748,10 +4754,10 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 50
+  m_fontSize: 47.3
   m_fontSizeBase: 50
   m_fontWeight: 400
-  m_enableAutoSizing: 0
+  m_enableAutoSizing: 1
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
@@ -8944,17 +8950,17 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   colorGradientTexture: {fileID: 0}
   shallowColor: {r: 0, g: 0.7725491, b: 0.62352943, a: 0.5019608}
-  deepColor: {r: 0.01176471, g: 0.28593415, b: 0.50980073, a: 1}
+  deepColor: {r: 0.01176471, g: 0.28593412, b: 0.50980073, a: 1}
   colorDepth: 0.84
-  horizonColor: {r: 0, g: 0.22711065, b: 0.8, a: 1}
+  horizonColor: {r: 0, g: 0.22711062, b: 0.8, a: 1}
   horizonDistance: 20
   shoreFade: 1
-  shoreColor: {r: 0, g: 0.98039216, b: 0.30162045, a: 0}
+  shoreColor: {r: 0, g: 0.98039216, b: 0.30162042, a: 0}
   shoreStrength: 0
   shoreBlend: 1
   shoreDepth: 0.74
   waveColor: {r: 0, g: 0, b: 0, a: 0}
-  underwaterColor: {r: 0.20359898, g: 0.30946353, b: 0.517647, a: 0}
+  underwaterColor: {r: 0.20359895, g: 0.3094635, b: 0.517647, a: 0}
   underwaterColorStrength: 0
   underwaterRefractionStrength: 0.099
   surfaceFoamTexture: {fileID: 2800000, guid: d3b0d77dfe711a04c8ff18ecc260aa66, type: 3}

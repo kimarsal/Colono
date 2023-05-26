@@ -46,8 +46,8 @@ public abstract class PeasantScript : MonoBehaviour
     [JsonProperty] public bool isInConstruction;
     protected bool isDying;
     private float ageSpeed = 0.1f;
-    private float hungerSpeed = 0.01f;
-    private float exhaustionSpeed = 0.01f;
+    private float hungerSpeed = 0.005f;
+    private float exhaustionSpeed = 0.005f;
 
     [Header("Scripts")]
     public IslandScript islandScript;
