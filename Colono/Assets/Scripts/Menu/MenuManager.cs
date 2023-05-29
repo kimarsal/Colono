@@ -37,8 +37,7 @@ public class MenuManager : MonoBehaviour
     {
         serializerSettings = new JsonSerializerSettings
         {
-            TypeNameHandling = TypeNameHandling.Auto/*,
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore*/
+            TypeNameHandling = TypeNameHandling.Auto
         };
 
         titleScreen.gameObject.SetActive(true);

@@ -775,7 +775,7 @@ Transform:
   m_GameObject: {fileID: 4988031085164999163}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 3657501405692181471}
@@ -840,13 +840,14 @@ MonoBehaviour:
   animalType: 3
   position: {x: 0, y: 0, z: 0}
   orientation: 0
+  age: 0
+  confortLevel: 0
+  isInPlaceForPairing: 0
   penScript: {fileID: 0}
   walkSpeed: 1
   meatAmount: 6
   ageSpeed: 0.005
-  age: 0
-  confortLevel: 0
-  isInPlaceForPairing: 0
+  confortSpeed: 0.05
 --- !u!1 &5102079722779066344
 GameObject:
   m_ObjectHideFlags: 0

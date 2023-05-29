@@ -320,7 +320,8 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
     {
         if (adding) // Enviar a la construcció
         {
-            PeasantScript peasantScript = GetClosestPeasant(constructionScript.entry.position, constructionScript.constructionType != ConstructionScript.ConstructionType.Ship);
+            PeasantScript peasantScript = GetClosestPeasant(constructionScript.entry.position,
+                constructionScript.constructionType != ConstructionScript.ConstructionType.Ship);
 
             if (peasantScript != null)
             {

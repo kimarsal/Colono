@@ -63,7 +63,7 @@ public class CanvasScript : MonoBehaviour
 
     public void PlayerIsNearIsland(IslandScript islandScript)
     {
-        dockButton.GetComponentInChildren<TextMeshProUGUI>().text = "Dock onto " + (islandScript.islandName == null ? "unknown island" : islandScript.islandName);
+        dockButton.GetComponentInChildren<TextMeshProUGUI>().text = "Dock onto\n" + (islandScript.islandName == null ? "unknown island" : islandScript.islandName);
         dockButtonAnimator.Play("ShowBottomButton");
     }
 

@@ -34,7 +34,6 @@ public abstract class ConstructionScript : MonoBehaviour
     {
         peasantScript.constructionScript = this;
         peasantList.Add(peasantScript);
-        UpdateConstructionDetails();
     }
 
     public virtual PeasantScript RemovePeasant()

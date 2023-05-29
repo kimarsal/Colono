@@ -70,7 +70,7 @@ public abstract class EnclosureScript : ConstructionScript, TaskSourceInterface
     public override PeasantScript RemovePeasant()
     {
         PeasantAdultScript peasantScript = (PeasantAdultScript)peasantList[0];
-        for(int i = 0; i < peasantList.Count; i++)
+        for(int i = 1; i < peasantList.Count; i++)
         {
             PeasantAdultScript peasantAdultScript = (PeasantAdultScript)peasantList[i];
             if(peasantAdultScript.task == null)
@@ -90,7 +90,6 @@ public abstract class EnclosureScript : ConstructionScript, TaskSourceInterface
         if (other.gameObject.CompareTag("NPC"))
         {
             peasantsInside++;
-            Debug.Log("Peasant " + islandScript.peasantList.IndexOf(other.gameObject.GetComponent<PeasantScript>()) + " has arrived to enclosure. Number of peasants inside: " + peasantsInside);
             UpdateConstructionDetails();
         }
     }
@@ -100,7 +99,6 @@ public abstract class EnclosureScript : ConstructionScript, TaskSourceInterface
         if (other.gameObject.CompareTag("NPC"))
         {
             peasantsInside--;
-            Debug.Log("Peasant " + islandScript.peasantList.IndexOf(other.gameObject.GetComponent<PeasantScript>()) + " has exited enclosure. Number of peasants inside: " + peasantsInside);
             UpdateConstructionDetails();
         }
     }

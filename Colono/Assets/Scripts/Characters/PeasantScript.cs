@@ -268,4 +268,24 @@ public abstract class PeasantScript : MonoBehaviour
     public abstract void UpdateTask();
 
     protected abstract void ArrivedAtDestination();
+
+    public void UnlinkFromTavernAndCabin()
+    {
+        if (tavern != null)
+        {
+            if (isInBuilding)
+            {
+                tavern.peasantsInside--;
+            }
+            tavern.peasantList.Remove(this);
+        }
+        if (cabin != null)
+        {
+            if (tavern == null && isInBuilding)
+            {
+                cabin.peasantsInside--;
+            }
+            cabin.peasantList.Remove(this);
+        }
+    }
 }

@@ -158,6 +158,8 @@ public class ShipScript : ConstructionScript
             shipInterior.peasantList.RemoveAt(0);
             peasantsInside--;
 
+            peasantScript.UnlinkFromTavernAndCabin();
+
             peasantScript.transform.parent = islandScript.npcsTransform;
             peasantScript.navMeshAgent.Warp(entry.position);
             peasantScript.islandScript = islandScript;

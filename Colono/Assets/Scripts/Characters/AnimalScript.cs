@@ -30,14 +30,14 @@ public class AnimalScript : MonoBehaviour
 
     private void Start()
     {
-        if (animalType == ResourceScript.AnimalType.Chicken)
+        /*if (animalType == ResourceScript.AnimalType.Chicken)
         {
             transform.localScale = Vector3.one * 0.1f;
         }
         else if (animalType == ResourceScript.AnimalType.Chick)
         {
             transform.localScale = Vector3.one * 0.05f;
-        }
+        }*/
 
         navMeshAgent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();

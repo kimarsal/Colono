@@ -3,7 +3,7 @@ using UnityEngine;
 
 public abstract class BuildingScript : ConstructionScript
 {
-    public enum BuildingType { Warehouse, Cabin, Tavern, Mine, Alchemist};
+    public enum BuildingType { Warehouse, Cabin, Tavern, Mine};
     [JsonProperty] public BuildingType buildingType;
     [JsonProperty] [JsonConverter(typeof(VectorConverter))] public Vector3 position;
     [JsonProperty] public int orientation;

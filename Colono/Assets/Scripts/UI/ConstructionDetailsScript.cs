@@ -16,7 +16,6 @@ public class ConstructionDetailsScript : MonoBehaviour
     [SerializeField] private Button removePeasantButton;
     [SerializeField] private Button addPeasantButton;
 
-    public Button editConstructionButton;
     public Button removeConstructionButton;
 
     public ConstructionScript constructionScript;
@@ -102,19 +101,16 @@ public class ConstructionDetailsScript : MonoBehaviour
 
         if(state == ConstructionDetailsState.Editor)
         {
-            editorScript?.gameObject.SetActive(false);
+            editorScript.gameObject.SetActive(false);
             editorScript = constructionScript.editorScript;
-            if(editorScript != null)
-            {
-                editorScript.gameObject.SetActive(true);
-                editorScript.SetEditor(constructionScript);
-            }
+            editorScript.gameObject.SetActive(true);
+            editorScript.SetEditor(constructionScript);
         }
 
         title.text = constructionScript.title;
         image.sprite = constructionScript.sprite;
-        bool canSwitchBetweenConstructions = constructionScript.islandScript.constructionList.Count > 0;
-        previousConstructionButton.interactable = nextConstructionButton.interactable = canSwitchBetweenConstructions;
+        previousConstructionButton.interactable = nextConstructionButton.interactable =
+            constructionScript.islandScript.constructionList.Count > 0;
 
         if (constructionScript.canManagePeasants)
         {
@@ -129,7 +125,6 @@ public class ConstructionDetailsScript : MonoBehaviour
         UpdatePeasantNum();
 
         removeConstructionButton.enabled = constructionScript.canBeRemoved;
-        editConstructionButton.enabled = constructionScript.editorScript != null;
     }
 
     public void SwitchConstruction(bool next)

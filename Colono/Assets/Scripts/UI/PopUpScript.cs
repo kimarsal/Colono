@@ -4,7 +4,7 @@ public class PopUpScript : MonoBehaviour
 {
     private Animator animator;
 
-    public void ShowPopUp()
+    public virtual void ShowPopUp()
     {
         animator = GetComponent<Animator>();
         animator.Play("ShowPopUp");

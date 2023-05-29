@@ -321,7 +321,7 @@ public class GameManager : MonoBehaviour
 
     public void QuitGame()
     {
-        SceneManager.LoadScene("MainMenu");
+        SceneManager.LoadScene("MenuScene");
     }
 
     public void LoadGame()

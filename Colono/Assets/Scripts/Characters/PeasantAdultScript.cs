@@ -220,22 +220,7 @@ public class PeasantAdultScript : PeasantScript
     {
         isDying = true;
         peasantRowScript?.PeasantDies();
-        if (tavern != null)
-        {
-            if (isInBuilding)
-            {
-                tavern.peasantsInside--;
-            }
-            tavern.peasantList.Remove(this);
-        }
-        if (cabin != null)
-        {
-            if (tavern == null && isInBuilding)
-            {
-                cabin.peasantsInside--;
-            }
-            cabin.peasantList.Remove(this);
-        }
+        UnlinkFromTavernAndCabin();
         if (constructionScript != null) constructionScript.peasantList.Remove(this);
         islandScript.peasantList.Remove(this);
 
