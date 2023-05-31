@@ -55,6 +55,7 @@ public class PatchScript : TaskScript
         if(cropState < CropState.Barren)
         {
             crop = Instantiate(ResourceScript.Instance.GetCropPrefab(cropType, cropState), center, Quaternion.Euler(0, orientation, 0), transform);
+            crop.transform.localScale = Vector3.one * 0.4f;
         }
         timeSinceLastStateChange = 0;
     }

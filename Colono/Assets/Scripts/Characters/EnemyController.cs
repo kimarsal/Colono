@@ -26,15 +26,15 @@ public class EnemyController : ShipController
 
     public void Initialize(EnemyController enemyInfo = null)
     {
-        health = new int[4];
-        if(enemyInfo == null)
+        if(enemyInfo is null)
         {
             for (int i = 0; i < health.Length; i++)
             {
                 health[i] = 2;
             }
 
-            HideFromMap();
+            enemyStatus = Random.Range(0, 2) == 0 ? EnemyStatus.Trading : EnemyStatus.Attacking;
+            GetComponent<EnemyShipScript>().Initialize();
         }
         else
         {
@@ -48,7 +48,7 @@ public class EnemyController : ShipController
 
     protected override void ManageInput()
     {
-        if(enemyStatus == EnemyStatus.Trading || enemyStatus == EnemyStatus.StandBy)
+        if(enemyStatus == EnemyStatus.Trading || enemyStatus == EnemyStatus.StandBy || GameManager.Instance.isGameOver)
         {
             verticalInput = 0;
             horizontalInput = 0;
@@ -66,12 +66,12 @@ public class EnemyController : ShipController
         isInFront = angleDiff > 0;
         isToTheRight = Mathf.Abs(angleDiff) > 90;
         //Debug.Log("Player is " + (isInFront ? "in front" : "behind") + " and to the " + (isToTheRight ? "right" : "left"));
+        wantsToShoot = false;
 
         if(enemyStatus == EnemyStatus.Fleeing)
         {
             verticalInput = 1;
             horizontalInput = isToTheRight ? -1 : 1;
-            wantsToShoot = false;
             return;
         }
 
@@ -82,7 +82,6 @@ public class EnemyController : ShipController
         {
             verticalInput = 1;
             horizontalInput = isToTheRight ? 1 : -1;
-            wantsToShoot = false;
         }
         else
         {
@@ -107,7 +106,7 @@ public class EnemyController : ShipController
         }
     }
 
-    private IEnumerator SinkCoroutine()
+    protected override IEnumerator SinkCoroutine()
     {
         yield return new WaitForSeconds(1);
         Instantiate(ResourceScript.Instance.box, transform.position, Quaternion.identity, transform.parent).inventoryScript = GetComponent<EnemyShipScript>().inventoryScript;
@@ -117,8 +116,8 @@ public class EnemyController : ShipController
 
     protected override void Sink()
     {
-        base.Sink();
         rb.constraints = RigidbodyConstraints.FreezeRotation;
+        base.Sink();
         StartCoroutine(SinkCoroutine());
     }
 

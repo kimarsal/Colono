@@ -31,7 +31,7 @@ public class PeasantAdultScript : PeasantScript
     {
         base.InitializePeasant(peasantInfo);
 
-        if(peasantInfo != null)
+        if(peasantInfo is not null)
         {
             PeasantAdultScript peasantAdultInfo = (PeasantAdultScript)peasantInfo;
 

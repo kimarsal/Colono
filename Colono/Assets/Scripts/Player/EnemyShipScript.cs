@@ -1,12 +1,13 @@
+using Newtonsoft.Json;
 using UnityEngine;
 using static ResourceScript;
 
-[System.Serializable]
+[JsonObject(MemberSerialization.OptIn)]
 public class EnemyShipScript : MonoBehaviour
 {
-    public Vector3 position;
-    public int orientation;
-    public InventoryScript inventoryScript;
+    [JsonProperty] [JsonConverter(typeof(VectorConverter))] private Vector3 position;
+    [JsonProperty] private int orientation;
+    [JsonProperty] public InventoryScript inventoryScript;
 
     private void Start()
     {
@@ -15,7 +16,7 @@ public class EnemyShipScript : MonoBehaviour
 
     public void Initialize(EnemyShipScript enemyShipInfo = null)
     {
-        if (enemyShipInfo == null)
+        if (enemyShipInfo is null)
         {
             RandomizeInventory();
         }

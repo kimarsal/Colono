@@ -46,6 +46,7 @@ public class CanvasScript : MonoBehaviour
     [SerializeField] private NewCropPopUpScript newCropPopUpScript;
     [SerializeField] private AudioSource soundSource;
     [SerializeField] private AudioClip pageFlipClip;
+    [SerializeField] private GameObject gameOverScreen;
 
     private bool canPlayerTrade = false;
     private bool canPlayerFish = false;
@@ -342,6 +343,8 @@ public class CanvasScript : MonoBehaviour
 
     public void Trade()
     {
+        if (tradeEditor.gameObject.activeSelf) return;
+
         tradeEditor.gameObject.SetActive(true);
         tradeEditor.SetEditor(null);
         soundSource.PlayOneShot(pageFlipClip);
@@ -349,12 +352,16 @@ public class CanvasScript : MonoBehaviour
 
     public void OpenMap()
     {
+        if (mapPopUp.gameObject.activeSelf || GameManager.Instance.isGameOver) return;
+
         mapPopUp.gameObject.SetActive(true);
         mapPopUp.ShowPopUp();
     }
 
     public void TogglePauseMenu()
     {
+        if (GameManager.Instance.isGameOver) return;
+
         if (pauseMenu.gameObject.activeSelf)
         {
             pauseMenu.HidePopUp();
@@ -365,5 +372,10 @@ public class CanvasScript : MonoBehaviour
             pauseMenu.ShowPopUp();
         }
         soundSource.PlayOneShot(pageFlipClip);
+    }
+
+    public void GameOver()
+    {
+        gameOverScreen.SetActive(true);
     }
 }

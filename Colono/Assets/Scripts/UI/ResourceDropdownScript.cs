@@ -34,10 +34,16 @@ public class ResourceDropdownScript : MonoBehaviour
         if (resourceType != ResourceType.Crop) return;
 
         int i = -1;
+        if (includeEmptyOption) i--;
         foreach(Transform item in transform.GetChild(transform.childCount - 1).GetChild(0).GetChild(0))
         {
-            if (i != -1) item.gameObject.SetActive(GameManager.Instance.discoveredCrops[i]);
+            if (i >= 0)
+            {
+                item.gameObject.SetActive(GameManager.Instance.discoveredCrops[i + (displayIntroducedCrops ? 0 : 5)]);
+            }
             i++;
         }
+
+        //dropdown.interactable = shouldBeInteractable;
     }
 }

@@ -1,7 +1,9 @@
+using System.Collections;
 using UnityEngine;
 
 public class PlayerController : ShipController
 {
+
 	//Distància màxima amb les vores
 	private float xLeftMargin = 20f;
 	private float xRightMargin = 20f;
@@ -9,10 +11,10 @@ public class PlayerController : ShipController
 	private float zUpperMargin = 20f;
 
 	//Marges de la zona de joc
-	public float xLeftBounds;
 	public float xRightBounds;
 	public float zLowerBounds;
 	public float zUpperBounds;
+	public float xLeftBounds;
 
 	private void Start()
     {
@@ -32,7 +34,7 @@ public class PlayerController : ShipController
 	public void Initialize(PlayerController playerInfo)
 	{
         health = new int[4];
-		if(playerInfo == null)
+		if(playerInfo is null)
 		{
             for (int i = 0; i < health.Length; i++)
             {
@@ -91,10 +93,19 @@ public class PlayerController : ShipController
 
     protected override void Sink()
     {
+		CameraScript.Instance.canMove = false;
+		GameManager.Instance.isGameOver = true;
+		rb.constraints = RigidbodyConstraints.FreezeRotation;
         base.Sink();
-		rb.constraints = RigidbodyConstraints.FreezeAll;
-		GameManager.Instance.GameOver();
+		StartCoroutine(SinkCoroutine());
     }
+
+	protected override IEnumerator SinkCoroutine()
+	{
+		yield return new WaitForSeconds(2);
+		GameManager.Instance.GameOver();
+		rb.constraints = RigidbodyConstraints.FreezeAll;
+	}
 
 	public bool Repair(int position)
 	{

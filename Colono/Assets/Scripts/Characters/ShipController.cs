@@ -5,7 +5,7 @@ using UnityEngine;
 [JsonObject(MemberSerialization.OptIn)]
 public abstract class ShipController : MonoBehaviour
 {
-    [JsonProperty] protected int[] health;
+    [JsonProperty] protected int[] health = new int[4];
     protected const int maxHealth = 3;
     public float speed = 1.0f;
     public float steerSpeed = 5.0f;
@@ -177,4 +177,6 @@ public abstract class ShipController : MonoBehaviour
     {
         rb.useGravity = true;
     }
+
+    protected abstract IEnumerator SinkCoroutine();
 }

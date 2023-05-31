@@ -41,12 +41,12 @@ public class ShipScript : ConstructionScript
 
         for (int i = 0; i < GetEnumLength(ResourceType.Crop) / 2; i++)
         {
-            shipInterior.inventoryScript.AddResource(ResourceType.Crop, i, 1);
+            shipInterior.inventoryScript.AddResource(ResourceType.Crop, i, 20);
         }
 
         for (int i = 0; i < GetEnumLength(ResourceType.Meat); i++)
         {
-            shipInterior.inventoryScript.AddResource(ResourceType.Meat, i, 10);
+            shipInterior.inventoryScript.AddResource(ResourceType.Meat, i, 20);
         }
 
         shipInterior.inventoryScript.AddResource(ResourceType.Material, (int)MaterialType.Wood, 30);
@@ -88,7 +88,7 @@ public class ShipScript : ConstructionScript
 
     public void InitializeShip(ShipScript shipInfo)
     {
-        if(shipInfo == null)
+        if(shipInfo is null)
         {
             AddDefaultElements();
             return;
@@ -122,10 +122,12 @@ public class ShipScript : ConstructionScript
 
     void Update()
     {
+        if (GameManager.Instance.isInIsland) return;
+
         position = transform.position;
         orientation = (int)transform.rotation.eulerAngles.y % 360;
-
-        if(!GameManager.Instance.isInIsland && entry.position != transform.position)
+        
+        if(entry.position != transform.position)
         {
             Vector3 forceVector = transform.position - entry.position;
             if(forceVector.magnitude < 5) GetComponent<Rigidbody>().AddForce(forceVector.normalized / forceVector.magnitude * 10);

@@ -12,6 +12,8 @@ public class GameManager : MonoBehaviour
     public static string gameName;
     public float timePlayed;
     public static int seed;
+    public bool isGameOver;
+
     public static GameManager Instance { get; private set; }
     public Transform islandsTransform;
     public List<IslandScript> islandList = new List<IslandScript>();
@@ -51,9 +53,8 @@ public class GameManager : MonoBehaviour
 
         islandGenerator = GetComponent<IslandGenerator>();
 
-        /*if(MenuManager.loadGame) LoadGame();
-        else StartGame();*/
-        StartGame();
+        if(MenuManager.loadGame) LoadGame();
+        else StartGame();
 
         inventoryEditor.shipInventoryScript = ShipScript.Instance.shipInterior.inventoryScript;
     }
@@ -114,7 +115,8 @@ public class GameManager : MonoBehaviour
             {
                 if (minDistance > distanceForEnemyToAppear)
                 {
-                    EnemyController.Instance.transform.position = enemyShipPosition;
+                    EnemyController.Instance.transform.position = new Vector3(enemyShipPosition.x, -0.7f, enemyShipPosition.z);
+                    EnemyController.Instance.transform.rotation = Quaternion.Euler(0, UnityEngine.Random.Range(0, 360), 0);
                     EnemyController.Instance.Initialize();
                 }
             }
@@ -162,7 +164,8 @@ public class GameManager : MonoBehaviour
         {
             islandGenerator.GenerateIsland(new Vector2(nextIslandPosition.x, nextIslandPosition.z));
         }
-        else if(minDistanceToIsland > distanceToDoSeaStuff && distanceToEnemyShip > distanceToCheckIfCanInteract)
+        
+        if(minDistanceToIsland > distanceToDoSeaStuff)
         {
             CanvasScript.Instance.CanFish();
         }
@@ -313,6 +316,9 @@ public class GameManager : MonoBehaviour
         gameInfo.timePlayed = timePlayed;
         gameInfo.seed = seed;
         gameInfo.shipScript = ShipScript.Instance;
+        gameInfo.playerController = ShipScript.Instance.GetComponent<PlayerController>();
+        gameInfo.enemyController = EnemyController.Instance;
+        gameInfo.enemyShipScript = EnemyController.Instance.GetComponent<EnemyShipScript>();
         gameInfo.islandList = islandList;
 
         string json = JsonConvert.SerializeObject(gameInfo, Formatting.Indented, MenuManager.serializerSettings);
@@ -361,10 +367,7 @@ public class GameManager : MonoBehaviour
             discoveredCrops[i] = true;
         }
 
-        islandGenerator.GenerateIsland(new Vector2(0, 40));
-
-        EnemyController.Instance.Initialize();
-        EnemyController.Instance.GetComponent<EnemyShipScript>().Initialize();
+        islandGenerator.GenerateIsland(new Vector2(0, 100));
 
         ShipScript.Instance.InitializeShip(null);
         ShipScript.Instance.GetComponent<PlayerController>().Initialize(null);
@@ -372,7 +375,8 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     {
-        CameraScript.Instance.canMove = false;
+        isGameOver = true;
+        CanvasScript.Instance.GameOver();
     }
 
     public static object ConvertStringToVector(string sValue)
