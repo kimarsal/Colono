@@ -199,15 +199,18 @@ public class ShipScript : ConstructionScript
     {
         for(int i = 0; i < Enum.GetValues(typeof(MaterialType)).Length; i++)
         {
-            shipInterior.inventoryScript.AddResource(ResourceType.Material, i, boxInventoryScript.GetResourceAmount(ResourceType.Material, i));
+            int amount = shipInterior.inventoryScript.AddResource(ResourceType.Material, i, boxInventoryScript.GetResourceAmount(ResourceType.Material, i));
+            if(amount > 0) CanvasScript.Instance.InventoryChange(ResourceType.Material, i, amount);
         }
         for (int i = 0; i < Enum.GetValues(typeof(CropType)).Length; i++)
         {
-            shipInterior.inventoryScript.AddResource(ResourceType.Crop, i, boxInventoryScript.GetResourceAmount(ResourceType.Crop, i));
+            int amount = shipInterior.inventoryScript.AddResource(ResourceType.Crop, i, boxInventoryScript.GetResourceAmount(ResourceType.Crop, i));
+            if (amount > 0) CanvasScript.Instance.InventoryChange(ResourceType.Crop, i, amount);
         }
         for (int i = 0; i < Enum.GetValues(typeof(MeatType)).Length; i++)
         {
-            shipInterior.inventoryScript.AddResource(ResourceType.Meat, i, boxInventoryScript.GetResourceAmount(ResourceType.Meat, i));
+            int amount = shipInterior.inventoryScript.AddResource(ResourceType.Meat, i, boxInventoryScript.GetResourceAmount(ResourceType.Meat, i));
+            if (amount > 0) CanvasScript.Instance.InventoryChange(ResourceType.Meat, i, amount);
         }
     }
 

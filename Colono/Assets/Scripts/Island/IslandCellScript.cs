@@ -200,8 +200,6 @@ public class IslandCellScript : MonoBehaviour, IPointerDownHandler, IPointerUpHa
 
         if (selectMode == SelectMode.None)
         {
-            if (!GameManager.Instance.isInIsland) enabled = false; //S'ha activat la classe sola
-
             if (islandGenerator.regions[islandScript.regionMap[x, y]].type == Terrain.TerrainType.Field
                 || islandGenerator.regions[islandScript.regionMap[x, y]].type == Terrain.TerrainType.Hill) //Si la cel·la és gespa
             {

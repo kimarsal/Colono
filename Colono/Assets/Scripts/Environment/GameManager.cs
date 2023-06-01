@@ -254,6 +254,8 @@ public class GameManager : MonoBehaviour
 
     public void TopButtonClick(TopButtonScript topButtonScript)
     {
+        if (!isInIsland) return;
+
         CanvasScript.Instance.ChooseTopButton();
         islandSelectionScript.enabled = false;
         islandCellScript.enabled = true;
