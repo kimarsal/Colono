@@ -190,7 +190,7 @@ public class PeasantAdultScript : PeasantScript
                 {
                     case PatchScript.CropState.Barren: animator.SetInteger("State", (int)PeasantAction.Planting); break;
                     case PatchScript.CropState.Planted: case PatchScript.CropState.Grown: animator.SetInteger("State", (int)PeasantAction.Watering); break;
-                    case PatchScript.CropState.Blossomed: animator.SetInteger("Pick", 1); animator.SetInteger("State", (int)PeasantAction.Gathering); break;
+                    case PatchScript.CropState.Blossomed: animator.SetInteger("Pick", 0); animator.SetInteger("State", (int)PeasantAction.Gathering); break;
                 }
             }
         }
@@ -201,8 +201,8 @@ public class PeasantAdultScript : PeasantScript
         if(task != null)
         {
             task.TaskProgress();
-            hunger += 0.05f;
-            exhaustion += 0.05f;
+            hunger += 0.01f;
+            exhaustion += 0.01f;
         }
     }
 

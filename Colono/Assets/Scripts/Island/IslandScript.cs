@@ -198,11 +198,12 @@ public class IslandScript : MonoBehaviour, TaskSourceInterface
         {
             if (!GameManager.Instance.CheckIfCropIsNew(resourceIndex))
             {
-                foreach (GardenScript gardenScript in constructionList)
+                foreach (ConstructionScript constructionScript in constructionList)
                 {
-                    if (gardenScript == null) continue;
+                    if (constructionScript.constructionType != ConstructionScript.ConstructionType.Enclosure
+                        || ((EnclosureScript)constructionScript).enclosureType != EnclosureScript.EnclosureType.Garden) continue;
 
-                    remainingAmount = gardenScript.UseNewCrops((ResourceScript.CropType)resourceIndex, remainingAmount);
+                    remainingAmount = ((GardenScript)constructionScript).UseNewCrops((ResourceScript.CropType)resourceIndex, remainingAmount);
 
                     if (remainingAmount == 0) break;
                 }

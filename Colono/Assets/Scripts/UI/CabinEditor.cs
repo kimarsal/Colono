@@ -73,6 +73,7 @@ public class CabinEditor : EditorScript
 
     public void RemoveRow(PeasantRowScript peasantRowScript, bool inConstruction)
     {
+        if (peasantRows == null) return;
         peasantRows[inConstruction ? 0 : 1].Remove(peasantRowScript);
         Destroy(peasantRowScript.gameObject);
     }

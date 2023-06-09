@@ -97,12 +97,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74aa8528bf1ad0344926f14bc722022e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  center: {x: 0, y: 0, z: 0}
   taskType: 0
+  center: {x: 0, y: 0, z: 0}
+  cell: {x: 0, y: 0}
   peasantAdultScript: {fileID: 0}
   isBeingTakenCareOf: 0
   actionType: 2
-  itemCell: {x: 0, y: 0}
   orientation: 0
   materialType: 0
   materialAmount: 1
@@ -120,7 +120,7 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 0
-  m_Extents: {x: 0.77300006, y: 0.64900005, z: 0.77300006}
+  m_Extents: {x: 0.5, y: 0.64900005, z: 0.5}
   m_MoveThreshold: 0.1
   m_Carve: 0
   m_CarveOnlyStationary: 1
